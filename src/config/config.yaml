@@ -1,0 +1,30 @@
+embedding_model: nomic-embed-text
+ollama_host: https://127.0.0.1:11434/
+query_model: qwen3:0.6b
+query_system_prompt: "You are given a history of messages between a user and an AI\
+  \ agent.\nYour task is to generate search queries to retrieve documents that may\
+  \ help answer the user's question. Previously, you made the following queries:\n\
+  \    \n<previous_queries/>\n{queries}\n</previous_queries>\n\nSystem time: {system_time}\n"
+response_model: qwen3:0.6b
+response_system_prompt: 'You are a helpful AI assistant. Provide answers to questions
+  by using fact based and statistical information when possible.
+
+  Use the following pieces of information to provide a concise answer to the question
+  enclosed in <question> tags.
+
+  If you don''t know the answer, just say that you don''t know, don''t try to make
+  up an answer.
+
+  <context>
+
+  {context}
+
+  </context>
+
+
+  The response should be specific and use statistics or numbers when possible.
+
+
+  System time: {system_time}
+
+  '

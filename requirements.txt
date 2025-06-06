@@ -1,0 +1,22 @@
+# Core dependencies
+langchain
+langchain-ollama
+langchain-huggingface
+langchain-experimental
+langchain-community
+langgraph
+
+# Vector store dependencies	
+faiss-cpu
+
+# YAML config
+pyyaml
+
+# Parser dependencies
+marker-pdf
+markdown
+unstructured
+pyvips
+
+# UI
+pyside6
