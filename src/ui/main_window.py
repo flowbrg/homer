@@ -15,7 +15,6 @@ class MainWindow(QMainWindow):
 
         # Backend logic
         self.backend = backend
-        self.database_wrapper = self.backend.get_database_wrapper()
 
         # Define buttons
         self.delete_chat_action = QAction(QIcon("./src/resources/icons/minus.png"),"Delete",self)
@@ -35,7 +34,7 @@ class MainWindow(QMainWindow):
         self.main_layout = QHBoxLayout(central_widget)
 
         # Main widget
-        self.chat_widget = ChatWidget(backend=self.backend, database_wrapper=self.database_wrapper)
+        self.chat_widget = ChatWidget(backend=self.backend)
         self.main_layout.addWidget(self.chat_widget)
 
         # Connect signal to enable/disable delete buttons

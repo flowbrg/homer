@@ -1,3 +1,6 @@
+#DEPRECATED
+
+
 import sqlite3
 import os
 
@@ -13,6 +16,7 @@ class DatabaseWrapper:
         self.db_path = Path(os.getenv("DB_PATH"))
         self.conn = get_connection()
         self._initialize_database()
+
     def _database_has_required_tables(self,conn: sqlite3.Connection) -> bool:
         """Check if all required tables exist in the database."""
         cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -40,34 +44,23 @@ class DatabaseWrapper:
                 conn.executescript(DB_SCHEMA)
             print("Base de données initialisée avec succès.")
 
-    def get_all_chats(self):
-        with get_connection() as conn:
-            cursor = conn.execute("SELECT chat_id, chat_name FROM chats ORDER BY chat_id DESC")
-            return cursor.fetchall()
+import uuid
 
-    def get_messages_for_chat(self,chat_id: int):
-        with get_connection() as conn:
-            cursor = conn.execute("""
-                SELECT message_type, message FROM messages
-                WHERE chat_id = ? ORDER BY timestamp ASC
-            """, (chat_id,))
-            return cursor.fetchall()
+def get_all_threads() -> list[dict]:
+    """Retrieve all threads from the database."""
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT thread_id, thread_name FROM threads")
+        return [(row[0], row[1]) for row in cursor.fetchall()]
 
-    def create_chat(self,chat_name: str) -> int:
-        with get_connection() as conn:
-            cursor = conn.execute("INSERT INTO chats (chat_name) VALUES (?)", (chat_name,))
-            if cursor.lastrowid is None:
-                raise RuntimeError("Failed to retrieve lastrowid after inserting chat.")
-            return cursor.lastrowid
+def add_thread():
+    with get_connection() as conn:
+        thread_id = uuid.uuid4()
+        conn.execute(
+            "INSERT INTO threads (thread_id) VALUES (?)", (thread_id)
+        )
 
-    def add_message(self,chat_id: int, msg_type: str, message: str):
-        with get_connection() as conn:
-            conn.execute("""
-                INSERT INTO messages (chat_id, message_type, message, timestamp)
-                VALUES (?, ?, ?, ?)
-            """, (chat_id, msg_type, message, datetime.now()))
-
-    def delete_chat(self,chat_id: int):
-        with get_connection() as conn:
-            conn.execute("DELETE FROM chats WHERE chat_id = ?", (chat_id,))
-            conn.execute("DELETE FROM messages WHERE chat_id = ?", (chat_id,))
+def delete_thread(thread_id: int):
+    with get_connection() as conn:
+        conn.execute("DELETE FROM threads WHERE thread_id = ?", (thread_id,))
+        conn.execute("DELETE FROM checkpoints WHERE thread_id = ?", (thread_id,))
+        conn.execute("DELETE FROM writes WHERE thread_id = ?", (thread_id,))

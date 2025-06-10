@@ -58,17 +58,19 @@ class StreamWorker(QObject):
         self._buffer = ""
         return result
 
-from src.core.db import DatabaseWrapper
+from src.core import database
+
+from langchain_core.messages import AIMessage
+from langchain_core.messages.human import HumanMessage
 
 class ChatWidget(QWidget):
 
     chat_selected = Signal(bool)  # True if a chat is selected
 
-    def __init__(self, backend: Application, database_wrapper: DatabaseWrapper):
+    def __init__(self, backend: Application):
         super().__init__()
         self.backend= backend
-        self.database_wrapper = database_wrapper
-        self.current_chat_id = None
+        self.current_thread_id = None
 
         # Layouts
         splitter = QSplitter()
@@ -97,6 +99,7 @@ class ChatWidget(QWidget):
         right_layout.addLayout(entry_layout)
 
         self.send_button.clicked.connect(self.send_message)
+        self.message_entry.returnPressed.connect(self.send_message)
 
         # Add both widgets to the splitter
         splitter.addWidget(left_widget)
@@ -112,30 +115,31 @@ class ChatWidget(QWidget):
     def on_chat_select(self):
         idx = self.chat_listbox.currentRow()
         if idx >= 0 and idx < len(self.chat_items):
-            self.current_chat_id = self.chat_items[idx][0]
+            self.current_thread_id = self.chat_items[idx][0]
             self.update_chat_display()
         else:
-            self.current_chat_id = None
+            self.current_thread_id = None
         self._update_selection()
 
     def update_chat_display(self):
         self.chat_display.clear()
-        if self.current_chat_id is None:
+        if self.current_thread_id is None:
             return
-        for msg_type, message in self.database_wrapper.get_messages_for_chat(self.current_chat_id):
-            if msg_type == "human":
+        for message in self.backend.get_state(self.current_thread_id):
+            if isinstance(message,HumanMessage):
                 prefix = "<b>You:</b>" 
                 color = "grey"
-            else: 
+            elif isinstance(message, AIMessage): 
                 prefix = "<b>Ai:</b>"
                 color = "black"
+            else:
+                raise ValueError("Unexpected message type:", type(message))
             self.chat_display.append(f'<span style="color:{color}">{prefix} {message}</span><br>')
 
     def send_message(self):
         msg = self.message_entry.text().strip()
-        if msg and self.current_chat_id is not None:
+        if msg and self.current_thread_id is not None:
             # Store user message
-            self.database_wrapper.add_message(self.current_chat_id, "human", msg)
             self.update_chat_display()
             self.message_entry.clear()
 
@@ -153,7 +157,6 @@ class ChatWidget(QWidget):
         self.stream_worker.moveToThread(self.stream_thread)
 
         self.stream_worker.update.connect(self._append_stream_token)
-        self.stream_worker.finished.connect(self._finalize_stream_response)
         self.stream_worker.finished.connect(self.stream_thread.quit)
         self.stream_worker.finished.connect(self.stream_worker.deleteLater)
         self.stream_thread.finished.connect(self.stream_thread.deleteLater)
@@ -169,22 +172,18 @@ class ChatWidget(QWidget):
         self.chat_display.setTextCursor(cursor)
         self.chat_display.ensureCursorVisible()
 
-    def _finalize_stream_response(self, response: str):
-        if self.current_chat_id is not None and response.strip():
-            self.database_wrapper.add_message(self.current_chat_id, "ai", response.strip())
-
     def _update_selection(self):
-        if self.current_chat_id == None:
+        if self.current_thread_id == None:
             self.chat_selected.emit(False)
         else:
             self.chat_selected.emit(True)
     
     def refresh_chat_list(self, select_id: int | None = None):
         self.chat_listbox.clear()
-        self.chat_items = []  # list of (chat_id, chat_name)
-        for chat_id, name in self.database_wrapper.get_all_chats():
+        self.chat_items = []  # list of (thread_id, chat_name)
+        for thread_id, name in database.get_all_threads():
             self.chat_listbox.addItem(name)
-            self.chat_items.append((chat_id, name))
+            self.chat_items.append((thread_id, name))
         if select_id:
             for i, (cid, _) in enumerate(self.chat_items):
                 if cid == select_id:
@@ -193,6 +192,6 @@ class ChatWidget(QWidget):
         elif self.chat_items:
             self.chat_listbox.setCurrentRow(0)
         else:
-            self.current_chat_id = None
+            self.current_thread_id = None
         self._update_selection()
 
