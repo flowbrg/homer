@@ -16,6 +16,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from src.core.retrieval_agent import retrieval, InputState, State
 from src.core.configuration import Configuration
@@ -153,7 +154,7 @@ graph = builder.compile(
 )
 graph.name = "RetrievalGraph"
 
-def get_retrieval_graph() -> StateGraph:
+def get_retrieval_graph() -> CompiledStateGraph:
     """
     Constructs and returns the retrieval graph.
 

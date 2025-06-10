@@ -26,10 +26,10 @@ class Application:
         return self._database_wrapper
 
     def retrieval_invoke(self, query: str):
-        return self._retrieval_graph.invoke(input=query, configuration=self._config)
+        return self._retrieval_graph.invoke(input=query, config={"configurable": self._config.asdict()})
 
     def retrieval_stream(self, query: str):
-        for t in self._retrieval_graph.stream(input=query, configuration=self._config):
+        for t in self._retrieval_graph.stream(input=query, config={"configurable": self._config.asdict()}):
             yield t
 
     # Uncomment the following methods if you want to implement knowledge base population and clearing

@@ -59,6 +59,18 @@ class Configuration:
         },
     )
 
+    def asdict(self) -> dict[str, any]:
+        """Convert the instance to a dictionary.
+
+        Args:
+            cls (Type[T]): The class itself.
+            instance (T): The instance of the class.
+
+        Returns:
+            dict[str, any]: A dictionary representation of the instance.
+        """
+        return {f.name: getattr(self, f.name) for f in fields(self)}
+
     @classmethod
     def from_runnable_config(
         cls: Type[T], config: Optional[RunnableConfig] = None

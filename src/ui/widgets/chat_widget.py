@@ -24,7 +24,7 @@ class StreamWorker(QObject):
 
     def run(self):
         full_response = ""
-        for token in self.backend.stream(self.query):
+        for token in self.backend.retrieval_stream(self.query):
             result = self._process_token(token)
             if result is not None:
                 self.update.emit(result)
