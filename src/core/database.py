@@ -5,6 +5,7 @@ import sqlite3
 import os
 
 from pathlib import Path
+from typing import Any
 
 from src.schemas.database import DB_SCHEMA, REQUIRED_TABLES
 from src.resources.utils import get_connection
@@ -43,19 +44,20 @@ class DatabaseWrapper:
             print("Base de données initialisée avec succès.")
 
 
-
-def get_all_threads() -> list[dict]:
+def get_all_threads() -> list[tuple]:
     """Retrieve all threads from the database."""
     with get_connection() as conn:
-        cursor = conn.execute("SELECT thread_id, thread_name FROM threads")
+        cursor = conn.execute("SELECT thread_id, thread_name FROM threads ORDER BY thread_id ASC")
         return [(row[0], row[1]) for row in cursor.fetchall()]
 
 def new_thread(thread_id: int, thread_name: str):
     with get_connection() as conn:
         conn.execute(
-            "INSERT INTO chats (thread_id, name) VALUES (?, ?)", (thread_id, thread_name)
+            "INSERT INTO threads (thread_id, thread_name) VALUES (?, ?)", (thread_id, thread_name)
         )
 
 def delete_thread(thread_id: int):
     with get_connection() as conn:
-        conn.execute("DELETE FROM chats WHERE thread_id = ?", (thread_id,))
+        conn.execute("DELETE FROM threads WHERE thread_id = ?", (thread_id,))
+        conn.execute("DELETE FROM checkpoints WHERE thread_id = ?", (thread_id,))
+        conn.execute("DELETE FROM writes WHERE thread_id = ?", (thread_id,))

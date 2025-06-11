@@ -3,6 +3,7 @@
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 
+from src.core.database import DatabaseWrapper
 from src.core.configuration import Configuration
 from src.core.retrieval_agent.graph import get_retrieval_graph
 
@@ -16,22 +17,22 @@ class Application:
 
     def __init__(self, config: Configuration):
         self._config = config
-        #self._database_wrapper = DatabaseWrapper()
+        self._database_wrapper = DatabaseWrapper()
         self._retrieval_graph = get_retrieval_graph()
 
-    # Public methods
     def get_config(self):
         return self._config
     
     def set_config(self, config: Configuration):
         self._config = config
 
-    def get_state(
+    def get_messages(
             self,
             thread_id: int) -> list[AnyMessage]:
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        return self._retrieval_graph.get_state(config=config)
-
+        values = self._retrieval_graph.get_state(config=config)[0] # Output of get_state is a snapshot state tuple, [0] is the value of the state
+        messages = values.get("messages","")
+        return messages
     #def get_database_wrapper(self):
     #    return self._database_wrapper
 

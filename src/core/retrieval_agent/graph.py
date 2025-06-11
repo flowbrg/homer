@@ -6,24 +6,31 @@ and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
 
+import sqlite3
 
 from datetime import datetime, timezone
 from typing import cast
+from pydantic import BaseModel
 
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
-from pydantic import BaseModel
 from langchain_core.runnables import RunnableConfig
+
 from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.checkpoint.sqlite import SqliteSaver
 
 from src.core.retrieval_agent import retrieval, InputState, State
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, get_message_text, load_chat_model
+from src.resources.utils import format_docs, get_message_text, load_chat_model, get_connection
+
+
+# Checkpointer
+graph_conn = get_connection()
+memory = SqliteSaver(graph_conn)
 
 # Define the function that calls the model
-
 
 class SearchQuery(BaseModel):
     """Search the indexed documents for a query."""
@@ -217,7 +224,8 @@ def get_retrieval_graph() -> CompiledStateGraph:
     # Finally, we compile it!
     # This compiles it into a graph you can invoke and deploy.
     graph = builder.compile(
-        interrupt_before=[],  # if you want to update the state before calling the tools
+        checkpointer=memory, # Use the SQLite checkpointer for memory
+        interrupt_before=[],
         interrupt_after=[],
     )
 

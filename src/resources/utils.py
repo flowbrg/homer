@@ -8,10 +8,7 @@ import yaml
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(os.getenv("DB_PATH"))
-
-def get_threads_connection() -> sqlite3.Connection:
-    return sqlite3.connect(os.getenv("THREADS_DB_PATH"))
+    return sqlite3.connect(os.getenv("DB_PATH"), check_same_thread=False)
 
 ######################################## format documents ########################################
 

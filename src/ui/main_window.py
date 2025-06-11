@@ -83,8 +83,12 @@ class MainWindow(QMainWindow):
     def _create_new_chat(self):
         from PySide6.QtWidgets import QInputDialog
         name, ok = QInputDialog.getText(self, "New thread", "Create a new thread?")
+        existing_thread_ids = database.get_all_threads()
         if ok and name:
-            new_id = database.new_thread( #TODO : pass the thread name and mangae the thread ids
+            new_id = database.new_thread(
+                thread_id=(existing_thread_ids[-1] + 1) if existing_thread_ids else 1,
+                thread_name=name
+            )
             self.chat_widget.refresh_chat_list(select_id=new_id)
     
     def _delete_current_chat(self):

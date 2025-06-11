@@ -22,9 +22,9 @@ class StreamWorker(QObject):
         self._shown_thinking = False
         self._buffer = ""  # buffer for cases where <think> might span tokens
 
-    def run(self):
+    def run(self, thread_id: int):
         full_response = ""
-        for token in self.backend.retrieval_stream(self.query):
+        for token in self.backend.stream_retrieval_graph(query=self.query, thread_id=thread_id):
             result = self._process_token(token)
             if result is not None:
                 self.update.emit(result)
@@ -65,7 +65,7 @@ from langchain_core.messages.human import HumanMessage
 
 class ChatWidget(QWidget):
 
-    chat_selected = Signal(bool)  # True if a chat is selected
+    chat_selected = Signal(bool, int)  # True if a chat is selected, int for thread_id
 
     def __init__(self, backend: Application):
         super().__init__()
@@ -113,19 +113,20 @@ class ChatWidget(QWidget):
         #self.refresh_chat_list()
 
     def on_chat_select(self):
-        idx = self.chat_listbox.currentRow()
-        if idx >= 0 and idx < len(self.chat_items):
-            self.current_thread_id = self.chat_items[idx][0]
-            self.update_chat_display()
+        selection = self.chat_listbox.currentRow()
+        if selection >= 0 and selection < len(self.chat_items):
+            self.current_thread_id = self.chat_items[selection][0] #chat_items is as such: [(thread_id, thread_name),...]
+            self.chat_selected.emit(True, self.current_thread_id)
+            self._update_chat_display()
         else:
             self.current_thread_id = None
         self._update_selection()
 
-    def update_chat_display(self):
+    def _update_chat_display(self):
         self.chat_display.clear()
         if self.current_thread_id is None:
             return
-        for message in self.backend.get_state(self.current_thread_id):
+        for message in self.backend.get_messages(self.current_thread_id):
             if isinstance(message,HumanMessage):
                 prefix = "<b>You:</b>" 
                 color = "grey"
@@ -140,7 +141,7 @@ class ChatWidget(QWidget):
         msg = self.message_entry.text().strip()
         if msg and self.current_thread_id is not None:
             # Store user message
-            self.update_chat_display()
+            self._update_chat_display()
             self.message_entry.clear()
 
             # Start AI response streaming
@@ -181,9 +182,9 @@ class ChatWidget(QWidget):
     def refresh_chat_list(self, select_id: int | None = None):
         self.chat_listbox.clear()
         self.chat_items = []  # list of (thread_id, chat_name)
-        for thread_id, name in database.get_all_threads():
-            self.chat_listbox.addItem(name)
-            self.chat_items.append((thread_id, name))
+        for thread_id, thread_name in database.get_all_threads():
+            self.chat_listbox.addItem(thread_name)
+            self.chat_items.append((thread_id, thread_name))
         if select_id:
             for i, (cid, _) in enumerate(self.chat_items):
                 if cid == select_id:

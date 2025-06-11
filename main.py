@@ -13,8 +13,8 @@ def main():
     load_dotenv()  # take environment variables
     baseConfig = load_config()
     
-    print("[INFO] Configuration loaded successfully.")
-    print(f"[INFO] Configuration: {baseConfig}")
+    print("[info] Configuration loaded successfully.")
+    print(f"[info] Configuration: {baseConfig}")
     backend = Application(config=baseConfig)
     app = QApplication(sys.argv)
     window = MainWindow(backend=backend)
