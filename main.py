@@ -24,7 +24,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-# TO DO: 
+# TODO: 
 # -memory threads and database refactor
 # -streaming the rag graph
 # -report graph

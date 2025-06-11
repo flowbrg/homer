@@ -10,6 +10,9 @@ import sqlite3
 def get_connection() -> sqlite3.Connection:
     return sqlite3.connect(os.getenv("DB_PATH"))
 
+def get_threads_connection() -> sqlite3.Connection:
+    return sqlite3.connect(os.getenv("THREADS_DB_PATH"))
+
 ######################################## format documents ########################################
 
 from langchain_core.documents import Document
@@ -114,7 +117,7 @@ def load_chat_model(model_name: str)-> BaseChatModel:
 #        tokenizer=tokenizer,
 #    )
 
-######################################## Structured message output ########################################
+######################################## Structured messages ########################################
 
 from langchain_core.messages import AnyMessage
 
@@ -146,7 +149,7 @@ def get_message_text(msg: AnyMessage) -> str:
     else:
         txts = [c if isinstance(c, str) else (c.get("text") or "") for c in content]
         return "".join(txts).strip()
-    
+
 ######################################## Manage base yaml config ########################################
 
 from pathlib import Path

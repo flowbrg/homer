@@ -5,16 +5,14 @@ import sqlite3
 import os
 
 from pathlib import Path
-from datetime import datetime
 
-from src.schemas.db import DB_SCHEMA, REQUIRED_TABLES
+from src.schemas.database import DB_SCHEMA, REQUIRED_TABLES
 from src.resources.utils import get_connection
 
 
 class DatabaseWrapper:
     def __init__(self):
         self.db_path = Path(os.getenv("DB_PATH"))
-        self.conn = get_connection()
         self._initialize_database()
 
     def _database_has_required_tables(self,conn: sqlite3.Connection) -> bool:
@@ -44,7 +42,7 @@ class DatabaseWrapper:
                 conn.executescript(DB_SCHEMA)
             print("Base de données initialisée avec succès.")
 
-import uuid
+
 
 def get_all_threads() -> list[dict]:
     """Retrieve all threads from the database."""
@@ -52,15 +50,12 @@ def get_all_threads() -> list[dict]:
         cursor = conn.execute("SELECT thread_id, thread_name FROM threads")
         return [(row[0], row[1]) for row in cursor.fetchall()]
 
-def add_thread():
+def new_thread(thread_id: int, thread_name: str):
     with get_connection() as conn:
-        thread_id = uuid.uuid4()
         conn.execute(
-            "INSERT INTO threads (thread_id) VALUES (?)", (thread_id)
+            "INSERT INTO chats (thread_id, name) VALUES (?, ?)", (thread_id, thread_name)
         )
 
 def delete_thread(thread_id: int):
     with get_connection() as conn:
-        conn.execute("DELETE FROM threads WHERE thread_id = ?", (thread_id,))
-        conn.execute("DELETE FROM checkpoints WHERE thread_id = ?", (thread_id,))
-        conn.execute("DELETE FROM writes WHERE thread_id = ?", (thread_id,))
+        conn.execute("DELETE FROM chats WHERE thread_id = ?", (thread_id,))

@@ -1,8 +1,8 @@
 # src/core/application.py
 
+from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 
-from core.database import DatabaseWrapper #, clear, update_database
 from src.core.configuration import Configuration
 from src.core.retrieval_agent.graph import get_retrieval_graph
 
@@ -35,19 +35,28 @@ class Application:
     #def get_database_wrapper(self):
     #    return self._database_wrapper
 
-    def retrieval_invoke(
+    def invoke_retrieval_graph(
             self,
-            query: dict[str, Any] | Any,
+            query: str,
             thread_id: int) -> Dict[str, Any] | Any:
-        config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        return self._retrieval_graph.invoke(input=query, config=config)
+        """Invoke the retrieval graph with a query and thread ID.
 
-    def retrieval_stream(
+        Args:
+            query (dict[str, Any] | Any): The query to process.
+            thread_id (int): The ID of the thread for context.
+
+        Returns:
+            Dict[str, Any] | Any: The result of the retrieval process.
+        """
+        config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
+        return self._retrieval_graph.invoke(input=HumanMessage(query), config=config)
+
+    def stream_retrieval_graph(
             self,
-            query: dict[str, Any] | Any,
+            query: str,
             thread_id: int) -> Dict[str, Any] | Any:
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        for t in self._retrieval_graph.stream(input=query, config=config):
+        for t in self._retrieval_graph.stream(input=HumanMessage(query), config=config):
             yield t
 
     # Uncomment the following methods if you want to implement knowledge base population and clearing

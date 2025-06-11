@@ -195,3 +195,6 @@ class ChatWidget(QWidget):
             self.current_thread_id = None
         self._update_selection()
 
+    def get_current_thread_id(self):
+        return self.current_thread_id
+

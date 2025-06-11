@@ -5,6 +5,7 @@ from PySide6.QtGui import QAction, QIcon
 from src.ui.widgets.chat_widget import ChatWidget
 from src.ui.dialogs.settings_dialog import SettingsDialog
 from src.core.application import Application
+from src.core import database
 
 class MainWindow(QMainWindow):
     def __init__(self,backend: Application):
@@ -81,15 +82,15 @@ class MainWindow(QMainWindow):
 
     def _create_new_chat(self):
         from PySide6.QtWidgets import QInputDialog
-        name, ok = QInputDialog.getText(self, "New chat", "Name:")
+        name, ok = QInputDialog.getText(self, "New thread", "Create a new thread?")
         if ok and name:
-            new_id = self.database_wrapper.create_chat(name)
+            new_id = database.new_thread( #TODO : pass the thread name and mangae the thread ids
             self.chat_widget.refresh_chat_list(select_id=new_id)
     
     def _delete_current_chat(self):
         from PySide6.QtWidgets import QMessageBox
-        current_chat_id = self.chat_widget.current_chat_id
-        if current_chat_id is None:
+        current_thread_id = self.chat_widget.get_current_thread_id()
+        if current_thread_id is None:
             QMessageBox.warning(self, "Error", "Aucune discussion sélectionnée.")
             return
 
@@ -101,7 +102,7 @@ class MainWindow(QMainWindow):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if confirm == QMessageBox.StandardButton.Yes:
-            self.database_wrapper.delete_chat(current_chat_id)
+            database.delete_thread(current_thread_id)
             self.chat_widget.refresh_chat_list()
 
     def _update_delete_actions(self, chat_selected: bool):
