@@ -1,4 +1,5 @@
 # ui/widgets/chat_widget.py
+import asyncio
 
 from PySide6.QtWidgets import (
     QWidget, QListWidget, QTextEdit, QLineEdit,
@@ -14,17 +15,18 @@ class StreamWorker(QObject):
     update = Signal(str)
     finished = Signal(str)
 
-    def __init__(self, backend: Application, query: str):
+    def __init__(self, backend: Application, query: str, thread_id: int):
         super().__init__()
         self.backend = backend
         self.query = query
+        self.thread_id = thread_id
         self._in_think_block = False
         self._shown_thinking = False
         self._buffer = ""  # buffer for cases where <think> might span tokens
 
-    def run(self, thread_id: int):
+    def run(self):
         full_response = ""
-        for token in self.backend.stream_retrieval_graph(query=self.query, thread_id=thread_id):
+        for token in self.backend.stream_retrieval_graph(query=self.query, thread_id=self.thread_id):
             result = self._process_token(token)
             if result is not None:
                 self.update.emit(result)
@@ -65,7 +67,7 @@ from langchain_core.messages.human import HumanMessage
 
 class ChatWidget(QWidget):
 
-    chat_selected = Signal(bool, int)  # True if a chat is selected, int for thread_id
+    chat_selected = Signal(bool)  # True if a chat is selected
 
     def __init__(self, backend: Application):
         super().__init__()
@@ -116,7 +118,7 @@ class ChatWidget(QWidget):
         selection = self.chat_listbox.currentRow()
         if selection >= 0 and selection < len(self.chat_items):
             self.current_thread_id = self.chat_items[selection][0] #chat_items is as such: [(thread_id, thread_name),...]
-            self.chat_selected.emit(True, self.current_thread_id)
+            self.chat_selected.emit(True)
             self._update_chat_display()
         else:
             self.current_thread_id = None
@@ -154,7 +156,11 @@ class ChatWidget(QWidget):
 
     def _start_streaming_response(self, query):
         self.stream_thread = QThread()
-        self.stream_worker = StreamWorker(self.backend, query)
+        self.stream_worker = StreamWorker(
+            backend=self.backend,
+            query=query,
+            thread_id=self.current_thread_id
+        )
         self.stream_worker.moveToThread(self.stream_thread)
 
         self.stream_worker.update.connect(self._append_stream_token)

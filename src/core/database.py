@@ -13,7 +13,7 @@ from src.resources.utils import get_connection
 
 class DatabaseWrapper:
     def __init__(self):
-        self.db_path = Path(os.getenv("DB_PATH"))
+        self.db_path = Path(os.getenv("HOMER_PERSISTENT_DATA_PATH"))
         self._initialize_database()
 
     def _database_has_required_tables(self,conn: sqlite3.Connection) -> bool:
@@ -34,14 +34,14 @@ class DatabaseWrapper:
                         print(f"Database {self.db_path} already initialized")
                         initialize = False
                     else:
-                        print("Base de données incomplète. Réinitialisation du schéma...")
+                        print("Database incomplete. Recreating the database with the schema...")
             except sqlite3.DatabaseError:
                 print("Fichier existant invalide. Il ne s'agit pas d'une base SQLite valide.")
         
         if initialize:
             with sqlite3.connect(self.db_path) as conn:
                 conn.executescript(DB_SCHEMA)
-            print("Base de données initialisée avec succès.")
+            print("Database initialized successfully.")
 
 
 def get_all_threads() -> list[tuple]:

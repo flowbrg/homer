@@ -53,7 +53,7 @@ class Configuration:
     )
 
     ollama_host: str = field(
-        default=os.getenv("OLLAMA_HOST"),
+        default=os.getenv("OLLAMA_URL"),
         metadata={
             "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
         },

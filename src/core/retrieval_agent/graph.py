@@ -6,8 +6,6 @@ and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
 
-import sqlite3
-
 from datetime import datetime, timezone
 from typing import cast
 from pydantic import BaseModel
@@ -23,7 +21,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 
 from src.core.retrieval_agent import retrieval, InputState, State
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, get_message_text, load_chat_model, get_connection
+from src.resources.utils import format_docs, get_message_text, load_chat_model, load_embedding_model, get_connection
 
 
 # Checkpointer
@@ -38,7 +36,7 @@ class SearchQuery(BaseModel):
     query: str
 
 
-async def generate_query(
+def generate_query(
     state: State, *, config: RunnableConfig
 ) -> dict[str, list[str]]:
     """Generate a search query based on the current state and configuration.
@@ -73,11 +71,11 @@ async def generate_query(
                 ("human", "{messages}"),
             ]
         )
-        model = load_chat_model(model_name = configuration.query_model).with_structured_output(
+        model = load_chat_model(model = configuration.query_model).with_structured_output(
             SearchQuery
         )
 
-        message_value = await prompt.ainvoke(
+        message_value = prompt.invoke(
             {
                 "messages": state.messages,
                 "queries": "\n- ".join(state.queries),
@@ -85,13 +83,13 @@ async def generate_query(
             },
             config,
         )
-        generated = cast(SearchQuery, await model.ainvoke(message_value, config))
+        generated = cast(SearchQuery, model.invoke(message_value, config))
         return {
             "queries": [generated.query],
         }
 
 
-async def retrieve(
+def retrieve(
     state: State, *, config: RunnableConfig
 ) -> dict[str, list[Document]]:
     """Retrieve documents based on the latest query in the state.
@@ -109,12 +107,12 @@ async def retrieve(
         containing a list of retrieved Document objects.
     """
     configuration = Configuration.from_runnable_config(config)
-    with retrieval.make_retriever(embedding_model = configuration.embedding_model) as retriever:
-        response = await retriever.ainvoke(state.queries[-1], config)
+    with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
+        response = retriever.invoke(state.queries[-1], config)
         return {"retrieved_docs": response}
 
 
-async def respond(
+def respond(
     state: State, *, config: RunnableConfig
 ) -> dict[str, list[BaseMessage]]:
     """Call the LLM powering our "agent"."""
@@ -125,18 +123,18 @@ async def respond(
             ("human", "{messages}"),
         ]
     )
-    model = load_chat_model(model_name = configuration.response_model)
+    model = load_chat_model(model = configuration.response_model)
 
     retrieved_docs = format_docs(state.retrieved_docs)
-    message_value = await prompt.ainvoke(
+    message_value = prompt.invoke(
         {
             "messages": state.messages,
-            "retrieved_docs": retrieved_docs,
+            "context": retrieved_docs,
             "system_time": datetime.now(tz=timezone.utc).isoformat(),
         },
         config,
     )
-    response = await model.ainvoke(message_value, config)
+    response = model.invoke(message_value, config)
     # We return a list, because this will get added to the existing list
     return {"messages": [response]}
 

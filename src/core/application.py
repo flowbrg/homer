@@ -1,4 +1,5 @@
 # src/core/application.py
+import asyncio
 
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
@@ -57,8 +58,9 @@ class Application:
             query: str,
             thread_id: int) -> Dict[str, Any] | Any:
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        for t in self._retrieval_graph.stream(input=HumanMessage(query), config=config):
-            yield t
+        for message_chunk, metadata in self._retrieval_graph.stream(input=HumanMessage(query), stream_mode="messages", config=config):
+            if message_chunk.content and metadata["langgraph_node"] == "respond":
+                yield message_chunk.content
 
     # Uncomment the following methods if you want to implement knowledge base population and clearing
 

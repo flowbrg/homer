@@ -8,7 +8,7 @@ import yaml
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(os.getenv("DB_PATH"), check_same_thread=False)
+    return sqlite3.connect(os.getenv("HOMER_PERSISTENT_DATA_PATH"), check_same_thread=False)
 
 ######################################## format documents ########################################
 
@@ -72,17 +72,17 @@ from langchain.embeddings.base import Embeddings
 #    from langchain_huggingface import HuggingFaceEmbeddings
 #    return HuggingFaceEmbeddings(model_name="nomic-ai/nomic-embed-text-v2-moe",cache_folder="./cache", model_kwargs={"trust_remote_code":True})
 
-def load_embedding_model(model_name: str) -> Embeddings:   
+def load_embedding_model(model: str, host: str = "http://localhost:11434") -> Embeddings:   
     from langchain_ollama import OllamaEmbeddings
-    return OllamaEmbeddings(model=model_name)
+    return OllamaEmbeddings(model=model,base_url=host)
 
 ######################################## Chat model ########################################
 
 from langchain.chat_models.base import BaseChatModel
 
-def load_chat_model(model_name: str)-> BaseChatModel:
+def load_chat_model(model: str, host: str = "http://localhost:11434")-> BaseChatModel:
     from langchain_ollama import ChatOllama
-    return ChatOllama(model=model_name)
+    return ChatOllama(model=model,base_url=host)
 
 
 #def load_llm(model_name: str)-> BaseChatModel:
