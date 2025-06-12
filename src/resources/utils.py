@@ -8,7 +8,7 @@ import yaml
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(os.getenv("HOMER_PERSISTENT_DATA_PATH"), check_same_thread=False)
+    return sqlite3.connect(os.getenv("HOMER_PERSISTENT_DATA"), check_same_thread=False)
 
 ######################################## format documents ########################################
 
