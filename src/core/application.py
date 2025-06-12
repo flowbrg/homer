@@ -6,7 +6,7 @@ from langchain_core.messages import AnyMessage
 
 from src.core.database import DatabaseWrapper
 from src.core.configuration import Configuration
-from src.core.retrieval_agent.graph import get_retrieval_graph
+from src.core.agents.retrival_graph import get_retrieval_graph
 
 from typing import Any, Dict
 
@@ -20,6 +20,7 @@ class Application:
         self._config = config
         self._database_wrapper = DatabaseWrapper()
         self._retrieval_graph = get_retrieval_graph()
+        self._report_graph = get_report_graph()
 
     def get_config(self):
         return self._config
@@ -34,8 +35,6 @@ class Application:
         values = self._retrieval_graph.get_state(config=config)[0] # Output of get_state is a snapshot state tuple, [0] is the value of the state
         messages = values.get("messages","")
         return messages
-    #def get_database_wrapper(self):
-    #    return self._database_wrapper
 
     def invoke_retrieval_graph(
             self,
@@ -61,6 +60,9 @@ class Application:
         for message_chunk, metadata in self._retrieval_graph.stream(input=HumanMessage(query), stream_mode="messages", config=config):
             if message_chunk.content and metadata["langgraph_node"] == "respond":
                 yield message_chunk.content
+
+    def invoke_report_graph(query: str):
+        return "Report generation is not implemented yet."
 
     # Uncomment the following methods if you want to implement knowledge base population and clearing
 

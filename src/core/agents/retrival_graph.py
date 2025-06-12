@@ -19,7 +19,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-from src.core.retrieval_agent import retrieval, InputState, State
+from src.core.agents import retrieval, InputState, State
 from src.core.configuration import Configuration
 from src.resources.utils import format_docs, get_message_text, load_chat_model, load_embedding_model, get_connection
 
@@ -138,26 +138,6 @@ def respond(
     # We return a list, because this will get added to the existing list
     return {"messages": [response]}
 
-
-# Define a new graph (It's just a pipe)
-
-
-builder = StateGraph(State, input=InputState, config_schema=Configuration)
-
-builder.add_node(generate_query)
-builder.add_node(retrieve)
-builder.add_node(respond)
-builder.add_edge("__start__", "generate_query")
-builder.add_edge("generate_query", "retrieve")
-builder.add_edge("retrieve", "respond")
-
-# Finally, we compile it!
-# This compiles it into a graph you can invoke and deploy.
-graph = builder.compile(
-    interrupt_before=[],  # if you want to update the state before calling the tools
-    interrupt_after=[],
-)
-graph.name = "RetrievalGraph"
 
 def get_retrieval_graph() -> CompiledStateGraph:
     """

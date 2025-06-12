@@ -52,10 +52,31 @@ class Configuration:
         },
     )
 
+    outline_system_prompt: str = field(
+        default=prompts.OUTLINE_SYSTEM_PROMPT,
+        metadata={
+            "description": "The system prompt used for generating outlines for reports."
+        },
+    )
+
+    outline_model: str = field(
+        default="qwen3:0.6b",
+        metadata={
+            "description": "The language model used for processing the outline of the report. Must be a valid LLM name."
+        },
+    )
+
     ollama_host: str = field(
         default=os.getenv("OLLAMA_URL"),
         metadata={
             "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
+        },
+    )
+
+    number_of_parts: int = field(
+        default=6,
+        metadata={
+            "description": "The number of parts in the report outline. Must be a positive integer."
         },
     )
 

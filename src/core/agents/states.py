@@ -79,3 +79,38 @@ class State(InputState):
 
     # Feel free to add additional attributes to your state as needed.
     # Common examples include retrieved documents, extracted entities, API connections, etc.
+
+
+def add_sections(
+    existing: Sequence[dict[str, str]], new: Sequence[dict[str, str]]
+) -> Sequence[dict[str, str]]:
+    """Combine existing sections with new sections.
+
+    Args:
+        existing (Sequence[Dict[str, str]]): The current list of sections in the state.
+        new (Sequence[Dict[str, str]]): The new sections to be added.
+
+    Returns:
+        Sequence[Dict[str, str]]: A new list containing all sections from both input sequences.
+    """
+    return list(existing) + list(new)
+
+
+@dataclass(kw_only=True)
+class StateReport(InputState):
+    """The state of your report graph / agent."""
+
+    query: str = field(default_factory=list)
+    """An improved search query that the agent has generated."""
+
+    outlines: list[dict[str, str]]
+    """A list of sections that the agent has generated for the report."""
+
+    report: Annotated[list[dict[str, str]], add_sections] = field(default_factory=list)
+    """The final report as a list of sections, where each section is a dictionary with keys like 'title' and 'content'."""
+
+    retrieved_docs: list[Document] = field(default_factory=list)
+    """Populated by the retriever. This is a list of documents that the agent can reference."""
+
+    # Feel free to add additional attributes to your state as needed.
+    # Common examples include retrieved documents, extracted entities, API connections, etc.
