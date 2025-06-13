@@ -1,5 +1,31 @@
 embedding_model: nomic-embed-text
-ollama_host: http://127.0.0.1:11434/
+number_of_parts: 6
+ollama_host: null
+outline_model: qwen3:0.6b
+outline_system_prompt: '
+
+  You are a senior technical writer. Draft an outline with exactly six technical sections
+
+  for a detailed professional report about the following query.
+
+
+  The report should feature at most {number_of_parts} parts each in the format:
+
+  Title: <technical title>; Summary: <1-2-sentence summary>
+
+
+  Use the following pieces of information to help you create the outline.
+
+  <context>
+
+  {context}
+
+  </context>
+
+
+  System time: {system_time}
+
+  '
 query_model: qwen3:0.6b
 query_system_prompt: "\nYou are given a history of messages between a user and an\
   \ AI agent.\nYour task is to generate search queries to retrieve documents that\

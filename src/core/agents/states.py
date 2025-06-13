@@ -103,7 +103,7 @@ class StateReport(InputState):
     query: str = field(default_factory=list)
     """An improved search query that the agent has generated."""
 
-    outlines: list[dict[str, str]]
+    outlines: list[dict[str, str]] = field(default_factory=list)
     """A list of sections that the agent has generated for the report."""
 
     report: Annotated[list[dict[str, str]], add_sections] = field(default_factory=list)

@@ -135,7 +135,7 @@ def retrieve(
         input = state.query
     else:
         current_section = state.outlines[0]
-        input = "\n".join([current_section["title"], current_section["summuray"]])
+        input = "\n".join([current_section["title"], current_section["summary"]])
 
     with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
         response = retriever.invoke(input, config)
@@ -165,7 +165,7 @@ def generate_section(
             "message": state.messages,
             "title": state.report[-1]["title"] if state.report else "",
             "summary": state.report[-1]["summary"] if state.report else "",
-            "previous_sections_text": "\n".join([section.get("content","")] for section in state.report) if state.report else "This is the first section. There are no previous sections.",
+            "previous_sections_text": "\n".join(section.get("content","") for section in state.report) if state.report else "This is the first section. There are no previous sections.",
             "context": retrieved_docs,
             "system_time": datetime.now(tz=timezone.utc).isoformat(),
         },

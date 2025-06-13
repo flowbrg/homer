@@ -74,7 +74,7 @@ class Configuration:
     )
 
     number_of_parts: int = field(
-        default=6,
+        default=3,
         metadata={
             "description": "The number of parts in the report outline. Must be a positive integer."
         },
