@@ -20,7 +20,7 @@ class Application:
         self._config = config
         self._database_wrapper = DatabaseWrapper()
         self._retrieval_graph = get_retrieval_graph()
-        self._report_graph = get_report_graph()
+        #self._report_graph = get_report_graph()
 
     def get_config(self):
         return self._config
