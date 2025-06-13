@@ -13,7 +13,7 @@ from src.resources.utils import get_connection
 
 class DatabaseWrapper:
     def __init__(self):
-        self.db_path = Path(os.getenv("HOMER_PERSISTENT_DATA_PATH"))
+        self.db_path = Path(os.getenv("HOMER_PERSISTENT_DATA"))
         self._initialize_database()
 
     def _database_has_required_tables(self,conn: sqlite3.Connection) -> bool:
