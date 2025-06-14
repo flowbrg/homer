@@ -6,7 +6,6 @@ vector store backends, specifically Elasticsearch, Pinecone, and MongoDB.
 The retrievers support filtering results by user_id to ensure data isolation between users.
 """
 
-import os
 from contextlib import contextmanager
 from typing import Generator
 from pathlib import Path
@@ -14,16 +13,7 @@ from pathlib import Path
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
 
-## Encoder constructors
-
-
-from langchain.embeddings.base import Embeddings
-
-def make_text_encoder(model: str) -> Embeddings:   
-    from langchain_ollama import OllamaEmbeddings
-    return OllamaEmbeddings(model=model)
-
-## Retriever constructors
+from src.resources.utils import VECTORSTORE_PATH
 
 
 @contextmanager
@@ -35,7 +25,7 @@ def make_retriever(
     from langchain_community.docstore.in_memory import InMemoryDocstore
     from langchain_community.vectorstores import FAISS
 
-    vstore_path = Path(os.getenv("VECTORSTORE_PATH"))
+    vstore_path = Path(VECTORSTORE_PATH)
     index = faiss.IndexHNSWFlat(len(embedding_model.embed_query("hello world")), 32)
 
     if not vstore_path.is_dir():

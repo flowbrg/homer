@@ -6,6 +6,7 @@ from dataclasses import dataclass, field, fields
 from typing import Annotated, Optional, Type, TypeVar
 
 from src.resources import prompts
+from src.resources.utils import OLLAMA_CLIENT
 
 from langchain_core.runnables import RunnableConfig, ensure_config
 
@@ -67,7 +68,7 @@ class Configuration:
     )
 
     ollama_host: str = field(
-        default=os.getenv("OLLAMA_CLIENT"),
+        default = OLLAMA_CLIENT,
         metadata={
             "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
         },

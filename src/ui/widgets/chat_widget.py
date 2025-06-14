@@ -117,8 +117,8 @@ class ChatWidget(QWidget):
     def on_chat_select(self):
         selection = self.chat_listbox.currentRow()
         if selection >= 0 and selection < len(self.chat_items):
-            self.current_thread_id = self.chat_items[selection][0] #chat_items is as such: [(thread_id, thread_name),...]
-            self.chat_selected.emit(True)
+            self.current_thread_id = self.chat_items[selection][0] # chat_items is as such: [(thread_id, thread_name),...]
+            self.chat_selected.emit(True) # emit signal for the main window to enable/disable delete button
             self._update_chat_display()
         else:
             self.current_thread_id = None
@@ -129,7 +129,7 @@ class ChatWidget(QWidget):
         if self.current_thread_id is None:
             return
         for message in self.backend.get_messages(self.current_thread_id):
-            if isinstance(message,HumanMessage):
+            if isinstance(message, HumanMessage):
                 prefix = "<b>You:</b>" 
                 color = "grey"
             elif isinstance(message, AIMessage): 
@@ -137,17 +137,19 @@ class ChatWidget(QWidget):
                 color = "black"
             else:
                 raise ValueError("Unexpected message type:", type(message))
-            self.chat_display.append(f'<span style="color:{color}">{prefix} {message}</span><br>')
+            self.chat_display.append(f'<span style="color:{color}">{prefix} {message.content}</span><br>')
 
     def send_message(self):
         msg = self.message_entry.text().strip()
         if msg and self.current_thread_id is not None:
-            # Store user message
-            self._update_chat_display()
+            # Clear the input immediately
             self.message_entry.clear()
-
+            
+            # Immediately display the user message in the UI
+            self.chat_display.append(f'<span style="color:grey"><b>You:</b> {msg}</span><br>')
+            
             # Start AI response streaming
-            self.chat_display.append("AI: ")  # placeholder line
+            self.chat_display.append('<span style="color:black"><b>AI:</b> ')  # placeholder line
             self._start_streaming_response(msg)
     
     def set_entry_enabled(self, bool: bool):
@@ -164,6 +166,7 @@ class ChatWidget(QWidget):
         self.stream_worker.moveToThread(self.stream_thread)
 
         self.stream_worker.update.connect(self._append_stream_token)
+        self.stream_worker.finished.connect(self._on_stream_finished)
         self.stream_worker.finished.connect(self.stream_thread.quit)
         self.stream_worker.finished.connect(self.stream_worker.deleteLater)
         self.stream_thread.finished.connect(self.stream_thread.deleteLater)
@@ -178,6 +181,14 @@ class ChatWidget(QWidget):
         cursor.insertText(token)
         self.chat_display.setTextCursor(cursor)
         self.chat_display.ensureCursorVisible()
+
+    def _on_stream_finished(self, full_response: str):
+        # Close the AI response span and add line breaks
+        from PySide6.QtGui import QTextCursor
+        cursor = self.chat_display.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        #cursor.insertText("</span><br>")
+        self.chat_display.setTextCursor(cursor)
 
     def _update_selection(self):
         if self.current_thread_id == None:

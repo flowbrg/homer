@@ -32,8 +32,8 @@ class Application:
             self,
             thread_id: int) -> list[AnyMessage]:
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        values = self._retrieval_graph.get_state(config=config)[0] # Output of get_state is a snapshot state tuple, [0] is the value of the state
-        messages = values.get("messages","")
+        graph_state = self._retrieval_graph.get_state(config=config) # Output of get_state is a snapshot state tuple
+        messages = graph_state.values["messages"] if "messages" in graph_state.values.keys() else []
         return messages
 
     def invoke_retrieval_graph(

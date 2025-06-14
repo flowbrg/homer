@@ -1,6 +1,6 @@
 embedding_model: nomic-embed-text
-number_of_parts: 6
-ollama_host: null
+number_of_parts: '6'
+ollama_host: http://127.0.0.1:11434/
 outline_model: qwen3:0.6b
 outline_system_prompt: '
 

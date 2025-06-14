@@ -3,12 +3,18 @@
 import os
 import yaml
 
+######################################## Environment variables ########################################
+
+OLLAMA_CLIENT= "http://127.0.0.1:11434/"
+HOMER_PERSISTENT_DATA = "./user_data/threads/threads.db"
+VECTORSTORE_PATH= "./user_data/faiss_index/"
+
 ######################################## connect to database ########################################
 
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(os.getenv("HOMER_PERSISTENT_DATA"), check_same_thread=False)
+    return sqlite3.connect(HOMER_PERSISTENT_DATA, check_same_thread=False)
 
 ######################################## format documents ########################################
 

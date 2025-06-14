@@ -86,7 +86,7 @@ class MainWindow(QMainWindow):
         existing_thread_ids = database.get_all_threads()
         if ok and name:
             new_id = database.new_thread(
-                thread_id=(existing_thread_ids[-1] + 1) if existing_thread_ids else 1,
+                thread_id=(int(existing_thread_ids[-1][0]) + 1) if existing_thread_ids else 1,
                 thread_name=name
             )
             self.chat_widget.refresh_chat_list(select_id=new_id)
