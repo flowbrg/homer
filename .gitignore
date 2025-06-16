@@ -2,7 +2,10 @@
 tests/
 user_data/data
 graph.ipynb
-threads.db
+user_data/threads/threads.db
+user_data/threads/threads.db-wal
+user_data/threads/threads.db-shm
+
 
 .ipynb_checkpoints/
 
