@@ -5,6 +5,7 @@ retrieval graph. It includes the main graph definition, state management,
 and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
+import sqlite3
 
 from datetime import datetime, timezone
 from typing import cast
@@ -19,13 +20,14 @@ from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-from src.core.agents import retrieval, InputState, State
+from src.core.agents import retrieval
+from src.core.agents.states import InputState, State
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, get_message_text, load_chat_model, load_embedding_model, get_connection
-
+from src.resources.utils import format_docs, format_messages, get_message_text, load_chat_model, load_embedding_model
 
 # Checkpointer
-graph_conn = get_connection()
+
+graph_conn = sqlite3.connect(":memory:", check_same_thread = False)
 memory = SqliteSaver(graph_conn)
 
 # Define the function that calls the model
@@ -57,36 +59,34 @@ def generate_query(
         - For subsequent messages, it uses a language model to generate a refined query.
         - The function uses the configuration to set up the prompt and model for query generation.
     """
-    messages = state.messages
-    if len(messages) == 1:
-        # It's the first user question. We will use the input directly to search.
-        human_input = get_message_text(messages[-1])
-        return {"queries": [human_input]}
-    else:
-        configuration = Configuration.from_runnable_config(config)
+    
+    configuration = Configuration.from_runnable_config(config)
 
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", configuration.query_system_prompt),
-                ("human", "{messages}"),
-            ]
-        )
-        model = load_chat_model(model = configuration.query_model).with_structured_output(
-            SearchQuery
-        )
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", configuration.query_system_prompt),
+            ("human", "{message}"),
+        ]
+    )
 
-        message_value = prompt.invoke(
-            {
-                "messages": state.messages,
-                "queries": "\n- ".join(state.queries),
-                "system_time": datetime.now(tz=timezone.utc).isoformat(),
-            },
-            config,
-        )
-        generated = cast(SearchQuery, model.invoke(message_value, config))
-        return {
-            "queries": [generated.query],
-        }
+    model = load_chat_model(model = configuration.query_model).with_structured_output(
+        SearchQuery
+    )
+
+    message_value = prompt.invoke(
+        {
+            "message": state.messages[-1],
+            "system_time": datetime.now(tz=timezone.utc).isoformat(),
+        },
+        config,
+    )
+
+    generated = cast(SearchQuery, model.invoke(message_value, config))
+    
+    return {
+        "enhanced_query": generated.query,
+        "retrieved_docs": [],
+    }
 
 
 def retrieve(
@@ -108,8 +108,10 @@ def retrieve(
     """
     configuration = Configuration.from_runnable_config(config)
     with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
-        response = retriever.invoke(state.queries[-1], config)
-        return {"retrieved_docs": response}
+        response = retriever.invoke(state.enhanced_query, config)
+        return {
+            "retrieved_docs": response
+        }
 
 
 def respond(
@@ -126,17 +128,24 @@ def respond(
     model = load_chat_model(model = configuration.response_model)
 
     retrieved_docs = format_docs(state.retrieved_docs)
+    history = format_messages(state.messages)
+    
     message_value = prompt.invoke(
         {
             "messages": state.messages,
             "context": retrieved_docs,
+            "history": history,
             "system_time": datetime.now(tz=timezone.utc).isoformat(),
         },
         config,
     )
     response = model.invoke(message_value, config)
     # We return a list, because this will get added to the existing list
-    return {"messages": [response]}
+    return {
+        "messages": [response],
+        "retrieved_docs": [],
+        "enhanced_query": "",
+    }
 
 
 def get_retrieval_graph() -> CompiledStateGraph:

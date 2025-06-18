@@ -21,20 +21,20 @@ class Configuration:
     """
 
     embedding_model: str = field(
-        default="nomic-embed-text",
-        metadata={
+        default = "nomic-embed-text",
+        metadata = {
             "description": "Name of the embedding model to use. Must be a valid embedding model name."
         },
     )
 
     response_system_prompt: str = field(
-        default=prompts.RESPONSE_SYSTEM_PROMPT,
-        metadata={"description": "The system prompt used for generating responses."},
+        default = prompts.RESPONSE_SYSTEM_PROMPT,
+        metadata = {"description": "The system prompt used for generating responses."},
     )
 
     response_model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
-        default="qwen3:0.6b",
-        metadata={
+        default = "gemma3:1b-it-qat",   #"qwen3:0.6b",
+        metadata = {
             "description": "The language model used for generating responses. Must be a valid LLM name."
         },
     )
@@ -47,36 +47,36 @@ class Configuration:
     )
 
     query_model: str = field(
-        default="qwen3:0.6b",
-        metadata={
+        default = "gemma3:1b-it-qat",   #"qwen3:0.6b",
+        metadata = {
             "description": "The language model used for processing and refining queries. Must be a valid LLM name."
         },
     )
 
     outline_system_prompt: str = field(
         default=prompts.OUTLINE_SYSTEM_PROMPT,
-        metadata={
+        metadata = {
             "description": "The system prompt used for generating outlines for reports."
         },
     )
 
     outline_model: str = field(
-        default="qwen3:0.6b",
-        metadata={
+        default = "gemma3:1b-it-qat",   #"qwen3:0.6b",
+        metadata = {
             "description": "The language model used for processing the outline of the report. Must be a valid LLM name."
         },
     )
 
     ollama_host: str = field(
         default = OLLAMA_CLIENT,
-        metadata={
+        metadata = {
             "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
         },
     )
 
     number_of_parts: int = field(
-        default=3,
-        metadata={
+        default = 3,
+        metadata = {
             "description": "The number of parts in the report outline. Must be a positive integer."
         },
     )

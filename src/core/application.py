@@ -50,14 +50,14 @@ class Application:
             Dict[str, Any] | Any: The result of the retrieval process.
         """
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        return self._retrieval_graph.invoke(input=HumanMessage(query), config=config)
+        return self._retrieval_graph.invoke(input={"messages":[HumanMessage(content=query)]}, config=config)
 
     def stream_retrieval_graph(
             self,
             query: str,
             thread_id: int) -> Dict[str, Any] | Any:
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        for message_chunk, metadata in self._retrieval_graph.stream(input=HumanMessage(query), stream_mode="messages", config=config):
+        for message_chunk, metadata in self._retrieval_graph.stream(input={"messages":[HumanMessage(content=query)]}, stream_mode="messages", config=config):
             if message_chunk.content and metadata["langgraph_node"] == "respond":
                 yield message_chunk.content
 

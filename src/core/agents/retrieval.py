@@ -21,26 +21,12 @@ def make_retriever(
     embedding_model: Embeddings
 ) -> Generator[VectorStoreRetriever, None, None]:
     """Create a retriever for the agent, based on the current configuration."""
-    import faiss
-    from langchain_community.docstore.in_memory import InMemoryDocstore
-    from langchain_community.vectorstores import FAISS
+    from langchain_chroma import Chroma
 
-    vstore_path = Path(VECTORSTORE_PATH)
-    index = faiss.IndexHNSWFlat(len(embedding_model.embed_query("hello world")), 32)
-
-    if not vstore_path.is_dir():
-        vstore = FAISS(
-            embedding_function = embedding_model,
-            index=index,
-            docstore = InMemoryDocstore(),
-            index_to_docstore_id={},
-        )
-        vstore.save_local(vstore_path)
-    
-    vstore = FAISS.load_local(
-        vstore_path,
-        embedding_model,
-        allow_dangerous_deserialization=True
+    vector_store = Chroma(
+        collection_name = "example_collection",
+        embedding_function = embedding_model,
+        persist_directory = VECTORSTORE_PATH,  # Where to save data locally, remove if not necessary
     )
 
-    yield vstore.as_retriever()
+    yield vector_store.as_retriever()

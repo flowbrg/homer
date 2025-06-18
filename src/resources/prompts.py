@@ -9,18 +9,18 @@ If you don't know the answer, just say that you don't know, don't try to make up
 {context}
 </context>
 
+Here is the history of the discussion:
+{history}
+
 The response should be specific and use statistics or numbers when possible.
 
 System time: {system_time}
 """
 
+# System prompt for query enhancement
 QUERY_SYSTEM_PROMPT = """
 You are given a history of messages between a user and an AI agent.
-Your task is to generate search queries to retrieve documents that may help answer the user's question. Previously, you made the following queries:
-    
-<previous_queries/>
-{queries}
-</previous_queries>
+Your task is to generate search queries to retrieve documents that may help answer the user's question.
 
 System time: {system_time}
 """

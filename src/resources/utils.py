@@ -3,18 +3,26 @@
 import os
 import yaml
 
-######################################## Environment variables ########################################
+
+
+######################################## environment variables ########################################
 
 OLLAMA_CLIENT= "http://127.0.0.1:11434/"
-HOMER_PERSISTENT_DATA = "./user_data/threads/threads.db"
-VECTORSTORE_PATH= "./user_data/faiss_index/"
+PERSISTENT_DATA = "./user_data/threads/threads.db"
+VECTORSTORE_PATH= "./user_data/vectorstore/"
 
 ######################################## connect to database ########################################
 
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(HOMER_PERSISTENT_DATA, check_same_thread=False)
+    return sqlite3.connect(PERSISTENT_DATA, check_same_thread=False)
+
+import aiosqlite
+
+def aget_connection() -> aiosqlite.Connection:
+    """Asynchronous version of get_connection."""
+    return aiosqlite.connect(PERSISTENT_DATA)
 
 ######################################## format documents ########################################
 
@@ -69,6 +77,32 @@ def format_docs(docs: Optional[list[Document]]) -> str:
     return f"""<documents>
 {formatted}
 </documents>"""
+
+######################################## format messages ########################################
+
+import re
+
+from langchain_core.messages import AnyMessage, AIMessage
+from langchain_core.messages.human import HumanMessage
+
+
+def _format_message(message: AnyMessage) -> str:
+    text = re.sub(r'<think>.*?</think>', '', message.content, flags=re.DOTALL)
+    if isinstance(message, HumanMessage):
+        flag = "HumanMessage"
+    if isinstance(message, AIMessage):
+        flag = "AIMessage"
+    else:
+        flag = "message"
+    return f"<{flag}>\n{text}\n</{flag}>"
+
+def format_messages(messages: Optional[list[AnyMessage]])-> str:
+    if not messages:
+        return "<messages></messages>"
+    formatted = "\n".join(_format_message(message) for message in messages)
+    return f"""<messages>
+{formatted}
+<messages>"""
 
 ######################################## Embedding model ########################################
 
@@ -155,42 +189,10 @@ def get_message_text(msg: AnyMessage) -> str:
 
 ######################################## Manage base yaml config ########################################
 
-from pathlib import Path
 from src.core.configuration import Configuration, T  # Your dataclass config
 from typing import Type
 
-CONFIG_PATH = "./src/config/config.yaml"
-
 def load_config(cls: Type[T] = Configuration) -> T:
     """Load configuration from a YAML file into a dataclass instance."""
-    try:
-        with open(CONFIG_PATH, 'r') as f:
-            config_dict = yaml.safe_load(f)
-            if config_dict:
-                return cls(**config_dict)
-            else:
-                print("Warning: Configuration file is empty or invalid, loading default configuration.")
-    except (FileNotFoundError, yaml.YAMLError) as e:
-        print(f"Warning: Failed to load config from {CONFIG_PATH} ({e}), loading default configuration.")
-
     config = cls()
-    save_config(config)  # Save default config to file
     return config
-
-
-def _make_yaml_safe(data):
-    """Recursively convert non-serializable types (e.g. Path) to strings for YAML."""
-    if isinstance(data, dict):
-        return {k: _make_yaml_safe(v) for k, v in data.items()}
-    elif isinstance(data, list):
-        return [_make_yaml_safe(i) for i in data]
-    elif isinstance(data, Path):
-        return str(data)
-    return data
-
-
-def save_config(config: Configuration):
-    """Save a dataclass config instance to YAML, converting non-serializables."""
-    serializable = _make_yaml_safe(config.__dict__)
-    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(serializable, f, default_flow_style=False, allow_unicode=True)

@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from src.schemas.database import DB_SCHEMA, REQUIRED_TABLES
-from src.resources.utils import get_connection, HOMER_PERSISTENT_DATA
+from src.resources.utils import get_connection, PERSISTENT_DATA
 
 class DatabaseWrapper:
     def __init__(self):
-        self.db_path = Path(HOMER_PERSISTENT_DATA)
+        self.db_path = Path(PERSISTENT_DATA)
         self._initialize_database()
 
     def _database_has_required_tables(self,conn: sqlite3.Connection) -> bool:

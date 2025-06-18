@@ -204,7 +204,7 @@ graph = builder.compile(
     interrupt_before=[],  # if you want to update the state before calling the tools
     interrupt_after=[],
 )
-graph.name = "RetrievalGraph"
+graph.name = "ReportGraph"
 
 def get_report_graph() -> CompiledStateGraph:
-    return "Not implemented yet"
+    return graph
