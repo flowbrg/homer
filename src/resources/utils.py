@@ -2,14 +2,7 @@
 
 import os
 import yaml
-
-
-
-######################################## environment variables ########################################
-
-OLLAMA_CLIENT= "http://127.0.0.1:11434/"
-PERSISTENT_DATA = "./user_data/threads/threads.db"
-VECTORSTORE_PATH= "./user_data/vectorstore/"
+from src.env import *
 
 ######################################## connect to database ########################################
 
@@ -104,56 +97,6 @@ def format_messages(messages: Optional[list[AnyMessage]])-> str:
 {formatted}
 <messages>"""
 
-######################################## Embedding model ########################################
-
-from langchain.embeddings.base import Embeddings
-
-#def load_embeddings(model_name: str)-> Embeddings:
-#    from langchain_huggingface import HuggingFaceEmbeddings
-#    return HuggingFaceEmbeddings(model_name="nomic-ai/nomic-embed-text-v2-moe",cache_folder="./cache", model_kwargs={"trust_remote_code":True})
-
-def load_embedding_model(model: str, host: str = "http://localhost:11434") -> Embeddings:   
-    from langchain_ollama import OllamaEmbeddings
-    return OllamaEmbeddings(model=model,base_url=host)
-
-######################################## Chat model ########################################
-
-from langchain.chat_models.base import BaseChatModel
-
-def load_chat_model(model: str, host: str = "http://localhost:11434")-> BaseChatModel:
-    from langchain_ollama import ChatOllama
-    return ChatOllama(model=model,base_url=host)
-
-
-#def load_llm(model_name: str)-> BaseChatModel:
-#    from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
-#    from transformers.models.auto.tokenization_auto import AutoTokenizer
-
-    # load the tokenizer and the model
-#    tokenizer = AutoTokenizer.from_pretrained(model_name,cache_dir="./cache")
-
-
-#    llm = HuggingFacePipeline.from_model_id(
-#        model_id=model_name,
-#        task="text-generation",
-#        pipeline_kwargs=dict(
-#            max_new_tokens=512,
-#            do_sample=False,
-#            repetition_penalty=1.03,
-#        ),
-#        model_kwargs=dict(
-#            # https://huggingface.co/docs/transformers/main_classes/model
-#            torch_dtype="auto",
-#            device_map="cpu",
-#            cache_dir="./cache",
-#        )
-#    )
-
-#    return ChatHuggingFace(
-#       llm=llm,
-#        tokenizer=tokenizer,
-#    )
-
 ######################################## Structured messages ########################################
 
 from langchain_core.messages import AnyMessage
@@ -186,13 +129,3 @@ def get_message_text(msg: AnyMessage) -> str:
     else:
         txts = [c if isinstance(c, str) else (c.get("text") or "") for c in content]
         return "".join(txts).strip()
-
-######################################## Manage base yaml config ########################################
-
-from src.core.configuration import Configuration, T  # Your dataclass config
-from typing import Type
-
-def load_config(cls: Type[T] = Configuration) -> T:
-    """Load configuration from a YAML file into a dataclass instance."""
-    config = cls()
-    return config

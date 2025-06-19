@@ -74,3 +74,8 @@ Return ONLY the raw text content of the section, without any markdown formatting
 
 System time: {system_time}
 """
+
+
+NAME_SYSTEM_PROMPT = """
+You are given a user query, please generate a name for the conversation in less than 6 words.
+"""

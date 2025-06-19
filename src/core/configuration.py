@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
-from typing import Annotated, Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar
 
 from src.resources import prompts
-from src.resources.utils import OLLAMA_CLIENT
+from src.env import OLLAMA_CLIENT
 
 from langchain_core.runnables import RunnableConfig, ensure_config
 
 import os
+import requests
 
 @dataclass(kw_only=True)
 class Configuration:
@@ -20,36 +21,16 @@ class Configuration:
     retrieval processes.
     """
 
-    embedding_model: str = field(
-        default = "nomic-embed-text",
-        metadata = {
-            "description": "Name of the embedding model to use. Must be a valid embedding model name."
-        },
-    )
-
+    # prompts
     response_system_prompt: str = field(
         default = prompts.RESPONSE_SYSTEM_PROMPT,
         metadata = {"description": "The system prompt used for generating responses."},
-    )
-
-    response_model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
-        default = "gemma3:1b-it-qat",   #"qwen3:0.6b",
-        metadata = {
-            "description": "The language model used for generating responses. Must be a valid LLM name."
-        },
     )
 
     query_system_prompt: str = field(
         default=prompts.QUERY_SYSTEM_PROMPT,
         metadata={
             "description": "The system prompt used for processing and refining queries."
-        },
-    )
-
-    query_model: str = field(
-        default = "gemma3:1b-it-qat",   #"qwen3:0.6b",
-        metadata = {
-            "description": "The language model used for processing and refining queries. Must be a valid LLM name."
         },
     )
 
@@ -60,25 +41,37 @@ class Configuration:
         },
     )
 
-    outline_model: str = field(
-        default = "gemma3:1b-it-qat",   #"qwen3:0.6b",
-        metadata = {
-            "description": "The language model used for processing the outline of the report. Must be a valid LLM name."
-        },
-    )
-
-    ollama_host: str = field(
-        default = OLLAMA_CLIENT,
-        metadata = {
-            "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
-        },
-    )
-
+    # Report configuration
     number_of_parts: int = field(
         default = 3,
         metadata = {
             "description": "The number of parts in the report outline. Must be a positive integer."
         },
+    )
+
+    # Ollama configuration
+    ollama_host: str = field(
+        default = "https://127.0.0.1:11434/",
+        metadata = {
+            "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
+        },
+    )
+    
+    # Models
+    embedding_model: str = field(
+        default = "nomic-embed-text",
+    )
+
+    response_model: str = field(
+        default = "gemma3:1b",   #"qwen3:0.6b",
+    )
+
+    query_model: str = field(
+        default = "gemma3:1b",   #"qwen3:0.6b",
+    )
+
+    outline_model: str = field(
+        default = "gemma3:1b",   #"qwen3:0.6b",
     )
 
     def asdict(self) -> dict[str, any]:
@@ -113,3 +106,19 @@ class Configuration:
 
 
 T = TypeVar("T", bound=Configuration)
+
+
+def _is_ollama_client_available(url: str) -> bool:
+    import requests
+    try:
+        response = requests.get(url, timeout=2)
+        return response.ok
+    except requests.RequestException:
+        return False
+
+def load_config(cls: Optional[Type[T]] = Configuration) -> T:
+    config = cls()
+    if _is_ollama_client_available(OLLAMA_CLIENT):
+        print(f"[info] {OLLAMA_CLIENT} available")
+        config.ollama_host = OLLAMA_CLIENT
+    return config

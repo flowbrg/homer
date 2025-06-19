@@ -5,7 +5,6 @@ retrieval graph. It includes the main graph definition, state management,
 and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
-import sqlite3
 
 from datetime import datetime, timezone
 from typing import cast
@@ -23,12 +22,8 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from src.core.agents import retrieval
 from src.core.agents.states import InputState, State
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, format_messages, get_message_text, load_chat_model, load_embedding_model
-
-# Checkpointer
-
-graph_conn = sqlite3.connect(":memory:", check_same_thread = False)
-memory = SqliteSaver(graph_conn)
+from src.resources.utils import format_docs, format_messages, get_connection
+from src.core.models import load_chat_model, load_embedding_model
 
 # Define the function that calls the model
 
@@ -210,10 +205,10 @@ def get_retrieval_graph() -> CompiledStateGraph:
 
     # Finally, we compile it!
     # This compiles it into a graph you can invoke and deploy.
+    memory = SqliteSaver(get_connection())
     graph = builder.compile(
         checkpointer=memory, # Use the SQLite checkpointer for memory
         interrupt_before=[],
         interrupt_after=[],
     )
-
     return graph
