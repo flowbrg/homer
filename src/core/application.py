@@ -5,6 +5,7 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 
 from src.core.configuration import Configuration
+from src.core import database as db
 from src.core.agents.retrival_graph import get_retrieval_graph
 from src.core.agents.simple_query_graph import get_simple_query_graph
 
@@ -27,6 +28,12 @@ class Application:
     
     def set_config(self, config: Configuration):
         self._config = config
+
+    def get_config(self):
+        return self._current_thread
+    
+    def set_current_thread(self, thread = int):
+        self._current_thread = thread
 
     def get_messages(
             self,

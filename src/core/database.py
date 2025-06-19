@@ -52,6 +52,26 @@ def new_thread(thread_id: int, thread_name: str):
         )
 
 
+def edit_thread_name(thread_id: int, new_thread_name: str) -> bool:
+    """
+    Edit the thread name for a given thread ID.
+    
+    Args:
+        thread_id (int): The thread ID to update (primary key)
+        new_thread_name (str): The new name for the thread
+    
+    Returns:
+        bool: True if the thread was updated successfully, False if no thread was found
+    """
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "UPDATE threads SET thread_name = ? WHERE thread_id = ?", 
+            (new_thread_name, thread_id)
+        )
+        # Return True if at least one row was affected, False otherwise
+        return cursor.rowcount > 0
+
+
 def delete_thread(thread_id: int):
     with get_connection() as conn:
         conn.execute("DELETE FROM threads WHERE thread_id = ?", (thread_id,))
