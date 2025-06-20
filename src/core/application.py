@@ -5,9 +5,11 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 
 from src.core.configuration import Configuration
-from src.core import database as db
 from src.core.agents.retrival_graph import get_retrieval_graph
 from src.core.agents.simple_query_graph import get_simple_query_graph
+from src.core.agents.report_graph import get_report_graph
+from src.core.agents.index_graph import get_index_graph
+
 
 from typing import Any, Dict
 
@@ -21,7 +23,8 @@ class Application:
         self._config = config
         self._retrieval_graph = get_retrieval_graph()
         self._simple_query_graph = get_simple_query_graph()
-        #self._report_graph = get_report_graph()
+        self._report_graph = get_report_graph()
+        self._index_graph = get_index_graph()
 
     def get_config(self):
         return self._config
@@ -46,13 +49,13 @@ class Application:
     def invoke_simple_query_graph(
             self,
             query: str) -> Dict[str, Any] | Any:
-        """Invoke the retrieval graph with a query and thread ID.
+        """Invoke a graph to name the discussion.
 
         Args:
-            query (dict[str, Any] | Any): The query to process.
+            query (dict[str, Any] | Any): The first message of a discussion.
 
         Returns:
-            Dict[str, Any] | Any: The result of the retrieval process.
+            str: The name of the discussion.
         """
         config = {"configurable": self._config.asdict()}
         output = self._simple_query_graph.invoke(input={"messages":[HumanMessage(content=query)]}, config=config)
@@ -79,14 +82,6 @@ class Application:
     def invoke_report_graph(query: str):
         return "Report generation is not implemented yet."
     
+    def invoke_index_graph(self):
+        return "Index is not implemented yet."
 
-    # Uncomment the following methods if you want to implement knowledge base population and clearing
-
-    #def populate_knowledge(self):
-    #    print("Populating the knowledge base...")
-    #    update_database(config=self.config)
-    #    print("Knowledge base update complete")
-        
-
-    #def clear_knowledge(self):
-    #    clear(config=self.config)

@@ -18,6 +18,7 @@ def _database_has_required_tables(conn: sqlite3.Connection) -> bool:
 def initialize_database():
     """Initializes the SQLite database with the required schema."""
     db_path = Path(PERSISTENT_DATA)
+    os.makedirs(db_path.stem, exist_ok=True)
     db_exists = db_path.exists()
     initialize = True
 

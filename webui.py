@@ -9,9 +9,10 @@ def _init():
     if "backend" not in st.session_state:
         st.session_state.backend = Application(config=st.session_state.baseConfig)
     if "threads" not in st.session_state:
+        # st.session_state.threads is list[(thread_id = int, thread_name = str)]
         st.session_state.threads = db.get_all_threads()
-    # Only set currentThread if it doesn't exist or if there are no threads
     if "currentThread" not in st.session_state:
+        # st.session_state.currentThread is (thread_id = int, thread_name = str)
         st.session_state.currentThread = st.session_state.threads[-1] if st.session_state.threads else None
 
 st.set_page_config(page_title="Homer")
@@ -43,7 +44,7 @@ def _create_new_thread():
 
 def _delete_current_thread():
     """Delete the current thread"""
-    db.delete_thread(st.session_state.currentThread)
+    db.delete_thread(thread_id=st.session_state.currentThread[0])
     st.session_state.threads = db.get_all_threads()
     
     # Set current thread to the last available thread, or None if no threads exist
@@ -62,8 +63,8 @@ def _build_sidebar():
         
         # Find current thread index
         current_idx = 0
-        if st.session_state.currentThread in thread_ids:
-            current_idx = thread_ids.index(st.session_state.currentThread)
+        if st.session_state.currentThread[0] in thread_ids:
+            current_idx = thread_ids.index(st.session_state.currentThread[0])
         
         selected_idx = st.sidebar.selectbox(
             label="Select Thread:",
@@ -75,7 +76,7 @@ def _build_sidebar():
         
         # Update current thread when selection changes
         if selected_idx is not None:
-            st.session_state.currentThread = st.session_state.threads[selected_idx][0]
+            st.session_state.currentThread = st.session_state.threads[selected_idx]
     else:
         st.sidebar.write("No threads available")
     
@@ -90,14 +91,14 @@ def _build_sidebar():
 def _name_discussion(query: str):
     """Name the discussion based on the first query"""
     chat_name = st.session_state.backend.invoke_simple_query_graph(query=query)
-    db.edit_thread_name(thread_id=st.session_state.currentThread, thread_name=chat_name)
-    st.session.currentThread[1] = chat_name  # Update the current thread name in session state
+    db.edit_thread_name(thread_id=st.session_state.currentThread[0], new_thread_name=chat_name)
+    st.session_state.currentThread = (st.session_state.currentThread[0], chat_name)  # Update the current thread name in session state
     st.session_state.threads = db.get_all_threads()
 
 def main():
     # Handle the case where we need to create a new thread
     if st.session_state.currentThread is None and st.session_state.threads:
-        st.session_state.currentThread = st.session_state.threads[-1][0]
+        st.session_state.currentThread = st.session_state.threads[-1]
     elif st.session_state.currentThread is None:
         _create_new_thread()
 
@@ -106,13 +107,13 @@ def main():
 
     # Display current conversation
     if st.session_state.currentThread is not None:
-        _display_conversation(st.session_state.currentThread)
+        _display_conversation(thread_id=st.session_state.currentThread[0])
     
     # Chat input
     query = st.chat_input("Enter your query:")
     if query:
         # If this is a new thread that hasn't been named yet, name it
-        if st.session.currentThread[1] == "New Thread":
+        if st.session_state.currentThread[1] == "New Thread":
             _name_discussion(query)
         
         # Display user message
@@ -127,7 +128,7 @@ def main():
                 with st.spinner("Processing your query..."):
                     for chunk in st.session_state.backend.stream_retrieval_graph(
                         query=query,
-                        thread_id=st.session_state.currentThread
+                        thread_id=st.session_state.currentThread[0]
                     ):
                         streamed_text += chunk
                         response_placeholder.markdown(streamed_text)
@@ -135,7 +136,6 @@ def main():
             except Exception as e:
                 error_message = f"Error processing query: {str(e)}"
                 response_placeholder.markdown(error_message)
-            st.rerun(scope="scope")
 
 if __name__ == "__main__":
     _init()

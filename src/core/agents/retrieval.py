@@ -8,13 +8,14 @@ The retrievers support filtering results by user_id to ensure data isolation bet
 
 from contextlib import contextmanager
 from typing import Generator
-from pathlib import Path
 
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
 
 from src.resources.utils import VECTORSTORE_PATH
 
+
+_COLLECTION = "HOMER"
 
 @contextmanager
 def make_retriever(
@@ -24,9 +25,17 @@ def make_retriever(
     from langchain_chroma import Chroma
 
     vector_store = Chroma(
-        collection_name = "example_collection",
+        collection_name = _COLLECTION,
         embedding_function = embedding_model,
         persist_directory = VECTORSTORE_PATH,  # Where to save data locally, remove if not necessary
     )
 
     yield vector_store.as_retriever()
+
+
+def get_existing_documents():
+    return "not implemented yet"
+
+
+def delete_documents(docs: str | list[str]):
+    return "not implemented yet"

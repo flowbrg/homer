@@ -7,7 +7,6 @@ relevant documents, and formulating responses.
 """
 
 from datetime import datetime, timezone
-from typing import cast, TypedDict
 from pydantic import BaseModel
 
 from langchain_core.documents import Document
@@ -17,9 +16,8 @@ from langchain_core.runnables import RunnableConfig
 
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
-from langgraph.checkpoint.sqlite import SqliteSaver
 
-from src.core.agents import retrieval, InputState, State, StateReport
+from src.core.agents import retrieval, InputState, StateReport
 from src.core.configuration import Configuration
 from src.resources.utils import format_docs, get_message_text, load_chat_model, load_embedding_model, get_connection
 from src.resources import prompts
