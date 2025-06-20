@@ -132,3 +132,9 @@ def get_message_text(msg: AnyMessage) -> str:
     else:
         txts = [c if isinstance(c, str) else (c.get("text") or "") for c in content]
         return "".join(txts).strip()
+        
+######################################## Remove duplicates ########################################
+
+def remove_duplicates(base: list[str], new: list[str]) -> list[str]:
+    base_set = set(base)
+    return [item for item in new if item not in base_set]

@@ -51,9 +51,9 @@ class Configuration:
 
     # Ollama configuration
     ollama_host: str = field(
-        default = "https://127.0.0.1:11434/",
+        default = "http://127.0.0.1:11434/",
         metadata = {
-            "description": "The host URL for the Ollama service. Must be a valid URL. Default is https://127.0.0.1:11434/"
+            "description": "The host URL for the Ollama service. Must be a valid URL. Default is http://127.0.0.1:11434/"
         },
     )
     

@@ -2,9 +2,7 @@
 tests/
 user_data/data
 graph.ipynb
-user_data/threads/threads.db
-user_data/threads/threads.db-wal
-user_data/threads/threads.db-shm
+user_data/vectorstore
 
 
 .ipynb_checkpoints/

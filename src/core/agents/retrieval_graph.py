@@ -64,7 +64,7 @@ def generate_query(
         ]
     )
 
-    model = load_chat_model(model = configuration.query_model).with_structured_output(
+    model = load_chat_model(model = configuration.query_model, host = configuration.ollama_host).with_structured_output(
         SearchQuery
     )
 
@@ -102,7 +102,7 @@ def retrieve(
         containing a list of retrieved Document objects.
     """
     configuration = Configuration.from_runnable_config(config)
-    with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
+    with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model, host = configuration.ollama_host)) as retriever:
         response = retriever.invoke(state.enhanced_query, config)
         return {
             "retrieved_docs": response
@@ -120,7 +120,7 @@ def respond(
             ("human", "{messages}"),
         ]
     )
-    model = load_chat_model(model = configuration.response_model)
+    model = load_chat_model(model = configuration.response_model, host = configuration.ollama_host)
 
     retrieved_docs = format_docs(state.retrieved_docs)
     history = format_messages(state.messages)

@@ -5,7 +5,7 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 
 from src.core.configuration import Configuration
-from src.core.agents.retrival_graph import get_retrieval_graph
+from src.core.agents.retrieval_graph import get_retrieval_graph
 from src.core.agents.simple_query_graph import get_simple_query_graph
 from src.core.agents.report_graph import get_report_graph
 from src.core.agents.index_graph import get_index_graph
@@ -82,6 +82,6 @@ class Application:
     def invoke_report_graph(query: str):
         return "Report generation is not implemented yet."
     
-    def invoke_index_graph(self):
-        return "Index is not implemented yet."
+    def invoke_index_graph(self, path: str):
+        self._index_graph.invoke(input={"path": path})
 

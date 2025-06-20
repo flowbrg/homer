@@ -6,9 +6,77 @@ from langchain_core.documents import Document
 from langchain_core.messages import AnyMessage
 from langgraph.graph import add_messages
 
+
+def reduce_docs(
+    existing: Optional[Sequence[Document]],
+    new: Union[
+        Sequence[Document],
+        Sequence[dict[str, Any]],
+        Sequence[str],
+        str,
+        Literal["delete"],
+    ],
+) -> Sequence[Document]:
+    """Reduce and process documents based on the input type.
+
+    This function handles various input types and converts them into a sequence of Document objects.
+    It can delete existing documents, create new ones from strings or dictionaries,
+    or return the existing documents.
+
+    Args:
+        existing (Optional[Sequence[Document]]): The existing docs in the state, if any.
+        new (Union[Sequence[Document], Sequence[dict[str, Any]], Sequence[str], str, Literal["delete"]]):
+            The new input to process. Can be a sequence of Documents, dictionaries, strings,
+            a single string, or the literal "delete".
+    """
+    if new == "delete":
+        return []
+    if isinstance(new, str):
+        return [Document(page_content=new, metadata={"id": str(uuid.uuid4())})]
+    if isinstance(new, list):
+        coerced = []
+        for item in new:
+            if isinstance(item, str):
+                coerced.append(
+                    Document(page_content=item, metadata={"id": str(uuid.uuid4())})
+                )
+            elif isinstance(item, dict):
+                coerced.append(Document(**item))
+            else:
+                coerced.append(item)
+        return coerced
+    return existing or []
+
+
+@dataclass(kw_only=True)
+class InputIndexState:
+    """Represents the input state for document indexing.
+
+    This class defines the structure of the input index state, which includes
+    the path of the documents to be indexed.
+    """
+
+    path: str
+    """The path to the files."""
+
+
+@dataclass(kw_only=True)
+class IndexState(InputIndexState):
+    """Represents the state for document indexing.
+
+    Attrs:
+        docs (Sequence[Document]): a sequence of documents using a reducer
+        to handle parallel modifications
+    """
+
+    docs: Annotated[Sequence[Document], reduce_docs]
+    """A list of documents that the agent can index."""
+
+
 # Optional, the InputState is a restricted version of the State that is used to
 # define a narrower interface to the outside world vs. what is maintained
 # internally.
+
 
 @dataclass(kw_only=True)
 class InputState:
