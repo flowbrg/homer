@@ -9,7 +9,10 @@ from src.env import *
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(PERSISTENT_DATA, check_same_thread=False)
+    return sqlite3.connect(
+        database=":memory:",  #PERSISTENT_DATA,
+        check_same_thread=False
+    )
 
 import aiosqlite
 

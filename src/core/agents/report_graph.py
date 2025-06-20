@@ -19,7 +19,8 @@ from langgraph.graph.state import CompiledStateGraph
 
 from src.core.agents import retrieval, InputState, StateReport
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, get_message_text, load_chat_model, load_embedding_model, get_connection
+from src.resources.utils import format_docs, get_message_text
+from src.core.models import load_chat_model, load_embedding_model
 from src.resources import prompts
 
 

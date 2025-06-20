@@ -1,31 +1,31 @@
 import streamlit as st
 
-st.set_page_config(page_title="Report", page_icon="🔍")
+from src.core.application import Application
+from src.core.configuration import load_config
 
-st.markdown("# Query")
-st.sidebar.header("Query")
+def _init():
+    if "baseConfig" not in st.session_state:
+        st.session_state.baseConfig = load_config()
+    if "backend" not in st.session_state:
+        st.session_state.backend = Application(config=st.session_state.baseConfig)
+
+st.set_page_config(page_title="Report")
+
 
 def main():
-    # Display conversation history
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
     # Create the query input area at the bottom
     query = st.chat_input("Enter your query:")
 
     if query:
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": query})
-        history.append(query)
-
-        # Display the user message immediately
-        with st.chat_message
+        with st.spinner("Updating database..."):
+            try:
+                st.session_state.backend.invoke_report_graph(query=query)
+            except Exception as e:
+                st.error(f"Error generating the report: {str(e)}")
+            else:
+                st.success("Report generated.")
+        
+        st.info()
 
 if __name__ == "__main__":
-    if "logged_in" not in st.session_state:
-        st.error("You are not logged in")
-    elif not st.session_state.logged_in:
-        st.error("You are not logged in")
-    else:
-        main()
+    _init()
