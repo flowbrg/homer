@@ -12,8 +12,8 @@ from src.core.agents.retrieval import get_existing_documents
 def _init():
     if "baseConfig" not in st.session_state:
         st.session_state.baseConfig = load_config()
-    if "indexGraph" not in st.session_state:
-        st.session_state.indexGraph = Application(config=st.session_state.baseConfig)
+    if "backend" not in st.session_state:
+        st.session_state.backend = Application(config=st.session_state.baseConfig)
 
 st.set_page_config(page_title="Documents")
 
@@ -96,4 +96,5 @@ def list_documents():
     )
 
 if __name__ == "__main__":
+    _init()
     main()
