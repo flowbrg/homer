@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.core.configuration import load_config
 from src.core.application import Application
-from src.core.agents.retrieval import delete_documents
+from src.core.retrieval import delete_documents
 from src.env import UPLOAD_DIR
 from src.core.retrieval import get_existing_documents
 

@@ -21,26 +21,6 @@ class Configuration:
     retrieval processes.
     """
 
-    # prompts
-    response_system_prompt: str = field(
-        default = prompts.RESPONSE_SYSTEM_PROMPT,
-        metadata = {"description": "The system prompt used for generating responses."},
-    )
-
-    query_system_prompt: str = field(
-        default=prompts.QUERY_SYSTEM_PROMPT,
-        metadata={
-            "description": "The system prompt used for processing and refining queries."
-        },
-    )
-
-    outline_system_prompt: str = field(
-        default=prompts.OUTLINE_SYSTEM_PROMPT,
-        metadata = {
-            "description": "The system prompt used for generating outlines for reports."
-        },
-    )
-
     # Report configuration
     number_of_parts: int = field(
         default = 3,

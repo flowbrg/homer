@@ -123,7 +123,7 @@ class InputState:
 
 
 @dataclass(kw_only=True)
-class State(InputState):
+class RetrievalState(InputState):
     """The state of your graph / agent."""
 
     enhanced_query: list[str] = field(default_factory=list)
@@ -152,7 +152,7 @@ def add_sections(
 
 
 @dataclass(kw_only=True)
-class StateReport(InputState):
+class ReportState(InputState):
     """The state of your report graph / agent."""
 
     query: str = field(default_factory=list)

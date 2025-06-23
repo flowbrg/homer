@@ -6,7 +6,7 @@ and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
 
-from datetime import datetime, timezone
+#from datetime import datetime, timezone
 from typing import cast
 from pydantic import BaseModel
 
@@ -15,14 +15,15 @@ from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableConfig
 
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from src.core import retrieval
-from src.core.agents.states import InputState, State
+from src.core.agents.states import InputState, RetrievalState
 from src.core.configuration import Configuration
 from src.resources.utils import format_docs, format_messages, get_connection
+from src.resources import prompts
 from src.core.models import load_chat_model, load_embedding_model
 
 # Define the function that calls the model
@@ -34,7 +35,7 @@ class SearchQuery(BaseModel):
 
 
 def generate_query(
-    state: State, *, config: RunnableConfig
+    state: RetrievalState, *, config: RunnableConfig
 ) -> dict[str, list[str]]:
     """Generate a search query based on the current state and configuration.
 
@@ -43,7 +44,7 @@ def generate_query(
     For subsequent messages, it uses a language model to generate a refined query.
 
     Args:
-        state (State): The current state containing messages and other information.
+        state (RetrievalState): The current state containing messages and other information.
         config (RunnableConfig | None, optional): Configuration for the query generation process.
 
     Returns:
@@ -59,19 +60,19 @@ def generate_query(
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", configuration.query_system_prompt),
+            ("system", prompts.QUERY_SYSTEM_PROMPT),
             ("human", "{message}"),
         ]
     )
 
-    model = load_chat_model(model = configuration.query_model, host = configuration.ollama_host).with_structured_output(
+    model = load_chat_model(model = configuration.query_model, ).with_structured_output(
         SearchQuery
     )
 
     message_value = prompt.invoke(
         {
-            "message": state.messages[-1],
-            "system_time": datetime.now(tz=timezone.utc).isoformat(),
+            "message": format_messages(state.messages[-3:]) if len(state.messages) >= 3 else format_messages(state.messages),
+            #"system_time": datetime.now(tz=timezone.utc).isoformat(),
         },
         config,
     )
@@ -85,7 +86,7 @@ def generate_query(
 
 
 def retrieve(
-    state: State, *, config: RunnableConfig
+    state: RetrievalState, *, config: RunnableConfig
 ) -> dict[str, list[Document]]:
     """Retrieve documents based on the latest query in the state.
 
@@ -94,7 +95,7 @@ def retrieve(
     the retrieved documents.
 
     Args:
-        state (State): The current state containing queries and the retriever.
+        state (RetrievalState): The current state containing queries and the retriever.
         config (RunnableConfig | None, optional): Configuration for the retrieval process.
 
     Returns:
@@ -102,7 +103,7 @@ def retrieve(
         containing a list of retrieved Document objects.
     """
     configuration = Configuration.from_runnable_config(config)
-    with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model, host = configuration.ollama_host)) as retriever:
+    with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
         response = retriever.invoke(state.enhanced_query, config)
         return {
             "retrieved_docs": response
@@ -110,27 +111,27 @@ def retrieve(
 
 
 def respond(
-    state: State, *, config: RunnableConfig
+    state: RetrievalState, *, config: RunnableConfig
 ) -> dict[str, list[BaseMessage]]:
     """Call the LLM powering our "agent"."""
     configuration = Configuration.from_runnable_config(config)
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", configuration.response_system_prompt),
+            ("system", prompts.RESPONSE_SYSTEM_PROMPT),
             ("human", "{messages}"),
         ]
     )
-    model = load_chat_model(model = configuration.response_model, host = configuration.ollama_host)
+    model = load_chat_model(model = configuration.response_model)
 
     retrieved_docs = format_docs(state.retrieved_docs)
-    history = format_messages(state.messages)
     
+    nb_messages = len(state.messages)%6 # The amount of messages since last summary
     message_value = prompt.invoke(
         {
-            "messages": state.messages,
+            "messages": state.messages[-nb_messages:],  # Limit to last 6 messages, which were not included in the last summary
             "context": retrieved_docs,
-            "history": history,
-            "system_time": datetime.now(tz=timezone.utc).isoformat(),
+            "summary": state.summary if state.summary else "",
+            #"system_time": datetime.now(tz=timezone.utc).isoformat(),
         },
         config,
     )
@@ -142,6 +143,58 @@ def respond(
         "enhanced_query": "",
     }
 
+
+def summarize_conversation(
+    state: RetrievalState, *, config: RunnableConfig
+) -> dict[str, list[BaseMessage]]:
+    # First, we get any existing summary
+    summary = state.summary if state.summary else ""
+    # If we have a summary, we will extend it with the new messages
+
+    configuration = Configuration.from_runnable_config(config)
+
+    # Create our summarization prompt 
+    if summary:
+        
+        # A summary already exists
+        summary_system_prompt = f"""This is summary of the conversation to date:
+        <summary>
+        {summary}
+        </summary>
+
+        Extend the summary by taking into account the new messages above:
+        """
+
+    else:
+        summary_system_prompt = "Create a summary of the conversation:"
+
+    model = load_chat_model(model = configuration.query_model)
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", summary_system_prompt),
+            ("human", "{messages}"),
+        ]
+    )
+    message_value = prompt.invoke(
+        {
+            "messages": state.messages[-6:], # Limit to last 6 messages
+        },
+        config,
+    )
+
+    # Add prompt to our history
+    response = model.invoke(message_value, config)
+    
+    # Delete all but the 2 most recent messages
+    return {"summary": response.content}
+
+def should_summarize(
+    state: RetrievalState, *, config: RunnableConfig
+):
+    if len(state.messages) % 6 == 0:
+        return "summarize_conversation"
+    return END 
 
 def get_retrieval_graph() -> CompiledStateGraph:
     """
@@ -194,14 +247,16 @@ def get_retrieval_graph() -> CompiledStateGraph:
         - Ensure the `Configuration` object matches the schema expected by the graph (`config_schema`).
     """
 
-    builder = StateGraph(State, input=InputState, config_schema=Configuration)
+    builder = StateGraph(RetrievalState, input=InputState, config_schema=Configuration)
 
     builder.add_node(generate_query)
     builder.add_node(retrieve)
     builder.add_node(respond)
+    builder.add_node(summarize_conversation)
     builder.add_edge("__start__", "generate_query")
     builder.add_edge("generate_query", "retrieve")
     builder.add_edge("retrieve", "respond")
+    builder.add_conditional_edges("respond", should_summarize)
 
     # Finally, we compile it!
     # This compiles it into a graph you can invoke and deploy.

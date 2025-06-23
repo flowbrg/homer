@@ -8,6 +8,7 @@ relevant documents, and formulating responses.
 
 from datetime import datetime, timezone
 from pydantic import BaseModel
+from typing import cast
 
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage
@@ -17,7 +18,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 
-from src.core.agents import InputState, StateReport
+from src.core.agents import InputState, ReportState
 from src.core.configuration import Configuration
 from src.resources.utils import format_docs, get_message_text
 from src.core.models import load_chat_model, load_embedding_model
@@ -40,7 +41,7 @@ class Outline(BaseModel):
 
 
 def improve_query(
-    state: StateReport, *, config: RunnableConfig
+    state: ReportState, *, config: RunnableConfig
     ) -> dict[str, list[str]]:
     """Generate a search query based on the user input and configuration.
 
@@ -69,7 +70,7 @@ def improve_query(
     return {"query": get_message_text(improved_query)}
 
 def generate_outline(
-    state: StateReport, *, config: RunnableConfig
+    state: ReportState, *, config: RunnableConfig
     ) -> list[dict[str, str]]:
     """Generate an outline based on the latest query in the state.
 
@@ -88,7 +89,7 @@ def generate_outline(
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", configuration.outline_system_prompt),
+            ("system", prompts.OUTLINE_SYSTEM_PROMPT),
             ("human", "{message}"),
         ]
     )
@@ -114,7 +115,7 @@ def generate_outline(
 
 
 def retrieve(
-    state: StateReport, *, config: RunnableConfig
+    state: ReportState, *, config: RunnableConfig
 ) -> dict[str, list[Document]]:
     """Retrieve documents based on the latest query in the state.
 
@@ -146,7 +147,7 @@ def retrieve(
 
 
 def generate_section(
-    state: StateReport, *, config: RunnableConfig
+    state: ReportState, *, config: RunnableConfig
 ) -> dict[str, list[BaseMessage]]:
     """Call the LLM powering our "agent"."""
     configuration = Configuration.from_runnable_config(config)
@@ -177,14 +178,14 @@ def generate_section(
     return {"report": [current_section]}
 
 
-def should_continue(state: StateReport, *, config: RunnableConfig):
+def should_continue(state: ReportState, *, config: RunnableConfig):
     if len(state.outlines) == 0:
         return END
     else:
         return "retrieve"
 
 
-builder = StateGraph(StateReport, input=InputState, config_schema=Configuration)
+builder = StateGraph(ReportState, input=InputState, config_schema=Configuration)
 
 builder.add_node(improve_query)
 builder.add_node("initial_retrieval", retrieve)
