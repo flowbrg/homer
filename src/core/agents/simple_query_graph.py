@@ -13,7 +13,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from src.core.agents.states import InputState, State
+from src.core.agents.states import InputState
 from src.core.configuration import Configuration
 from src.core.models import load_chat_model
 from src.resources import prompts
@@ -86,7 +86,7 @@ def get_simple_query_graph() -> CompiledStateGraph:
         - Ensure the `Configuration` object matches the schema expected by the graph (`config_schema`).
     """
 
-    builder = StateGraph(State, input=InputState, config_schema=Configuration)
+    builder = StateGraph(InputState, input=InputState, config_schema=Configuration)
 
     builder.add_node(respond)
     builder.add_edge("__start__", "respond")

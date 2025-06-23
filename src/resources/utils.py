@@ -14,11 +14,11 @@ def get_connection() -> sqlite3.Connection:
         check_same_thread=False
     )
 
-import aiosqlite
-
-def aget_connection() -> aiosqlite.Connection:
-    """Asynchronous version of get_connection."""
-    return aiosqlite.connect(PERSISTENT_DATA)
+#import aiosqlite
+#
+#def aget_connection() -> aiosqlite.Connection:
+#    """Asynchronous version of get_connection."""
+#    return aiosqlite.connect(PERSISTENT_DATA)
 
 ######################################## connect to database ########################################
 

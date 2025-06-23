@@ -1,7 +1,7 @@
-from .states import InputState, State, StateReport
+from .states import InputState, RetrievalState, ReportState
 
 __all__ = [
     "InputState",
-    "State",
-    "StateReport",
+    "RetrievalState",
+    "ReportState",
 ]
