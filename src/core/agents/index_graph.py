@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 
-from src.core.agents import retrieval
+from src.core import retrieval
 from src.core.configuration import Configuration
 from src.core.agents.states import IndexState, InputIndexState
 from src.core.models import load_embedding_model

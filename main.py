@@ -11,7 +11,7 @@ def run_streamlit_app():
     except subprocess.CalledProcessError as e:
         print(f"Streamlit exited with error: {e}")
 
-def ensure_path(path_str):
+def ensure_path(path_str: str):
     """Crée le répertoire parent si le chemin est un fichier, ou le répertoire lui-même."""
     from pathlib import Path
     path = Path(path_str)

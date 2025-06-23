@@ -19,7 +19,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-from src.core.agents import retrieval
+from src.core import retrieval
 from src.core.agents.states import InputState, State
 from src.core.configuration import Configuration
 from src.resources.utils import format_docs, format_messages, get_connection

@@ -24,8 +24,8 @@ def main():
                 st.error(f"Error generating the report: {str(e)}")
             else:
                 st.success("Report generated.")
-        
-        st.info()
+
 
 if __name__ == "__main__":
     _init()
+    main()
