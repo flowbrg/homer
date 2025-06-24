@@ -7,7 +7,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from src.core import retrieval
 from src.core.configuration import Configuration
-from src.core.agents.states import IndexState, InputIndexState
+from src.core.states import IndexState, InputIndexState
 from src.core.models import load_embedding_model
 from src.resources.utils import remove_duplicates
 

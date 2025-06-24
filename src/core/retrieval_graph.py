@@ -20,11 +20,11 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from src.core import retrieval
-from src.core.agents.states import InputState, RetrievalState
+from src.core.states import InputState, RetrievalState
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, format_messages, format_sources, get_message_text, get_connection
-from src.resources import prompts
 from src.core.models import load_chat_model, load_embedding_model
+from src.resources.utils import format_docs, format_messages, format_sources, get_connection
+from src.resources import prompts
 
 # Define the function that calls the model
 
@@ -65,7 +65,7 @@ def generate_query(
         ]
     )
 
-    model = load_chat_model(model = configuration.query_model, ).with_structured_output(
+    model = load_chat_model(model = configuration.query_model, host=configuration.ollama_host).with_structured_output(
         SearchQuery
     )
 
@@ -104,7 +104,8 @@ def retrieve(
         containing a list of retrieved Document objects.
     """
     configuration = Configuration.from_runnable_config(config)
-    with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
+    embeddings = load_embedding_model(model=configuration.embedding_model, host=configuration.ollama_host)
+    with retrieval.make_retriever(embedding_model = embeddings) as retriever:
         response = retriever.invoke(state.query, config)
         return {
             "retrieved_docs": response
@@ -122,7 +123,7 @@ def respond(
             ("human", "{messages}"),
         ]
     )
-    model = load_chat_model(model = configuration.response_model)
+    model = load_chat_model(model = configuration.response_model, host=configuration.ollama_host)
     
     nb_messages = len(state.messages)%6 # The amount of messages since last summary
     message_value = prompt.invoke(
@@ -173,7 +174,7 @@ def summarize_conversation(
     else:
         summary_system_prompt = "Create a summary of the conversation:"
 
-    model = load_chat_model(model = configuration.query_model)
+    model = load_chat_model(model = configuration.query_model, host=configuration.ollama_host)
 
     prompt = ChatPromptTemplate.from_messages(
         [

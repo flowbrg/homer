@@ -23,7 +23,7 @@ class Configuration:
 
     # Report configuration
     number_of_parts: int = field(
-        default = 3,
+        default = 5,
         metadata = {
             "description": "The number of parts in the report outline. Must be a positive integer."
         },

@@ -17,18 +17,7 @@ def reduce_docs(
         Literal["delete"],
     ],
 ) -> Sequence[Document]:
-    """Reduce and process documents based on the input type.
-
-    This function handles various input types and converts them into a sequence of Document objects.
-    It can delete existing documents, create new ones from strings or dictionaries,
-    or return the existing documents.
-
-    Args:
-        existing (Optional[Sequence[Document]]): The existing docs in the state, if any.
-        new (Union[Sequence[Document], Sequence[dict[str, Any]], Sequence[str], str, Literal["delete"]]):
-            The new input to process. Can be a sequence of Documents, dictionaries, strings,
-            a single string, or the literal "delete".
-    """
+    """Reduce and process documents based on the input type."""
     if new == "delete":
         return []
     if isinstance(new, str):
@@ -135,40 +124,36 @@ class RetrievalState(InputState):
     summary: str = field(default_factory=str)
     """A summary of the retrieved documents or the conversation history."""
 
-    # Feel free to add additional attributes to your state as needed.
-    # Common examples include retrieved documents, extracted entities, API connections, etc.
-
 
 def add_sections(
-    existing: Sequence[dict[str, str]], new: Sequence[dict[str, str]]
+    existing: Sequence[dict[str, str]], 
+    new: Union[Sequence[dict[str, str]], dict[str, str]]
 ) -> Sequence[dict[str, str]]:
-    """Combine existing sections with new sections.
-
-    Args:
-        existing (Sequence[Dict[str, str]]): The current list of sections in the state.
-        new (Sequence[Dict[str, str]]): The new sections to be added.
-
-    Returns:
-        Sequence[Dict[str, str]]: A new list containing all sections from both input sequences.
-    """
-    return list(existing) + list(new)
+    """Combine existing sections with new sections."""
+    existing_list = list(existing) if existing else []
+    
+    if isinstance(new, dict):
+        return existing_list + [new]
+    elif isinstance(new, list):
+        return existing_list + new
+    return existing_list
 
 
 @dataclass(kw_only=True)
 class ReportState(InputState):
     """The state of your report graph / agent."""
 
-    query: str = field(default_factory=list)
+    query: str = field(default_factory=str)
     """An improved search query that the agent has generated."""
 
     outlines: list[dict[str, str]] = field(default_factory=list)
     """A list of sections that the agent has generated for the report."""
 
-    report: Annotated[list[dict[str, str]], add_sections] = field(default_factory=list)
+    report: Annotated[list[dict[str, str]], add_sections] = field(default_factory=list[dict[str, str]])
     """The final report as a list of sections, where each section is a dictionary with keys like 'title' and 'content'."""
 
     retrieved_docs: list[Document] = field(default_factory=list)
     """Populated by the retriever. This is a list of documents that the agent can reference."""
 
-    # Feel free to add additional attributes to your state as needed.
-    # Common examples include retrieved documents, extracted entities, API connections, etc.
+    current_section_index: int = 0
+    """Track which section is being processed."""

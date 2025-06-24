@@ -63,9 +63,16 @@ class ReportAgent:
     def __init__(self):
         self._graph = get_report_graph()
     
-    def invoke(query: str):
-        return "Report generation is not implemented yet."
-    
+    def invoke(
+        self,
+        query: str,
+        configuration: Configuration,
+    ) -> list[dict[str,str]]:
+        config = {"configurable": configuration.asdict() | {"thread_id": "1"}}
+        return self._graph.invoke(
+            input={"messages": HumanMessage(content=query)},
+            config=config,
+            )
 
 from src.core.index_graph import get_index_graph
 

@@ -1,13 +1,10 @@
-# src/resources/utils.py
-
-import os
-import yaml
-
 from src.env import *
 
 ######################################## connect to database ########################################
 
 import sqlite3
+
+from contextlib import contextmanager
 
 def get_connection() -> sqlite3.Connection:
     return sqlite3.connect(':memory:', check_same_thread=False)
