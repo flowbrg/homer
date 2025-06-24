@@ -1,9 +1,8 @@
 """Main entrypoint for the conversational retrieval graph.
 
 This module defines the core structure and functionality of the conversational
-retrieval graph. It includes the main graph definition, state management,
-and key functions for processing user inputs, generating queries, retrieving
-relevant documents, and formulating responses.
+retrieval graph. It is used for a simple query to a LLM to generate a name for
+the conversation. Only relevant in the case of persistent database for discussions
 """
 
 from langchain_core.messages import BaseMessage
@@ -13,7 +12,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from src.core.agents.states import InputState
+from src.core.states import InputState
 from src.core.configuration import Configuration
 from src.core.models import load_chat_model
 from src.resources import prompts

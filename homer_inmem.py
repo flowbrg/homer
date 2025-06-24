@@ -1,13 +1,21 @@
 import streamlit as st
 
-from src.core.application import Application
+from typing import Any
+
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages import AnyMessage
+
+#from src.core.application import Application
+from src.core.agents import RetrievalAgent
 from src.core.configuration import load_config
 
 def _init():
     if "baseConfig" not in st.session_state:
         st.session_state.baseConfig = load_config()
-    if "backend" not in st.session_state:
-        st.session_state.backend = Application(config=st.session_state.baseConfig)
+    #if "backend" not in st.session_state:
+    #    st.session_state.backend = Application(config=st.session_state.baseConfig)
+    if "retrievalAgent" not in st.session_state:
+        st.session_state.retrievalAgent = RetrievalAgent()
     if "currentThread" not in st.session_state:
         st.session_state.currentThread = 1
 
@@ -17,7 +25,12 @@ def _display_conversation(thread_id: int):
     if thread_id is None:
         return
     
-    for message in st.session_state.backend.get_messages(thread_id=thread_id):
+    messages = st.session_state.retrievalAgent.get_messages(
+        configuration = st.session_state.baseConfig,
+        thread_id = st.session_state.currentThread,
+    )
+
+    for message in messages:
         from langchain_core.messages import AIMessage
         from langchain_core.messages.human import HumanMessage
         if isinstance(message, AIMessage):
@@ -34,6 +47,17 @@ def main():
     # Display current conversation
     _display_conversation(thread_id=st.session_state.currentThread)
     
+    # Sidebar button
+    on = st.sidebar.toggle(
+        label="Thinking model",
+    )
+    if on:
+        st.session_state.baseConfig.response_model = "qwen3:0.6b"
+        st.sidebar.write(f'using {st.session_state.baseConfig.response_model} model')
+    else:
+        st.session_state.baseConfig.response_model = "gemma3:1b"
+        st.sidebar.write(f'using {st.session_state.baseConfig.response_model} model')
+
     # Chat input
     query = st.chat_input("Enter your query:")
     if query:
@@ -47,9 +71,10 @@ def main():
             streamed_text = ""
             try:
                 with st.spinner("Processing your query..."):
-                    for chunk in st.session_state.backend.stream_retrieval_graph(
+                    for chunk in st.session_state.retrievalAgent.stream(
                         query=query,
-                        thread_id=st.session_state.currentThread
+                        configuration=st.session_state.baseConfig,
+                        thread_id=st.session_state.currentThread,
                     ):
                         streamed_text += chunk
                         response_placeholder.markdown(streamed_text)

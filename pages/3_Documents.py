@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 from src.core.configuration import load_config
-from src.core.application import Application
+from src.core.agents import IndexAgent
 from src.core.retrieval import delete_documents
 from src.env import UPLOAD_DIR
 from src.core.retrieval import get_existing_documents
@@ -12,8 +12,8 @@ from src.core.retrieval import get_existing_documents
 def _init():
     if "baseConfig" not in st.session_state:
         st.session_state.baseConfig = load_config()
-    if "backend" not in st.session_state:
-        st.session_state.backend = Application(config=st.session_state.baseConfig)
+    if "indexAgent" not in st.session_state:
+        st.session_state.indexAgent = IndexAgent()
 
 st.set_page_config(page_title="Documents")
 

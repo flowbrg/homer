@@ -1,3 +1,5 @@
+#DEPRECATED
+
 # src/core/application.py
 
 
@@ -5,10 +7,10 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 
 from src.core.configuration import Configuration
-from src.core.agents.retrieval_graph import get_retrieval_graph
-from src.core.agents.simple_query_graph import get_simple_query_graph
-from src.core.agents.report_graph import get_report_graph
-from src.core.agents.index_graph import get_index_graph
+from src.core.retrieval_graph import get_retrieval_graph
+from src.core.simple_query_graph import get_simple_query_graph
+from src.core.report_graph import get_report_graph
+from src.core.index_graph import get_index_graph
 
 
 from typing import Any, Dict
