@@ -126,11 +126,14 @@ class InputState:
 class RetrievalState(InputState):
     """The state of your graph / agent."""
 
-    enhanced_query: list[str] = field(default_factory=list)
+    query: list[str] = field(default_factory=list)
     """A list of search queries that the agent has generated."""
 
     retrieved_docs: list[Document] = field(default_factory=list)
     """Populated by the retriever. This is a list of documents that the agent can reference."""
+
+    summary: str = field(default_factory=str)
+    """A summary of the retrieved documents or the conversation history."""
 
     # Feel free to add additional attributes to your state as needed.
     # Common examples include retrieved documents, extracted entities, API connections, etc.

@@ -9,8 +9,8 @@ If you don't know the answer, just say that you don't know, don't try to make up
 {context}
 </context>
 
-Here is the history of the discussion:
-{history}
+Here is a summary of the previous discussion:
+{summary}
 
 The response should be specific and use statistics or numbers when possible.
 """
@@ -21,10 +21,6 @@ The response should be specific and use statistics or numbers when possible.
 QUERY_SYSTEM_PROMPT = """
 You are given a history of messages between a user and an AI agent.
 Your task is to generate search queries to retrieve documents that may help answer the user's question.
-<history>
-{history}
-</history>
-
 """
 #System time: {system_time}
 #"""

@@ -2,6 +2,7 @@
 
 import os
 import yaml
+
 from src.env import *
 
 ######################################## connect to database ########################################
@@ -9,23 +10,20 @@ from src.env import *
 import sqlite3
 
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(
-        database=":memory:",  #PERSISTENT_DATA,
-        check_same_thread=False
-    )
+    return sqlite3.connect(':memory:', check_same_thread=False)
 
-#import aiosqlite
-#
-#def aget_connection() -> aiosqlite.Connection:
-#    """Asynchronous version of get_connection."""
-#    return aiosqlite.connect(PERSISTENT_DATA)
+import aiosqlite
+
+def aget_connection() -> aiosqlite.Connection:
+    """Asynchronous version of get_connection."""
+    return aiosqlite.connect(PERSISTENT_DIR)
 
 ######################################## connect to database ########################################
 
 from chromadb import PersistentClient
 
 def get_chroma_client() -> PersistentClient:
-    return PersistentClient(path=VECTORSTORE_PATH)
+    return PersistentClient(path=VECTORSTORE_DIR)
 
 ######################################## format documents ########################################
 
@@ -88,7 +86,6 @@ import re
 from langchain_core.messages import AnyMessage, AIMessage
 from langchain_core.messages.human import HumanMessage
 
-
 def _format_message(message: AnyMessage) -> str:
     text = re.sub(r'<think>.*?</think>', '', message.content, flags=re.DOTALL)
     if isinstance(message, HumanMessage):
@@ -106,6 +103,60 @@ def format_messages(messages: Optional[list[AnyMessage]])-> str:
     return f"""<messages>
 {formatted}
 <messages>"""
+
+######################################## format sources ########################################
+
+from pathlib import Path
+
+def format_sources_markdown(documents: Optional[list[Document]])-> str:
+    """
+    Convert a list of documents to a markdown list of unique sources.
+    
+    Args:
+        documents: List of document objects with metadata attribute
+        
+    Returns:
+        str: Markdown formatted list of unique sources, sorted alphabetically
+    """
+    if not documents:
+        return "No sources available."
+    
+    # Extract unique sources
+    sources = set()
+    for document in documents:
+        source = document.metadata.get("source", "unknown")
+        sources.add(source)
+    
+    # Sort and format as markdown
+    sorted_sources = sorted(sources)
+    markdown_lines = [f"- {source}" for source in sorted_sources]
+    
+    return "\n".join(markdown_lines)
+
+def format_sources(documents: Optional[list[Document]])-> str:
+    """
+    Convert a list of documents to a string of unique sources.
+    
+    Args:
+        documents: List of document objects with metadata attribute
+        
+    Returns:
+        str: formatted list of unique sources, sorted alphabetically
+    """
+    if not documents:
+        return "No sources available."
+    
+    # Extract unique sources
+    sources = set()
+    for document in documents:
+        source = document.metadata.get("source", "unknown")
+        sources.add(Path(source).stem)
+    
+    # Sort and format as markdown
+    sorted_sources = sorted(sources)
+    sources_lines = [f"- {source}" for source in sorted_sources]
+    
+    return "\n".join(sources_lines)
 
 ######################################## Structured messages ########################################
 
@@ -139,7 +190,7 @@ def get_message_text(msg: AnyMessage) -> str:
     else:
         txts = [c if isinstance(c, str) else (c.get("text") or "") for c in content]
         return "".join(txts).strip()
-        
+    
 ######################################## Remove duplicates ########################################
 
 def remove_duplicates(base: list[str], new: list[str]) -> list[str]:

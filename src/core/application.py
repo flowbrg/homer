@@ -75,9 +75,14 @@ class Application:
             str | Any: message chunks of the 'response' node.
         """
         config = {"configurable": self._config.asdict() | {"thread_id": thread_id}}
-        for message_chunk, metadata in self._retrieval_graph.stream(input={"messages":[HumanMessage(content=query)]}, stream_mode="messages", config=config):
+        for message_chunk, metadata in self._retrieval_graph.stream(
+            input={"messages":[HumanMessage(content=query)]},
+            stream_mode="messages",
+            config=config,
+        ):
             if message_chunk.content and metadata["langgraph_node"] == "respond":
                 yield message_chunk.content
+            
 
     def invoke_report_graph(query: str):
         return "Report generation is not implemented yet."

@@ -22,7 +22,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from src.core import retrieval
 from src.core.agents.states import InputState, RetrievalState
 from src.core.configuration import Configuration
-from src.resources.utils import format_docs, format_messages, get_connection
+from src.resources.utils import format_docs, format_messages, format_sources, get_message_text, get_connection
 from src.resources import prompts
 from src.core.models import load_chat_model, load_embedding_model
 
@@ -60,7 +60,7 @@ def generate_query(
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", prompts.QUERY_SYSTEM_PROMPT),
+            ("system", prompts.IMPROVE_QUERY_SYSTEM_PROMPT),
             ("human", "{message}"),
         ]
     )
@@ -71,7 +71,8 @@ def generate_query(
 
     message_value = prompt.invoke(
         {
-            "message": format_messages(state.messages[-3:]) if len(state.messages) >= 3 else format_messages(state.messages),
+            "message": format_messages(state.messages[-1:]),
+            "previous_messages": format_messages(state.messages[-3:-1]) if len(state.messages) >= 3 else "There were no previous messages.",
             #"system_time": datetime.now(tz=timezone.utc).isoformat(),
         },
         config,
@@ -80,8 +81,8 @@ def generate_query(
     generated = cast(SearchQuery, model.invoke(message_value, config))
     
     return {
-        "enhanced_query": generated.query,
-        "retrieved_docs": [],
+        "query": generated.query,
+        "retrieved_docs": "delete" if state.retrieved_docs else [],
     }
 
 
@@ -104,7 +105,7 @@ def retrieve(
     """
     configuration = Configuration.from_runnable_config(config)
     with retrieval.make_retriever(embedding_model = load_embedding_model(model=configuration.embedding_model)) as retriever:
-        response = retriever.invoke(state.enhanced_query, config)
+        response = retriever.invoke(state.query, config)
         return {
             "retrieved_docs": response
         }
@@ -122,25 +123,29 @@ def respond(
         ]
     )
     model = load_chat_model(model = configuration.response_model)
-
-    retrieved_docs = format_docs(state.retrieved_docs)
     
     nb_messages = len(state.messages)%6 # The amount of messages since last summary
     message_value = prompt.invoke(
         {
-            "messages": state.messages[-nb_messages:],  # Limit to last 6 messages, which were not included in the last summary
-            "context": retrieved_docs,
+            "messages": format_messages(state.messages[-1:]),
+            "context": format_docs(state.retrieved_docs),
+            # Limit to last 6 messages, which were not included in the last summary
+            "previous_messages": format_messages(state.messages[-nb_messages:-1]) if len(state.messages) >= 6 else "There were no previous messages.",
             "summary": state.summary if state.summary else "",
             #"system_time": datetime.now(tz=timezone.utc).isoformat(),
-        },
+        },                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
         config,
     )
     response = model.invoke(message_value, config)
     # We return a list, because this will get added to the existing list
+
+    print("[info] Sources retrievedfor current thread")
+    print(format_sources(documents = state.retrieved_docs if state.retrieved_docs else []))
+
     return {
         "messages": [response],
         "retrieved_docs": [],
-        "enhanced_query": "",
+        "query": "",
     }
 
 
@@ -194,7 +199,7 @@ def should_summarize(
 ):
     if len(state.messages) % 6 == 0:
         return "summarize_conversation"
-    return END 
+    return END
 
 def get_retrieval_graph() -> CompiledStateGraph:
     """

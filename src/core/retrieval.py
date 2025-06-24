@@ -12,7 +12,7 @@ from typing import Generator
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
 
-from src.resources.utils import VECTORSTORE_PATH, get_chroma_client
+from src.resources.utils import VECTORSTORE_DIR, get_chroma_client
 
 
 _COLLECTION = "HOMER"
@@ -27,7 +27,7 @@ def make_retriever(
     vector_store = Chroma(
         collection_name = _COLLECTION,
         embedding_function = embedding_model,
-        persist_directory = VECTORSTORE_PATH,  # Where to save data locally, remove if not necessary
+        persist_directory = VECTORSTORE_DIR,  # Where to save data locally, remove if not necessary
     )
 
     yield vector_store.as_retriever()

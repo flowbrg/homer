@@ -24,8 +24,8 @@ def ensure_path(path_str: str):
         path.parent.mkdir(parents=True, exist_ok=True)
 
 if __name__ == "__main__":
-    #db.initialize_database()
     ensure_path(path_str = UPLOAD_DIR)
-    ensure_path(path_str = VECTORSTORE_PATH)
-    #ensure_path(path_str = PERSISTENT_DATA)    #Only for homer_persistent
+    ensure_path(path_str = VECTORSTORE_DIR)
+    ensure_path(path_str = PERSISTENT_DIR)    #Only for homer_persistent
+    db.initialize_database()
     run_streamlit_app()
