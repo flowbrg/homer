@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from src.core.agents import ReportAgent
 from src.core.configuration import load_config
-from src.resources.dict_to_pdf import dict_to_pdf
+from src.resources.dict_to_pdf import MarkdownToPDF
 from src.env import OUTPUT_DIR
 
 # Set up logging
@@ -59,11 +59,12 @@ def main():
                         Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
                         
                         # Generate the report
-                        report = st.session_state.reportAgent.invoke(
+                        output = st.session_state.reportAgent.invoke(
                             query=query, 
                             configuration=st.session_state.baseConfig
                         )
-                    
+                        report = output["report"]
+
                         if report:
                             # Display report preview
                             st.subheader("Report Preview")
@@ -73,11 +74,12 @@ def main():
                             
                             # Generate PDF
                             with st.spinner("📄 Creating PDF..."):
-                                dict_to_pdf(data=report, output_filename=str(output_path))
+                                converter = MarkdownToPDF()
+                                pdf_path = converter.generate_pdf(report, "output.pdf")
                             
                             # Success message
                             st.success(f"✅ Report generated successfully!")
-                            st.info(f"📁 Saved to: {output_path}")
+                            st.info(f"📁 Saved to: {pdf_path}")
                             
                             # Add to history
                             st.session_state.report_history.append({

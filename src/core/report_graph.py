@@ -33,47 +33,16 @@ class Outline(BaseModel):
     entries: list[OutlineEntry]
 
 
-def improve_query(
-    state: ReportState, *, config: RunnableConfig
-) -> dict[str, str]:
-    """Generate a search query based on the user input and configuration."""
-    try:
-        configuration = Configuration.from_runnable_config(config)
-        
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", prompts.IMPROVE_QUERY_SYSTEM_PROMPT),
-            ("human", "{message}"),
-        ])
-        
-        model = load_chat_model(model=configuration.query_model)
-        
-        # Get the last message content
-        last_message = state.messages[-1] if state.messages else None
-        if not last_message:
-            return {"query": ""}
-        
-        message_value = prompt.invoke({
-            "message": get_message_text(last_message),
-            "previous_messages": format_messages(state.messages[-3:-1]) if len(state.messages) >= 3 else "There were no previous messages.",
-        }, config)
-        
-        improved_query = model.invoke(message_value, config)
-        return {"query": get_message_text(improved_query)}
-    except Exception as e:
-        logger.error(f"Error in improve_query: {str(e)}")
-        return {"query": get_message_text(state.messages[-1]) if state.messages else ""}
-
-
 def generate_outline(
     state: ReportState, *, config: RunnableConfig
 ) -> dict[str, list[dict[str, str]]]:
-    """Generate an outline based on the query."""
+    """Generate an outline based on the user query."""
     try:
         configuration = Configuration.from_runnable_config(config)
         
         prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.OUTLINE_SYSTEM_PROMPT),
-            ("human", "{message}"),
+            ("human", "{query}")
         ])
         
         retrieved_docs = format_docs(state.retrieved_docs)
@@ -81,7 +50,7 @@ def generate_outline(
         model = load_chat_model(model=configuration.outline_model).with_structured_output(Outline)
         
         message_value = prompt.invoke({
-            "message": state.query,
+            "query": state.messages[-1].content,
             "number_of_parts": configuration.number_of_parts,
             "context": retrieved_docs,
         }, config)
@@ -99,7 +68,6 @@ def generate_outline(
             "current_section_index": 0
         }
 
-
 def retrieve(
     state: ReportState, *, config: RunnableConfig
 ) -> dict[str, list[Document]]:
@@ -112,10 +80,10 @@ def retrieve(
             current_section = state.outlines[state.current_section_index]
             input_query = "\n".join([current_section["title"], current_section["summary"]])
         else:
-            input_query = state.query
+            input_query = get_message_text(state.messages[-1])
         
         with retrieval.make_retriever(
-            embedding_model=load_embedding_model(model=configuration.embedding_model)
+            embedding_model=load_embedding_model(model=configuration.embedding_model),   
         ) as retriever:
             response = retriever.invoke(input_query, config)
             return {"retrieved_docs": response}
@@ -136,7 +104,6 @@ def generate_section(
         
         prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.SECTION_SYSTEM_PROMPT),
-            ("human", "{message}"),
         ])
         
         model = load_chat_model(model=configuration.response_model)
@@ -146,7 +113,6 @@ def generate_section(
         current_section = state.outlines[state.current_section_index].copy()
         
         message_value = prompt.invoke({
-            "message": state.messages,
             "title": current_section["title"],
             "summary": current_section["summary"],
             "previous_sections_text": "\n".join(
@@ -159,7 +125,7 @@ def generate_section(
         current_section["content"] = get_message_text(response)
         
         return {
-            "report": current_section,  # Single dict, not list
+            "report": [current_section],
             "current_section_index": state.current_section_index + 1
         }
     except Exception as e:
@@ -183,15 +149,13 @@ def get_report_graph() -> CompiledStateGraph:
     builder = StateGraph(ReportState, input=InputState, config_schema=Configuration)
     
     # Add nodes
-    builder.add_node("improve_query", improve_query)
     builder.add_node("initial_retrieval", retrieve)
     builder.add_node("generate_outline", generate_outline)
     builder.add_node("retrieve", retrieve)
     builder.add_node("generate_section", generate_section)
     
     # Add edges
-    builder.add_edge("__start__", "improve_query")
-    builder.add_edge("improve_query", "initial_retrieval")
+    builder.add_edge("__start__", "initial_retrieval")
     builder.add_edge("initial_retrieval", "generate_outline")
     builder.add_edge("generate_outline", "retrieve")
     builder.add_edge("retrieve", "generate_section")

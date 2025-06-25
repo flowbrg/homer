@@ -7,7 +7,7 @@ The retrievers support filtering results by user_id to ensure data isolation bet
 """
 
 from contextlib import contextmanager
-from typing import Generator
+from typing import Generator, Optional
 
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
@@ -19,10 +19,23 @@ _COLLECTION = "HOMER"
 
 @contextmanager
 def make_retriever(
-    embedding_model: Embeddings
+    embedding_model: Embeddings,
 ) -> Generator[VectorStoreRetriever, None, None]:
-    """Create a retriever for the agent, based on the current configuration."""
+    """
+    Create a retriever for the agent, based on the current configuration.
+    
+    search_type : “similarity” (default), “mmr”, or “similarity_score_threshold”
+    search_kwargs:
+        - k: Amount of documents to return (Default: 4)
+        - score_threshold: Minimum relevance threshold (for similarity_score_threshold)
+        - fetch_k: Amount of documents to pass to MMR algorithm (Default: 20)
+        - lambda_mult: Diversity of results returned by MMR, 1 for minimum diversity and 0 for maximum. (Default: 0.5)
+        - filter: Filter by document metadata
+    """
     from langchain_chroma import Chroma
+
+    search_type = "similarity_score_threshold"
+    search_kwargs = {"k":8, "score_threshold_score_threshold": 0.5}
 
     vector_store = Chroma(
         collection_name = _COLLECTION,
@@ -30,7 +43,7 @@ def make_retriever(
         persist_directory = VECTORSTORE_DIR,  # Where to save data locally, remove if not necessary
     )
 
-    yield vector_store.as_retriever()
+    yield vector_store.as_retriever(search_type=search_type, search_kwargs=search_kwargs)
 
 
 def get_existing_documents() -> list[str]:

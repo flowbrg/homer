@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, Literal, Any, Dict
 
-from src.resources import prompts
 from src.env import OLLAMA_CLIENT
 
 from langchain_core.runnables import RunnableConfig, ensure_config
@@ -37,6 +36,15 @@ class Configuration:
         },
     )
     
+    # Retriever configuration
+    #retriever_search_type: Literal["similarity","mmr","similarity_score_threshold"] = field(
+    #    default_factory = str,
+    #)
+
+    #retriever_search_kwargs: dict[str,Any] = field(
+    #    default_factory= Dict #{"k":8, "score_threshold_score_threshold": 0.5},
+    #)
+
     # Models
     embedding_model: str = field(
         default = "nomic-embed-text",

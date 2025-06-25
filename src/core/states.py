@@ -143,9 +143,6 @@ def add_sections(
 class ReportState(InputState):
     """The state of your report graph / agent."""
 
-    query: str = field(default_factory=str)
-    """An improved search query that the agent has generated."""
-
     outlines: list[dict[str, str]] = field(default_factory=list)
     """A list of sections that the agent has generated for the report."""
 
