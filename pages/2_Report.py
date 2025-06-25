@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from src.core.agents import ReportAgent
 from src.core.configuration import load_config
-from src.resources.dict_to_pdf import MarkdownToPDF
+from src.resources.dict_to_pdf import str_to_pdf
 from src.env import OUTPUT_DIR
 
 # Set up logging
@@ -19,7 +19,7 @@ def _init():
     if "baseConfig" not in st.session_state:
         st.session_state.baseConfig = load_config()
     if "reportAgent" not in st.session_state:
-        st.session_state.reportAgent = ReportAgent()
+        st.session_state.reportAgent = ReportAgent(st.session_state.baseConfig)
     if "report_history" not in st.session_state:
         st.session_state.report_history = []
 
@@ -59,24 +59,16 @@ def main():
                         Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
                         
                         # Generate the report
-                        output = st.session_state.reportAgent.invoke(
-                            query=query, 
-                            configuration=st.session_state.baseConfig
+                        output = st.session_state.reportAgent.generate_report(
+                            main_query=query,
                         )
-                        report = output["report"]
 
-                        if report:
-                            # Display report preview
-                            st.subheader("Report Preview")
-                            for section in report:
-                                with st.expander(section.get("title", "Untitled Section")):
-                                    st.write(section.get("content", "No content"))
+                        if output:
                             
                             # Generate PDF
                             with st.spinner("📄 Creating PDF..."):
-                                converter = MarkdownToPDF()
-                                pdf_path = converter.generate_pdf(
-                                    data = report,
+                                pdf_path = str_to_pdf(
+                                    data = output,
                                     filename = filename,
                                     output_dir = OUTPUT_DIR,
                                 )

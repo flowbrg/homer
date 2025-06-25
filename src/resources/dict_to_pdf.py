@@ -183,6 +183,57 @@ def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf",
     return converter.generate_pdf(data, output_filename, output_dir)
 
 
+def str_to_pdf(data: str, output_filename: str = "report.pdf", 
+               output_dir: str = None, title: str = None) -> str:
+    """
+    Convert a single string to PDF.
+    
+    Args:
+        data: String content (supports Markdown)
+        output_filename: Name of the output PDF file
+        output_dir: Directory to save the PDF (optional, defaults to current directory)
+        title: Optional title for the document
+        
+    Returns:
+        str: Path to the created PDF file
+    """
+    # Create full path
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        filepath = os.path.join(output_dir, output_filename)
+    else:
+        filepath = output_filename
+    
+    # Use the existing MarkdownToPDF class
+    converter = MarkdownToPDF()
+    
+    doc = SimpleDocTemplate(
+        filepath,
+        pagesize=converter.page_size,
+        rightMargin=72,
+        leftMargin=72,
+        topMargin=72,
+        bottomMargin=72
+    )
+    
+    story = []
+    
+    # Add title if provided
+    if title:
+        title_formatted = converter._markdown_to_reportlab(title)
+        story.append(Paragraph(title_formatted, converter.styles['title']))
+        story.append(Spacer(1, 12))
+    
+    # Add content
+    if data:
+        content_formatted = converter._markdown_to_reportlab(data)
+        if content_formatted:
+            story.append(Paragraph(content_formatted, converter.styles['content']))
+    
+    doc.build(story)
+    return os.path.abspath(filepath)
+
+
 # Example usage
 if __name__ == "__main__":
     sample_data = [
