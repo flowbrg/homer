@@ -49,27 +49,49 @@ def _list_uploaded_files():
 
 
 def main():
-
     # Create the file uploader
-    uploaded_file = st.file_uploader("Choose a PDF file", type=["pdf"])
-
-    if uploaded_file is not None:
-        # Check if the file is a PDF
-        if uploaded_file.name.lower().endswith('.pdf') and st.button(label="upload",type="primary"):
+    uploaded_files = st.file_uploader("Choose PDF files", type=["pdf"], accept_multiple_files=True)
+    
+    if uploaded_files is not None and len(uploaded_files) > 0:
+        
+        # Upload button
+        if st.button(label="Upload", type="primary"):
+            success_count = 0
+            error_count = 0
             
-            # Save the file to the selected category directory
-            save_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+            # Process each uploaded file
+            for uploaded_file in uploaded_files:
+                try:
+                    # Check if the file is a PDF
+                    if uploaded_file.name.lower().endswith('.pdf'):
+                        # Save the file to the selected category directory
+                        save_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+                        
+                        with open(save_path, "wb") as f:
+                            f.write(uploaded_file.getbuffer())
+                        
+                        success_count += 1
+                    else:
+                        st.warning(f"Skipped {uploaded_file.name} - not a PDF file")
+                        error_count += 1
+                        
+                except Exception as e:
+                    st.error(f"Error saving {uploaded_file.name}: {str(e)}")
+                    error_count += 1
             
-            with open(save_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            st.success(f"File {uploaded_file.name} has been saved")
-
+            # Show results
+            if success_count > 0:
+                st.success(f"Successfully uploaded {success_count} file(s)")
+            if error_count > 0:
+                st.warning(f"Failed to upload {error_count} file(s)")
+    
+    # List uploaded files (assuming this function exists)
     _list_uploaded_files()
 
     if st.sidebar.button(label="update database",type="primary",use_container_width=True):
         with st.spinner("Updating database..."):
             try:
-                st.session_state.backend.invoke_index_graph(path = UPLOAD_DIR)
+                st.session_state.indexAgent.invoke(path = UPLOAD_DIR)
             except Exception as e:
                 st.error(f"Error updating database: {str(e)}")
             
