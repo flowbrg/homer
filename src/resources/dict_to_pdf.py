@@ -11,6 +11,10 @@ import os
 class MarkdownToPDF:
     """Convert list of dictionaries with Markdown content to PDF."""
     
+    _IGNORED_TOKENS = ['<|endoftext|>', '<|startoftext|>', '<pad>', '<unk>', '<s>', '</s>',
+                       '<mask>', '<cls>', '<sep>', '<|im_start|>', '<|im_end|>', '<text>',
+                       'assistant', 'human', '<think>', '</think>']
+
     def __init__(self, page_size=letter):
         self.page_size = page_size
         self.styles = self._create_styles()
@@ -41,6 +45,16 @@ class MarkdownToPDF:
             )
         }
     
+    def _filter_ignored_tokens(self, text: str) -> str:
+        """Remove ignored tokens from text."""
+        if not text:
+            return text
+
+        for token in self._IGNORED_TOKENS:
+            text = text.replace(token, '')
+
+        return text.strip()
+
     def _clean_think_tags(self, text: str) -> str:
         """Remove <think>...</think> blocks from text."""
         return re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL | re.IGNORECASE).strip()
@@ -50,6 +64,9 @@ class MarkdownToPDF:
         if not text:
             return ""
         
+        # Remove ignored tokens first
+        text = self._filter_ignored_tokens(text)
+
         # Remove <think> tags first
         text = self._clean_think_tags(text)
         
@@ -92,19 +109,28 @@ class MarkdownToPDF:
         
         return text
     
-    def generate_pdf(self, data: List[Dict[str, str]], filename: str = "output.pdf") -> str:
+    def generate_pdf(self, data: List[Dict[str, str]], filename: str = "output.pdf", 
+                     output_dir: str = None) -> str:
         """
         Generate PDF from list of dictionaries.
         
         Args:
             data: List of dicts with 'title' and 'content' keys
             filename: Output PDF filename
+            output_dir: Directory to save the PDF (optional, defaults to current directory)
             
         Returns:
             Absolute path to created PDF file
         """
+        # Create full path
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+            filepath = os.path.join(output_dir, filename)
+        else:
+            filepath = filename
+            
         doc = SimpleDocTemplate(
-            filename,
+            filepath,
             pagesize=self.page_size,
             rightMargin=72,
             leftMargin=72,
@@ -137,22 +163,24 @@ class MarkdownToPDF:
                 story.append(Spacer(1, 24))
         
         doc.build(story)
-        return os.path.abspath(filename)
+        return os.path.abspath(filepath)
 
 
-def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf") -> str:
+def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf", 
+                output_dir: str = None) -> str:
     """
     Simple interface function to convert dictionaries to PDF.
     
     Args:
         data: List of dictionaries with 'title' and 'content' keys
         output_filename: Name of the output PDF file
+        output_dir: Directory to save the PDF (optional, defaults to current directory)
         
     Returns:
         str: Path to the created PDF file
     """
     converter = MarkdownToPDF()
-    return converter.generate_pdf(data, output_filename)
+    return converter.generate_pdf(data, output_filename, output_dir)
 
 
 # Example usage
@@ -195,6 +223,6 @@ class MyClass:
 The above `code block` shows a simple class definition."""
         }
     ]
-    
-    pdf_path = dict_to_pdf(sample_data, "sample_output.pdf")
+
+    pdf_path = dict_to_pdf(sample_data, "sample_output.pdf", "reports")
     print(f"PDF created successfully: {pdf_path}")

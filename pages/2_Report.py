@@ -75,7 +75,11 @@ def main():
                             # Generate PDF
                             with st.spinner("📄 Creating PDF..."):
                                 converter = MarkdownToPDF()
-                                pdf_path = converter.generate_pdf(report, "output.pdf")
+                                pdf_path = converter.generate_pdf(
+                                    data = report,
+                                    filename = filename,
+                                    output_dir = OUTPUT_DIR,
+                                )
                             
                             # Success message
                             st.success(f"✅ Report generated successfully!")
