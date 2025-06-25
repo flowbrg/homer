@@ -35,7 +35,7 @@ def make_retriever(
     from langchain_chroma import Chroma
 
     search_type = "similarity_score_threshold"
-    search_kwargs = {"k":8, "score_threshold": 0.5}
+    search_kwargs = {"k":16, "score_threshold": 0.5}
 
     vector_store = Chroma(
         collection_name = _COLLECTION,
