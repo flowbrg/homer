@@ -140,7 +140,7 @@ def respond(
     response = model.invoke(message_value, config)
     # We return a list, because this will get added to the existing list
 
-    print("[info] Sources retrievedfor current thread")
+    print("[info] Sources retrieved for current thread")
     print(format_sources(documents = state.retrieved_docs if state.retrieved_docs else []))
 
     return {
