@@ -8,6 +8,9 @@ from langchain_core.messages import AnyMessage
 #from src.core.application import Application
 from src.core.agents import RetrievalAgent
 from src.core.configuration import load_config
+from src.env import OLLAMA_CLIENT
+
+
 
 def _init():
     if "baseConfig" not in st.session_state:
@@ -43,20 +46,51 @@ def _display_conversation(thread_id: int):
         with st.chat_message(name):
             st.markdown(message.content)
 
+def _is_ollama_client_available(url: str) -> bool:
+    import requests
+    try:
+        response = requests.get(url, timeout=2)
+        return response.ok
+    except requests.RequestException:
+        return False
+
 def main():
     # Display current conversation
     _display_conversation(thread_id=st.session_state.currentThread)
     
     # Sidebar button
-    on = st.sidebar.toggle(
-        label="Thinking model",
+
+    connectionButton = st.sidebar.toggle(
+        label = "Server execution"
     )
-    if on:
-        st.session_state.baseConfig.response_model = "qwen3:0.6b"
-        st.sidebar.write(f'using {st.session_state.baseConfig.response_model} model')
+
+    if connectionButton:
+        conn = _is_ollama_client_available(OLLAMA_CLIENT)
+        if conn:
+            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
+            st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
+        else:
+            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
+            st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
     else:
+        st.sidebar.write(f"using localhost")
+        st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+        
+    modelButton = st.sidebar.toggle(
+        label = "Thinking model",
+    )
+
+    if modelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
+        st.session_state.baseConfig.response_model = "qwen3:0.6b"
+    elif not modelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
         st.session_state.baseConfig.response_model = "gemma3:1b"
-        st.sidebar.write(f'using {st.session_state.baseConfig.response_model} model')
+    elif modelButton and st.session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
+        st.session_state.baseConfig.response_model = "qwen3:30b-a3b"
+    else:
+        st.session_state.baseConfig.response_model = "gemma3:12b"
+
+    st.sidebar.write(f"using model {st.session_state.baseConfig.response_model}")
+
 
     # Chat input
     query = st.chat_input("Enter your query:")

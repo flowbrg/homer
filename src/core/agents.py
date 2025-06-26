@@ -54,31 +54,22 @@ class RetrievalAgent:
             if message_chunk.content and metadata["langgraph_node"] == "respond":
                 yield message_chunk.content
 
+from src.core.index_graph import get_index_graph
 
-from src.core.report_graph import get_report_graph
-
-class ReportAgent:
+class IndexAgent:
     """
-    Wrapper class for the report agent.
+    Wrapper Class for the index graph.
     """
     def __init__(self):
-        self._graph = get_report_graph()
-    
-    def invoke(
-        self,
-        query: str,
-        configuration: Configuration,
-    ) -> list[dict[str,str]]:
-        config = {"configurable": configuration.asdict() | {"thread_id": "1"}}
-        return self._graph.invoke(
-            input={"messages": HumanMessage(content=query)},
-            config=config,
-            )
+        self._graph = get_index_graph()
+
+    def invoke(self, path: str):
+        self._graph.invoke(input={"path": path})
 
 from src.core.models import load_chat_model, load_embedding_model
 from src.core.retrieval import make_retriever
 
-class IndexAgent:
+class ReportAgent:
     """
     Wrapper Class for the index graph.
     """
@@ -182,7 +173,7 @@ Context:
 Question: {query}
 
 Answer:"""
-        return self.llm.invoke(prompt).strip()
+        return self.llm.invoke(prompt).content.strip()
     
     def review(self, section_title: str, section_text: str, main_query: str) -> str:
         prompt = f"""
@@ -205,4 +196,5 @@ Answer:"""
 
     FINAL POLISHED SECTION:
     """
-        return self.llm.invoke(prompt).strip()
+        return self.llm.invoke(prompt).content.strip()
+    
