@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.core.configuration import load_config
 from src.core.agents import IndexAgent
-from src.core.retrieval import delete_documents
+from src.core.retrieval import delete_documents, get_existing_documents
 from src.env import UPLOAD_DIR, OLLAMA_CLIENT
 from src.core.retrieval import get_existing_documents
 
@@ -71,7 +71,15 @@ def _list_uploaded_files():
     else:
         st.info(f"No documents uploaded yet.")
 
-
+def _reset_vector_store():
+    with st.spinner("Updating database..."):
+            try:
+                documents = get_existing_documents()
+                delete_documents(docs=documents)
+            except Exception as e:
+                st.error(f"Error clearing database: {str(e)}")
+            else:
+                st.success("Database has been cleared.")
 def main():
     # Create the file uploader
     uploaded_files = st.file_uploader("Choose PDF files", type=["pdf"], accept_multiple_files=True)
@@ -124,14 +132,12 @@ def main():
                 os.remove(file_path)
             st.success("Database has been updated.")
 
-    if st.sidebar.button(label="reset database",type="primary",use_container_width=True):
-        with st.spinner("Updating database..."):
-            try:
-                delete_documents(docs="")
-            except Exception as e:
-                st.error(f"Error clearing database: {str(e)}")
-            else:
-                st.success("Database has been cleared.")
+    resetVectorStoreButton = st.sidebar.button(
+        label="reset database",
+        type="primary",
+        use_container_width=True
+    )
+        
 
     
 def list_documents():

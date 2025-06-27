@@ -1,5 +1,6 @@
 from typing import Optional
 from pathlib import Path
+from tqdm import tqdm
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
@@ -38,13 +39,15 @@ def parse_pdfs(
     if not pdf_files:
        print(f"[info] No PDF files found in directory: {state.path}")
 
-    for pdf_file in pdf_files:
+    for pdf_file in tqdm(pdf_files, "Loading files..."):
+        # Load the file into a Document object
         loader = PyMuPDFLoader(str(pdf_file))
-        documents.extend(loader.load())
+        # Split the Document content into smaller chunks
+        document = text_splitter.split_documents(loader.load())
+        # Add them to the list of Documents
+        documents.extend(document)
 
-    chunks = text_splitter.split_documents(documents)
-
-    return {"docs": chunks}
+    return {"docs": documents}
 
 
 def index_docs(
@@ -68,7 +71,7 @@ def index_docs(
     documents_batch = make_document_batch(documents=state.docs)
 
     with retrieval.make_retriever(embedding_model=load_embedding_model(model=configuration.embedding_model)) as retriever:
-        for batch in documents_batch:
+        for batch in tqdm(documents_batch, "Adding document batch..."):
             retriever.add_documents(batch)
         
     return {"docs": "delete"}
