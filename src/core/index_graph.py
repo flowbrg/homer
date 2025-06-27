@@ -9,7 +9,7 @@ from src.core import retrieval
 from src.core.configuration import Configuration
 from src.core.states import IndexState, InputIndexState
 from src.core.models import load_embedding_model
-from src.resources.utils import remove_duplicates
+from src.resources.utils import remove_duplicates, make_document_batch
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
@@ -65,8 +65,11 @@ def index_docs(
     if not configuration:
         raise ValueError("Configuration required to run index_docs.")
     
+    documents_batch = make_document_batch(documents=state.docs)
+
     with retrieval.make_retriever(embedding_model=load_embedding_model(model=configuration.embedding_model)) as retriever:
-        retriever.add_documents(state.docs)
+        for batch in documents_batch:
+            retriever.add_documents(batch)
         
     return {"docs": "delete"}
 
