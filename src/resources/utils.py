@@ -193,3 +193,64 @@ def get_message_text(msg: AnyMessage) -> str:
 def remove_duplicates(base: list[str], new: list[str]) -> list[str]:
     base_set = set(base)
     return [item for item in new if item not in base_set]
+
+######################################## Remove duplicates ########################################
+
+from itertools import islice
+from typing import Iterator, List
+
+def make_document_batch(documents: List[Document], size: int = 100) -> List[List[Document]]:
+    """
+    Split a list of documents into batches of specified size.
+    
+    Args:
+        documents: List of documents to batch
+        size: Maximum size of each batch (default: 100)
+        
+    Returns:
+        List of document batches
+        
+    Raises:
+        ValueError: If size is less than 1
+    """
+    if size < 1:
+        raise ValueError("Batch size must be at least 1")
+    
+    if not documents:
+        return []
+    
+    # Convert to iterator for memory efficiency
+    doc_iter = iter(documents)
+    
+    # Use islice to create batches efficiently
+    batches = []
+    while True:
+        batch = list(islice(doc_iter, size))
+        if not batch:
+            break
+        batches.append(batch)
+    
+    return batches
+
+
+# Alternative generator version for memory efficiency with large datasets
+def make_document_batch_generator(documents: List[Document], size: int = 100) -> Iterator[List[Document]]:
+    """
+    Generator version that yields batches one at a time.
+    Memory efficient for very large document lists.
+    """
+    if size < 1:
+        raise ValueError("Batch size must be at least 1")
+    
+    doc_iter = iter(documents)
+    while True:
+        batch = list(islice(doc_iter, size))
+        if not batch:
+            break
+        yield batch
+
+
+# One-liner alternative using list comprehension (less readable but very concise)
+def make_document_batch_oneliner(documents: List[Document], size: int = 100) -> List[List[Document]]:
+    """Concise one-liner version."""
+    return [documents[i:i + size] for i in range(0, len(documents), size)]
