@@ -1,8 +1,7 @@
 .venv/
 tests/
-user_data/data
 graph.ipynb
-threads.db
+user_data/
 
 .ipynb_checkpoints/
 

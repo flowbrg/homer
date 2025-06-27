@@ -1,32 +1,31 @@
-from PySide6.QtWidgets import QApplication
+import subprocess
 
-from src.ui.main_window import MainWindow
-from src.core.application import Application
-from src.resources.utils import load_config
+from src.core import database as db
+from src.env import *
 
-from dotenv import load_dotenv
 
-import sys
+def run_streamlit_app():
+    try:
+        #subprocess.run(["streamlit", "run", "homer_persistent.py"], check=True)
+        subprocess.run(["streamlit", "run", "homer_inmem.py"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Streamlit exited with error: {e}")
 
-def main():
-
-    load_dotenv()  # take environment variables
-    baseConfig = load_config()
+def ensure_path(path_str: str):
+    """Crée le répertoire parent si le chemin est un fichier, ou le répertoire lui-même."""
+    from pathlib import Path
+    path = Path(path_str)
     
-    print("[info] Configuration loaded successfully.")
-    print(f"[info] Configuration: {baseConfig}")
-    backend = Application(config=baseConfig)
-    app = QApplication(sys.argv)
-    window = MainWindow(backend=backend)
-    window.show()
-    sys.exit(app.exec())
+    # Si le chemin se termine par '/' ou n'a pas d'extension, c'est un dossier
+    if path_str.endswith('/') or not path.suffix:
+        path.mkdir(parents=True, exist_ok=True)
+    else:
+        # C'est un fichier, créer le répertoire parent
+        path.parent.mkdir(parents=True, exist_ok=True)
 
 if __name__ == "__main__":
-    main()
-
-# TODO: 
-# -memory threads and database refactor [X]
-# -streaming the rag graph              [X]
-# -report graph                         []
-# -indexing graph                       []
-# -create a parser API                  []
+    ensure_path(path_str = UPLOAD_DIR)
+    ensure_path(path_str = VECTORSTORE_DIR)
+    ensure_path(path_str = PERSISTENT_DIR)    #Only for homer_persistent
+    db.initialize_database()
+    run_streamlit_app()

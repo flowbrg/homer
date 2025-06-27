@@ -1,0 +1,5 @@
+OLLAMA_CLIENT = "http://127.0.0.1:6780/"
+PERSISTENT_DIR = "./user_data/threads/threads.db"
+UPLOAD_DIR = "./user_data/temp"
+OUTPUT_DIR = "./user_data/outputs"
+VECTORSTORE_DIR = "./user_data/vectorstore/"

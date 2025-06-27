@@ -1,14 +1,26 @@
-# src/resources/utils.py
-
-import os
-import yaml
+from src.env import *
 
 ######################################## connect to database ########################################
 
 import sqlite3
 
+from contextlib import contextmanager
+
 def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(os.getenv("HOMER_PERSISTENT_DATA"), check_same_thread=False)
+    return sqlite3.connect(':memory:', check_same_thread=False)
+
+import aiosqlite
+
+def aget_connection() -> aiosqlite.Connection:
+    """Asynchronous version of get_connection."""
+    return aiosqlite.connect(PERSISTENT_DIR)
+
+######################################## connect to database ########################################
+
+from chromadb import PersistentClient
+
+def get_chroma_client() -> PersistentClient:
+    return PersistentClient(path=VECTORSTORE_DIR)
 
 ######################################## format documents ########################################
 
@@ -64,55 +76,84 @@ def format_docs(docs: Optional[list[Document]]) -> str:
 {formatted}
 </documents>"""
 
-######################################## Embedding model ########################################
+######################################## format messages ########################################
 
-from langchain.embeddings.base import Embeddings
+import re
 
-#def load_embeddings(model_name: str)-> Embeddings:
-#    from langchain_huggingface import HuggingFaceEmbeddings
-#    return HuggingFaceEmbeddings(model_name="nomic-ai/nomic-embed-text-v2-moe",cache_folder="./cache", model_kwargs={"trust_remote_code":True})
+from langchain_core.messages import AnyMessage, AIMessage
+from langchain_core.messages.human import HumanMessage
 
-def load_embedding_model(model: str, host: str = "http://localhost:11434") -> Embeddings:   
-    from langchain_ollama import OllamaEmbeddings
-    return OllamaEmbeddings(model=model,base_url=host)
+def _format_message(message: AnyMessage) -> str:
+    text = re.sub(r'<think>.*?</think>', '', message.content, flags=re.DOTALL)
+    if isinstance(message, HumanMessage):
+        flag = "HumanMessage"
+    if isinstance(message, AIMessage):
+        flag = "AIMessage"
+    else:
+        flag = "message"
+    return f"<{flag}>\n{text}\n</{flag}>"
 
-######################################## Chat model ########################################
+def format_messages(messages: Optional[list[AnyMessage]])-> str:
+    if not messages:
+        return "<messages></messages>"
+    formatted = "\n".join(_format_message(message) for message in messages)
+    return f"""<messages>
+{formatted}
+<messages>"""
 
-from langchain.chat_models.base import BaseChatModel
+######################################## format sources ########################################
 
-def load_chat_model(model: str, host: str = "http://localhost:11434")-> BaseChatModel:
-    from langchain_ollama import ChatOllama
-    return ChatOllama(model=model,base_url=host)
+from pathlib import Path
 
+def format_sources_markdown(documents: Optional[list[Document]])-> str:
+    """
+    Convert a list of documents to a markdown list of unique sources.
+    
+    Args:
+        documents: List of document objects with metadata attribute
+        
+    Returns:
+        str: Markdown formatted list of unique sources, sorted alphabetically
+    """
+    if not documents:
+        return "No sources available."
+    
+    # Extract unique sources
+    sources = set()
+    for document in documents:
+        source = document.metadata.get("source", "unknown")
+        sources.add(source)
+    
+    # Sort and format as markdown
+    sorted_sources = sorted(sources)
+    markdown_lines = [f"- {source}" for source in sorted_sources]
+    
+    return "\n".join(markdown_lines)
 
-#def load_llm(model_name: str)-> BaseChatModel:
-#    from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
-#    from transformers.models.auto.tokenization_auto import AutoTokenizer
-
-    # load the tokenizer and the model
-#    tokenizer = AutoTokenizer.from_pretrained(model_name,cache_dir="./cache")
-
-
-#    llm = HuggingFacePipeline.from_model_id(
-#        model_id=model_name,
-#        task="text-generation",
-#        pipeline_kwargs=dict(
-#            max_new_tokens=512,
-#            do_sample=False,
-#            repetition_penalty=1.03,
-#        ),
-#        model_kwargs=dict(
-#            # https://huggingface.co/docs/transformers/main_classes/model
-#            torch_dtype="auto",
-#            device_map="cpu",
-#            cache_dir="./cache",
-#        )
-#    )
-
-#    return ChatHuggingFace(
-#       llm=llm,
-#        tokenizer=tokenizer,
-#    )
+def format_sources(documents: Optional[list[Document]])-> str:
+    """
+    Convert a list of documents to a string of unique sources.
+    
+    Args:
+        documents: List of document objects with metadata attribute
+        
+    Returns:
+        str: formatted list of unique sources, sorted alphabetically
+    """
+    if not documents:
+        return "No sources available."
+    
+    # Extract unique sources
+    sources = set()
+    for document in documents:
+        source = document.metadata.get("source", "unknown")
+        sources.add(Path(source).stem)
+    
+    # Sort and format as markdown
+    sorted_sources = sorted(sources)
+    sources_lines = [f"- {source}" for source in sorted_sources]
+    
+    return "\n".join(sources_lines)
 
 ######################################## Structured messages ########################################
 
@@ -146,45 +187,9 @@ def get_message_text(msg: AnyMessage) -> str:
     else:
         txts = [c if isinstance(c, str) else (c.get("text") or "") for c in content]
         return "".join(txts).strip()
+    
+######################################## Remove duplicates ########################################
 
-######################################## Manage base yaml config ########################################
-
-from pathlib import Path
-from src.core.configuration import Configuration, T  # Your dataclass config
-from typing import Type
-
-CONFIG_PATH = "./src/config/config.yaml"
-
-def load_config(cls: Type[T] = Configuration) -> T:
-    """Load configuration from a YAML file into a dataclass instance."""
-    try:
-        with open(CONFIG_PATH, 'r') as f:
-            config_dict = yaml.safe_load(f)
-            if config_dict:
-                return cls(**config_dict)
-            else:
-                print("Warning: Configuration file is empty or invalid, loading default configuration.")
-    except (FileNotFoundError, yaml.YAMLError) as e:
-        print(f"Warning: Failed to load config from {CONFIG_PATH} ({e}), loading default configuration.")
-
-    config = cls()
-    save_config(config)  # Save default config to file
-    return config
-
-
-def _make_yaml_safe(data):
-    """Recursively convert non-serializable types (e.g. Path) to strings for YAML."""
-    if isinstance(data, dict):
-        return {k: _make_yaml_safe(v) for k, v in data.items()}
-    elif isinstance(data, list):
-        return [_make_yaml_safe(i) for i in data]
-    elif isinstance(data, Path):
-        return str(data)
-    return data
-
-
-def save_config(config: Configuration):
-    """Save a dataclass config instance to YAML, converting non-serializables."""
-    serializable = _make_yaml_safe(config.__dict__)
-    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(serializable, f, default_flow_style=False, allow_unicode=True)
+def remove_duplicates(base: list[str], new: list[str]) -> list[str]:
+    base_set = set(base)
+    return [item for item in new if item not in base_set]
