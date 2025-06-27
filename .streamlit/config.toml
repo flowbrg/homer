@@ -15,7 +15,7 @@ serverAddress = "localhost"
 serverPort = 8501
 
 [theme]
-primaryColor = "#3b82f6"
+primaryColor = "#984a9c"
 backgroundColor = "#ffffff"
 secondaryBackgroundColor = "#f8fafc"
 textColor = "#1f2937"
@@ -25,3 +25,13 @@ font = "sans serif"
 caching = true
 displayEnabled = true
 showErrorDetails = true
+
+[theme.sidebar]
+# Primary accent color.
+primaryColor = "#984a9c"
+
+# Background color of the app.
+# backgroundColor =
+
+# Background color used for most interactive widgets.
+secondaryBackgroundColor = "#fbdefc"

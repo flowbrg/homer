@@ -8,6 +8,7 @@ from datetime import datetime
 from src.core.agents import ReportAgent
 from src.core.configuration import load_config
 from src.resources.dict_to_pdf import str_to_pdf
+from src.resources.utils import is_connected
 from src.env import OUTPUT_DIR, OLLAMA_CLIENT
 
 def _init():
@@ -107,7 +108,8 @@ def _build_query_input():
 
 def _build_sidebar():
     connectionButton = st.sidebar.toggle(
-        label = "Server execution"
+        label = "Server execution",
+        value = is_connected(st.session_state)
     )
 
     if connectionButton:

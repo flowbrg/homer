@@ -1,6 +1,6 @@
 import streamlit as st
 
-#from src.core.application import Application
+from src.resources.utils import is_connected
 from src.core.agents import RetrievalAgent
 from src.core.configuration import load_config
 from src.env import OLLAMA_CLIENT
@@ -49,20 +49,20 @@ def _is_ollama_client_available(url: str) -> bool:
 
 def _build_sidebar():
     connectionButton = st.sidebar.toggle(
-        label = "Server execution"
+        label = "Server execution",
+        value = is_connected(st.session_state)
     )
 
     if connectionButton:
         conn = _is_ollama_client_available(OLLAMA_CLIENT)
         if conn:
-            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
             st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
         else:
             st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
             st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
     else:
-        st.sidebar.write(f"using localhost")
         st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+    st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
         
     modelButton = st.sidebar.toggle(
         label = "Thinking model",

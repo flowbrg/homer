@@ -194,7 +194,7 @@ def remove_duplicates(base: list[str], new: list[str]) -> list[str]:
     base_set = set(base)
     return [item for item in new if item not in base_set]
 
-######################################## Remove duplicates ########################################
+######################################## Make document batch ########################################
 
 from itertools import islice
 from typing import Iterator, List
@@ -254,3 +254,15 @@ def make_document_batch_generator(documents: List[Document], size: int = 100) ->
 def make_document_batch_oneliner(documents: List[Document], size: int = 100) -> List[List[Document]]:
     """Concise one-liner version."""
     return [documents[i:i + size] for i in range(0, len(documents), size)]
+
+######################################## Streamlit connection button state ########################################
+
+from streamlit.runtime.state.session_state_proxy import SessionStateProxy
+from src.env import OLLAMA_CLIENT
+
+def is_connected(session_state: SessionStateProxy) -> bool:
+    if "baseConfig" not in session_state:
+        raise Exception("config not loaded in the session state")
+    elif session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
+        return True
+    return False
