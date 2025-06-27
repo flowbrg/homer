@@ -12,7 +12,14 @@ def _init():
 def main():
     st.info("PLACEHOLDER")
 
-
+    on = st.toggle(
+        label = 'button',
+        value = True,
+        #disabled= True
+    )
+    if on:
+        st.write('on')
+    else: st.write('off')
 if __name__ == "__main__":
     _init()
     main()

@@ -6,7 +6,7 @@ from pathlib import Path
 from src.core.configuration import load_config
 from src.core.agents import IndexAgent
 from src.core.retrieval import delete_documents
-from src.env import UPLOAD_DIR
+from src.env import UPLOAD_DIR, OLLAMA_CLIENT
 from src.core.retrieval import get_existing_documents
 
 def _init():
@@ -23,6 +23,30 @@ st.markdown("# Documents")
 # Ensure upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+def _is_ollama_client_available(url: str) -> bool:
+    import requests
+    try:
+        response = requests.get(url, timeout=2)
+        return response.ok
+    except requests.RequestException:
+        return False
+
+def _build_sidebar():
+    connectionButton = st.sidebar.toggle(
+        label = "Server execution"
+    )
+
+    if connectionButton:
+        conn = _is_ollama_client_available(OLLAMA_CLIENT)
+        if conn:
+            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
+            st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
+        else:
+            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
+            st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+    else:
+        st.sidebar.write(f"using localhost")
+        st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
 
 def _list_uploaded_files():
     """List all the uploaded files in the specified folder with delete option."""
@@ -109,6 +133,7 @@ def main():
             else:
                 st.success("Database has been cleared.")
 
+    
 def list_documents():
     files = [f for f in get_existing_documents()]
 
@@ -119,4 +144,5 @@ def list_documents():
 
 if __name__ == "__main__":
     _init()
+    _build_sidebar()
     main()
