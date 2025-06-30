@@ -121,7 +121,7 @@ def _build_uploader():
         st.button(
             label="Upload",
             type="primary",
-            on_click=_process_files
+            on_click=_process_files(uploaded_files)
         )
     
 def _list_documents():

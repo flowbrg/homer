@@ -197,4 +197,3 @@ Answer:"""
     FINAL POLISHED SECTION:
     """
         return self.llm.invoke(prompt).content.strip()
-    
