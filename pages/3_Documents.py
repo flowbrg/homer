@@ -118,12 +118,14 @@ def _build_uploader():
     if uploaded_files is not None and len(uploaded_files) > 0:
         
         # Upload button
-        st.button(
+        deleteButton=st.button(
             label="Upload",
             type="primary",
-            on_click=_process_files(uploaded_files)
+            #on_click=_process_files(uploaded_files)
         )
-    
+        if deleteButton:
+            _process_files(uploaded_files)
+
 def _list_documents():
     files = [f for f in get_existing_documents()]
     for file in files:

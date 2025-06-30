@@ -37,7 +37,7 @@ def parse_pdfs(
                                                        is_separator_regex=False)
 
     if not pdf_files:
-       print(f"[info] No PDF files found in directory: {state.path}")
+       print("[info] No new PDF files")
 
     for pdf_file in tqdm(pdf_files, "Loading files..."):
         # Load the file into a Document object

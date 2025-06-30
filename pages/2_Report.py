@@ -87,7 +87,10 @@ def _display_reports():
                 
 def _build_query_input():
     # Create the query input area
-    query = st.chat_input("Enter your query:")
+    query = st.chat_input(
+        placeholder="Enter your query:",
+        disabled=True,
+        )
 
     if query:
         # Display user query
