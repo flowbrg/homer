@@ -266,3 +266,30 @@ def is_connected(session_state: SessionStateProxy) -> bool:
     elif session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
         return True
     return False
+
+######################################## Clean thinking part ########################################
+
+import re
+
+def extract_think_and_answer(text: str) -> tuple[Optional[str], str]:
+    """
+    Separates a string into two parts: the content within <think>...</think> tags
+    and the remaining text (answer part).
+
+    Args:
+        text: The input string potentially containing <think>...</think> blocks.
+
+    Returns:
+        A tuple containing (thinking_part, answer_part).
+        If no <think> tags are found, thinking_part will be an empty string.
+    """
+    think_match = re.search(r'<think>(.*?)</think>', text, flags=re.DOTALL | re.IGNORECASE)
+
+    thinking_part = ""
+    answer_part = text
+
+    if think_match:
+        thinking_part = think_match.group(1).strip()
+        answer_part = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL | re.IGNORECASE).strip()
+        return thinking_part, answer_part
+    return None, text
