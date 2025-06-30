@@ -24,4 +24,4 @@ def load_chat_model(
     )-> BaseChatModel:
     from langchain_ollama import ChatOllama
     logger.info(f"Loading chat model: {model}")
-    return ChatOllama(model = model, base_url = host)
+    return ChatOllama(model = model, temperature=0, base_url = host)

@@ -7,7 +7,8 @@ from src.schemas.database import DB_SCHEMA, REQUIRED_TABLES
 from src.utils.utils import get_connection
 from src.env import PERSISTENT_DIR
 
-
+from src.utils.logging import get_logger
+databaseLogger = get_logger("database")
 
 def _database_has_required_tables(conn: sqlite3.Connection) -> bool:
     """Check if all required tables exist in the database."""
@@ -37,7 +38,7 @@ def initialize_database():
     if initialize:
         with sqlite3.connect(db_path) as conn:
             conn.executescript(DB_SCHEMA)
-        print("Database initialized successfully.")
+        databaseLogger.info("Database initialized successfully.")
 
 
 def get_all_threads() -> list[tuple]:

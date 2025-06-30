@@ -18,7 +18,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
 
 # Configure logger
-logger = get_logger(__name__)
+indexAgentLogger = get_logger("indexAgent")
 
 
 def parse_pdfs(
