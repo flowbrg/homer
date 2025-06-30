@@ -1,6 +1,5 @@
 
 import streamlit as st
-import logging
 
 from pathlib import Path
 from datetime import datetime
@@ -11,16 +10,22 @@ from src.utils.dict_to_pdf import str_to_pdf
 from src.utils.utils import is_connected
 from src.env import OUTPUT_DIR, OLLAMA_CLIENT
 
-def _init():
-    """Initialize session state variables."""
-    if "baseConfig" not in st.session_state:
-        st.session_state.baseConfig = load_config()
-    if "reportAgent" not in st.session_state:
-        st.session_state.reportAgent = ReportAgent(st.session_state.baseConfig)
-    if "report_history" not in st.session_state:
-        st.session_state.report_history = []
+
+############################## Initialize session state ##############################
+
 
 st.set_page_config(page_title="Report Generator", layout="wide")
+
+if "baseConfig" not in st.session_state:
+    st.session_state.baseConfig = load_config()
+if "reportAgent" not in st.session_state:
+    st.session_state.reportAgent = ReportAgent(st.session_state.baseConfig)
+if "report_history" not in st.session_state:
+    st.session_state.report_history = []
+
+
+############################## Private methods ##############################
+
 
 def _is_ollama_client_available(url: str) -> bool:
     import requests
@@ -29,6 +34,7 @@ def _is_ollama_client_available(url: str) -> bool:
         return response.ok
     except requests.RequestException:
         return False
+
 
 def _create_report(query=str):
     # Create a unique filename
@@ -76,6 +82,29 @@ def _create_report(query=str):
     else:
         st.error("No report content was generated.")
 
+
+############################## Page builders ##############################
+
+
+def _build_sidebar():
+    connectionButton = st.sidebar.toggle(
+        label = "Server execution",
+        value = is_connected(st.session_state)
+    )
+
+    if connectionButton:
+        conn = _is_ollama_client_available(OLLAMA_CLIENT)
+        if conn:
+            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
+            st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
+        else:
+            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
+            st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+    else:
+        st.sidebar.write(f"using localhost")
+        st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+
+
 def _display_reports():
     st.title("Report Generator")
     
@@ -84,7 +113,8 @@ def _display_reports():
         with st.expander("Previous Reports"):
             for idx, report_info in enumerate(st.session_state.report_history):
                 st.write(f"{idx + 1}. {report_info['query']} - {report_info['timestamp']}")
-                
+
+
 def _build_query_input():
     # Create the query input area
     query = st.chat_input(
@@ -109,29 +139,11 @@ def _build_query_input():
                         st.error(f"❌ Error generating the report: {str(e)}")
                         st.info("Please check the logs for more details.")
 
-def _build_sidebar():
-    connectionButton = st.sidebar.toggle(
-        label = "Server execution",
-        value = is_connected(st.session_state)
-    )
-
-    if connectionButton:
-        conn = _is_ollama_client_available(OLLAMA_CLIENT)
-        if conn:
-            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
-            st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
-        else:
-            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
-            st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
-    else:
-        st.sidebar.write(f"using localhost")
-        st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
 
 if __name__ == "__main__":
-    _init()
     
-    _display_reports()
-
     _build_sidebar()
+
+    _display_reports()
 
     _build_query_input()
