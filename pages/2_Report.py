@@ -7,8 +7,8 @@ from datetime import datetime
 
 from src.core.agents import ReportAgent
 from src.core.configuration import load_config
-from src.resources.dict_to_pdf import str_to_pdf
-from src.resources.utils import is_connected
+from src.utils.dict_to_pdf import str_to_pdf
+from src.utils.utils import is_connected
 from src.env import OUTPUT_DIR, OLLAMA_CLIENT
 
 def _init():

@@ -15,7 +15,7 @@ from langgraph.graph.state import CompiledStateGraph
 from src.core.states import InputState
 from src.core.configuration import Configuration
 from src.core.models import load_chat_model
-from src.resources import prompts
+from src.utils import prompts
 
 
 def respond(

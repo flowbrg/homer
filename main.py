@@ -2,7 +2,7 @@ import subprocess
 
 from src.core import database as db
 from src.env import *
-
+from src.utils.logging import setup_logging
 
 def run_streamlit_app():
     try:
@@ -24,6 +24,9 @@ def ensure_path(path_str: str):
         path.parent.mkdir(parents=True, exist_ok=True)
 
 if __name__ == "__main__":
+
+    setup_logging("INFO")  # or "DEBUG" for more detailed logs
+
     ensure_path(path_str = UPLOAD_DIR)
     ensure_path(path_str = VECTORSTORE_DIR)
     ensure_path(path_str = PERSISTENT_DIR)    #Only for homer_persistent

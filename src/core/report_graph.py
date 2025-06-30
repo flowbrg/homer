@@ -13,9 +13,9 @@ from langgraph.graph.state import CompiledStateGraph
 from src.core.states import ReportState, InputState
 from src.core.configuration import Configuration
 from src.core import retrieval
-from src.resources.utils import format_docs, get_message_text, format_messages
+from src.utils.utils import format_docs, get_message_text, format_messages
 from src.core.models import load_chat_model, load_embedding_model
-from src.resources import prompts
+from src.utils import prompts
 
 
 # Set up logging

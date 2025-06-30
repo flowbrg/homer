@@ -13,7 +13,8 @@ class MarkdownToPDF:
     
     _IGNORED_TOKENS = ['<|endoftext|>', '<|startoftext|>', '<pad>', '<unk>', '<s>', '</s>',
                        '<mask>', '<cls>', '<sep>', '<|im_start|>', '<|im_end|>', '<text>',
-                       'assistant', 'human', '<think>', '</think>']
+                       'assistant', 'human', '<think>', '</think>','</message>','</messages>',
+                       '<message>','<messages>']
 
     def __init__(self, page_size=letter):
         self.page_size = page_size

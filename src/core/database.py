@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 from src.schemas.database import DB_SCHEMA, REQUIRED_TABLES
-from src.resources.utils import get_connection
+from src.utils.utils import get_connection
 from src.env import PERSISTENT_DIR
 
 

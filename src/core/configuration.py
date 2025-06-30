@@ -12,6 +12,10 @@ from langchain_core.runnables import RunnableConfig, ensure_config
 import os
 import requests
 
+from src.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 @dataclass(kw_only=True)
 class Configuration:
     """Configuration class for indexing and retrieval operations.
@@ -107,6 +111,6 @@ def _is_ollama_client_available(url: str) -> bool:
 def load_config(cls: Optional[Type[T]] = Configuration) -> T:
     config = cls()
     if _is_ollama_client_available(OLLAMA_CLIENT):
-        print(f"[info] {OLLAMA_CLIENT} available")
+        logger.info(f"{OLLAMA_CLIENT} available")
         config.ollama_host = OLLAMA_CLIENT
     return config

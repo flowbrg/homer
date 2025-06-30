@@ -12,7 +12,7 @@
 #from langchain_community.vectorstores import FAISS
 
 #from src.parser.parser import simple_parser
-#from src.resources.utils import load_embeddings
+#from src.utils.utils import load_embeddings
 #from schemas.configuration import AppConfig
 #from langchain_core.vectorstores import VectorStore
 

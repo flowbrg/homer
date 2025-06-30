@@ -8,7 +8,7 @@ from src.core.agents import IndexAgent
 from src.core.retrieval import delete_documents, get_existing_documents
 from src.env import UPLOAD_DIR, OLLAMA_CLIENT
 from src.core.retrieval import get_existing_documents
-from src.resources.utils import is_connected
+from src.utils.utils import is_connected
 
 ############################## Initialize session state ##############################
 

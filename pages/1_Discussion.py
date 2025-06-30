@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.resources.utils import is_connected
+from src.utils.utils import is_connected
 from src.core.agents import RetrievalAgent
 from src.core.configuration import load_config
 from src.env import OLLAMA_CLIENT
