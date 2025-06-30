@@ -31,7 +31,7 @@ def parse_pdfs(
         new = [str(p) for p in list(path.glob("*.pdf"))]
     )
     
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=256,
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=512,
                                                        chunk_overlap=50,
                                                        length_function=len,
                                                        is_separator_regex=False)
