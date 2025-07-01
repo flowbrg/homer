@@ -50,12 +50,12 @@ def parse_pdfs(
         >>> result = parse_pdfs(state)
         >>> print(len(result["docs"]))  # Number of document chunks
     """
-    logger.info(f"Starting PDF parsing from directory: {state.path}")
+    indexAgentLogger.info(f"Starting PDF parsing from directory: {state.path}")
     
     try:
         path = Path(state.path)
         if not path.is_dir():
-            logger.error(f"Directory not found: {state.path}")
+            indexAgentLogger.error(f"Directory not found: {state.path}")
             raise FileNotFoundError(f"Directory not found: {state.path}")
 
         documents = []
@@ -66,7 +66,7 @@ def parse_pdfs(
             new=[str(p) for p in list(path.glob("*.pdf"))]
         )
         
-        logger.info(f"Found {len(pdf_files)} new PDF files to process")
+        indexAgentLogger.info(f"Found {len(pdf_files)} new PDF files to process")
         
         # Configure text splitter
         text_splitter = RecursiveCharacterTextSplitter(
@@ -77,13 +77,13 @@ def parse_pdfs(
         )
 
         if not pdf_files:
-            logger.info("No new PDF files to process")
+            indexAgentLogger.info("No new PDF files to process")
             return {"docs": documents}
 
         # Process each PDF file
         for pdf_file in tqdm(pdf_files, desc="Loading files..."):
             try:
-                logger.debug(f"Processing file: {pdf_file}")
+                indexAgentLogger.debug(f"Processing file: {pdf_file}")
                 
                 # Load the file into a Document object
                 loader = PyMuPDFLoader(str(pdf_file))
@@ -92,17 +92,17 @@ def parse_pdfs(
                 # Add them to the list of Documents
                 documents.extend(document)
                 
-                logger.debug(f"Successfully processed {pdf_file}, created {len(document)} chunks")
+                indexAgentLogger.debug(f"Successfully processed {pdf_file}, created {len(document)} chunks")
                 
             except Exception as e:
-                logger.error(f"Failed to process file {pdf_file}: {str(e)}")
+                indexAgentLogger.error(f"Failed to process file {pdf_file}: {str(e)}")
                 continue
 
-        logger.info(f"PDF parsing completed. Total document chunks created: {len(documents)}")
+        indexAgentLogger.info(f"PDF parsing completed. Total document chunks created: {len(documents)}")
         return {"docs": documents}
     
     except Exception as e:
-        logger.error(f"Error in parse_pdfs: {str(e)}")
+        indexAgentLogger.error(f"Error in parse_pdfs: {str(e)}")
         raise
 
 
@@ -141,24 +141,24 @@ def index_docs(
         This function uses the configured embedding model to create vector
         representations of the documents for efficient similarity search.
     """
-    logger.info("Starting document indexing process")
+    indexAgentLogger.info("Starting document indexing process")
     
     try:
         # Get configuration
         configuration = Configuration.from_runnable_config(config)
 
         if not configuration:
-            logger.error("Configuration required but not provided")
+            indexAgentLogger.error("Configuration required but not provided")
             raise ValueError("Configuration required to run index_docs.")
         
-        logger.info(f"Using embedding model: {configuration.embedding_model}")
+        indexAgentLogger.info(f"Using embedding model: {configuration.embedding_model}")
         
         # Prepare document batches
         documents_batch = make_document_batch(documents=state.docs)
         total_batches = len(documents_batch)
         total_documents = len(state.docs)
         
-        logger.info(f"Processing {total_documents} documents in {total_batches} batches")
+        indexAgentLogger.info(f"Processing {total_documents} documents in {total_batches} batches")
 
         # Index documents using the retriever
         with retrieval.make_retriever(
@@ -168,17 +168,17 @@ def index_docs(
             for i, batch in enumerate(tqdm(documents_batch, desc="Adding document batch..."), 1):
                 try:
                     retriever.add_documents(batch)
-                    logger.debug(f"Successfully indexed batch {i}/{total_batches} ({len(batch)} documents)")
+                    indexAgentLogger.debug(f"Successfully indexed batch {i}/{total_batches} ({len(batch)} documents)")
                     
                 except Exception as e:
-                    logger.error(f"Failed to index batch {i}/{total_batches}: {str(e)}")
+                    indexAgentLogger.error(f"Failed to index batch {i}/{total_batches}: {str(e)}")
                     raise
         
-        logger.info(f"Document indexing completed successfully. Indexed {total_documents} documents")
+        indexAgentLogger.info(f"Document indexing completed successfully. Indexed {total_documents} documents")
         return {"docs": "delete"}
     
     except Exception as e:
-        logger.error(f"Error in index_docs: {str(e)}")
+        indexAgentLogger.error(f"Error in index_docs: {str(e)}")
         raise
 
 
@@ -211,10 +211,10 @@ def should_index(state: IndexState, *, config: RunnableConfig) -> str:
         to control the flow based on the presence of documents.
     """
     if not state.docs:
-        logger.info("No documents to index, ending workflow")
+        indexAgentLogger.info("No documents to index, ending workflow")
         return END
     
-    logger.info(f"Found {len(state.docs)} documents, proceeding to indexing")
+    indexAgentLogger.info(f"Found {len(state.docs)} documents, proceeding to indexing")
     return "index_docs"
 
 
@@ -248,7 +248,7 @@ def get_index_graph() -> CompiledStateGraph:
         The graph uses the Configuration schema for type safety and
         validation of configuration parameters.
     """
-    logger.info("Building document indexing graph")
+    indexAgentLogger.info("Building document indexing graph")
     
     try:
         # Create the StateGraph with IndexState and Configuration schema
@@ -266,9 +266,9 @@ def get_index_graph() -> CompiledStateGraph:
         graph = builder.compile()
         graph.name = "IndexGraph"
         
-        logger.info("Successfully built and compiled IndexGraph")
+        indexAgentLogger.info("Successfully built and compiled IndexGraph")
         return graph
     
     except Exception as e:
-        logger.error(f"Error building index graph: {str(e)}")
+        indexAgentLogger.error(f"Error building index graph: {str(e)}")
         raise

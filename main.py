@@ -3,9 +3,8 @@ setup_logging("INFO")  # or "DEBUG" for more detailed logs
 
 import subprocess
 
-from src.core import database as db
 from src.env import *
-
+from src.utils.utils import ensure_path
 
 def run_streamlit_app():
     try:
@@ -14,22 +13,10 @@ def run_streamlit_app():
     except subprocess.CalledProcessError as e:
         print(f"Streamlit exited with error: {e}")
 
-def ensure_path(path_str: str):
-    """Crée le répertoire parent si le chemin est un fichier, ou le répertoire lui-même."""
-    from pathlib import Path
-    path = Path(path_str)
-    
-    # Si le chemin se termine par '/' ou n'a pas d'extension, c'est un dossier
-    if path_str.endswith('/') or not path.suffix:
-        path.mkdir(parents=True, exist_ok=True)
-    else:
-        # C'est un fichier, créer le répertoire parent
-        path.parent.mkdir(parents=True, exist_ok=True)
-
 if __name__ == "__main__":
 
     ensure_path(path_str = UPLOAD_DIR)
     ensure_path(path_str = VECTORSTORE_DIR)
-    ensure_path(path_str = PERSISTENT_DIR)    #Only for homer_persistent
-    db.initialize_database()
+    #ensure_path(path_str = PERSISTENT_DIR)    #Only for homer_persistent
+    #db.initialize_database()
     run_streamlit_app()

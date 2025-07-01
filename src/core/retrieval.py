@@ -16,7 +16,7 @@ from src.utils.utils import VECTORSTORE_DIR, get_chroma_client
 
 
 _COLLECTION = "HOMER"
-
+_COLLECTION_METADATA = {"hnsw:space": "cosine"}
 @contextmanager
 def make_retriever(
     embedding_model: Embeddings,
@@ -39,6 +39,7 @@ def make_retriever(
 
     vector_store = Chroma(
         collection_name = _COLLECTION,
+        collection_metadata= _COLLECTION_METADATA,
         embedding_function = embedding_model,
         persist_directory = VECTORSTORE_DIR,  # Where to save data locally, remove if not necessary
     )
@@ -54,7 +55,7 @@ def get_existing_documents() -> list[str]:
         list[str]: List of unique source file names
     """
     client=get_chroma_client()
-    collection = client.get_or_create_collection(_COLLECTION)
+    collection = client.get_or_create_collection(name=_COLLECTION, metadata=_COLLECTION_METADATA)
     
     # Get all documents with their metadata
     results = collection.get(include=["metadatas"])
@@ -77,7 +78,7 @@ def delete_documents(docs: str | list[str]):
         docs: Single document source name or list of source names to delete
     """
     client = get_chroma_client()
-    collection = client.get_or_create_collection(_COLLECTION)
+    collection = client.get_or_create_collection(name=_COLLECTION, metadata=_COLLECTION_METADATA)
     
     # Convert single string to list for uniform processing
     if isinstance(docs, str):

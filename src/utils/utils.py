@@ -293,3 +293,17 @@ def extract_think_and_answer(text: str) -> tuple[Optional[str], str]:
         answer_part = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL | re.IGNORECASE).strip()
         return thinking_part, answer_part
     return None, text
+
+######################################## Ensure path exists ########################################
+
+def ensure_path(path_str: str):
+    """Crée le répertoire parent si le chemin est un fichier, ou le répertoire lui-même."""
+    from pathlib import Path
+    path = Path(path_str)
+    
+    # Si le chemin se termine par '/' ou n'a pas d'extension, c'est un dossier
+    if path_str.endswith('/') or not path.suffix:
+        path.mkdir(parents=True, exist_ok=True)
+    else:
+        # C'est un fichier, créer le répertoire parent
+        path.parent.mkdir(parents=True, exist_ok=True)

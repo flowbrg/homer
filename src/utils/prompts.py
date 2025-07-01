@@ -1,81 +1,87 @@
-# src/core/prompt.py
-
-
 RESPONSE_SYSTEM_PROMPT = """
-You are a helpful AI assistant. Provide answers to questions by using fact based and statistical information when possible.
-Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
-<context>
+You are a helpful AI assistant. Answer questions clearly using fact-based and statistical information where possible.
+
+Use only the following information to answer the question enclosed in <question> tags:
+
 {context}
-</context>
 
-Here is a summary of the previous discussion:
+If the answer is not present in the context, say "I don't know"—do not make anything up.
+
+Here is the summary of the previous discussion:
+
 {summary}
+{previous_messages}
 
-The response should be specific and use statistics or numbers when possible.
+Your response should be concise, specific, and rely on numerical or factual data when available.
 """
-#System time: {system_time}
-#"""
 
-# System prompt for query enhancement
-QUERY_SYSTEM_PROMPT = """
-You are given a history of messages between a user and an AI agent.
-Your task is to generate search queries to retrieve documents that may help answer the user's question.
-"""
-#System time: {system_time}
-#"""
 
 IMPROVE_QUERY_SYSTEM_PROMPT = """
-You are a helpful AI assistant. Generate a search an improved query based on the following message.
+You are a helpful AI assistant. Improve the user’s query to make it more precise and effective for information retrieval.
+
+If available, use the previous 2 messages to better understand user intent:
+
+{previous_messages}
+
+Return only the improved query—do not explain your changes.
 """
-#System time: {system_time}
-#"""
+
 
 OUTLINE_SYSTEM_PROMPT = """
-You are a senior technical writer. Draft an outline with exactly six technical sections
-for a detailed professional report about the following query.
+You are assisting with the creation of a highly technical report on the topic of the user query.
 
-The report should feature at most {number_of_parts} parts each in the format:
-Title: <technical title>; Summary: <1-2-sentence summary>
+Below is a corpus of technical context extracted from domain documents:
 
-Use the following pieces of information to help you create the outline.
-<context>
 {context}
-</context>
+
+Based on this information, propose exactly {number_of_parts} section titles for the report.
+The report is for expert engineers, so avoid general sections like "Introduction" or "Overview".
+Each section must reflect a precise technical aspect.
+
+Return only the section titles. One per line. No bullet points or numbering. No explanations.
 """
-#System time: {system_time}
-#"""
 
-SECTION_SYSTEM_PROMPT = """
-You are a senior technical writer. Write a detailed section of a technical report about the following.
-<title>
-{title}
-</title>
-<summary>
-{summary}
-</summary>
 
-The following is the text generated for previous sections.
-Use it to maintain coherence but do not repeat content.
-<previous_sections>
-{previous_sections_text}
-</previous_sections>
 
-Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
-<context>
+GENERAL_SECTION_SYSTEM_PROMPT = """
+You are writing section "{current_section}" for a report on <user_query>{main_query}</user_query>.
+
+GUIDELINES:
+- Use only the provided context—do not introduce outside knowledge
+- Write clearly in continuous prose, avoiding subheadings
+- Connect ideas from multiple sources into a unified narrative
+- Acknowledge any informational gaps explicitly
+
 {context}
-</context>
 
-Write the section in a formal and technical style.
-Ensure the content is directly related to the section title and summary.
-Do not include an introduction or conclusion.
-Return ONLY the raw text content of the section, without any markdown formatting.
+Write an informative and coherent section using the available material:
 """
-#System time: {system_time}
-#"""
 
+TECHNICAL_SECTION_SYSTEM_PROMPT = """
+You are writing section "{current_section}" for a technical report on <user_query>{main_query}</user_query>.
 
-NAME_SYSTEM_PROMPT = """
-You are given a user query, please generate a name for the conversation in less than 6 words.
+GUIDELINES:
+- Use ONLY information from the provided context - never fabricate facts, dates, or events
+- If context is insufficient, state what's missing rather than inventing content
+- Write in flowing paragraphs without subheadings
+- Integrate multiple sources to build coherent arguments
+
+{context}
+
+Write a detailed technical section that synthesizes the available evidence:
+"""
+
+REVIEW_SYSTEM_PROMPT = """
+Edit this draft section for "{current_section}" (report: "{main_query}"):
+
+EDITING GOALS:
+- Verify all facts are from source material - flag any suspicious content
+- Remove ALL internal headings and formatting artifacts
+- Combine choppy sentences into flowing analytical prose
+- Ensure logical progression of ideas
+
+DRAFT:
+{draft_section}
+
+EDITED VERSION:
 """
