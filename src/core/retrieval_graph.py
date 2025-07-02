@@ -5,6 +5,10 @@ retrieval graph. It includes the main graph definition, state management,
 and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
+from src.utils.logging import setup_logging, get_logger
+setup_logging("INFO")  # or "DEBUG" for more detailed logs
+# Initialize retrievalAgentLogger
+retrievalAgentLogger = get_logger(__name__)
 
 from typing import cast, Dict, List, Union
 from pydantic import BaseModel
@@ -24,10 +28,7 @@ from src.core.configuration import Configuration
 from src.core.models import load_chat_model, load_embedding_model
 from src.utils.utils import format_docs, format_messages, format_sources, get_connection
 from src.utils import prompts
-from src.utils.logging import get_logger
 
-# Initialize retrievalAgentLogger
-retrievalAgentLogger = get_logger("retrievalAgent")
 
 
 class SearchQuery(BaseModel):
@@ -43,7 +44,7 @@ class SearchQuery(BaseModel):
     query: str
 
 
-def generate_query(
+def rephrase_query(
     state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, Union[str, List]]:
     """
@@ -96,7 +97,7 @@ def generate_query(
         
         # Setup prompt template
         prompt = ChatPromptTemplate.from_messages([
-            ("system", prompts.IMPROVE_QUERY_SYSTEM_PROMPT),
+            ("system", prompts.REPHRASE_QUERY_SYSTEM_PROMPT),
             ("human", "{message}"),
         ])
 
@@ -213,7 +214,7 @@ def retrieve(
             if response:
                 retrievalAgentLogger.info(f"Successfully retrieved {len(response)} documents")
                 for doc in response:
-                    retrievalAgentLogger.info(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
+                    retrievalAgentLogger.debug(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
             else:
                 retrievalAgentLogger.warning("No documents retrieved for the query")
             
@@ -304,22 +305,23 @@ def respond(
                    f"{nb_messages} recent messages, {docs_count} retrieved documents")
         
         # Prepare context
-        current_messages = format_messages(state.messages[-1:])
+
         previous_messages = (
-            format_messages(state.messages[-nb_messages:-1]) 
-            if len(state.messages) >= 6 
+            format_messages(state.messages[-nb_messages:-1])
+            if  state.messages[-nb_messages:-1]
             else "There were no previous messages."
         )
+
         context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
         
         # Generate response
         message_value = prompt.invoke({
-            "messages": current_messages,
+            "messages": state.query,
             "context": context_docs,
             "previous_messages": previous_messages,
             "summary": state.summary if state.summary else "",
         }, config)
-        
+
         response = model.invoke(message_value, config)
         
         retrievalAgentLogger.info("Response generated successfully")
@@ -515,9 +517,9 @@ def get_retrieval_graph() -> CompiledStateGraph:
 
     Graph Architecture:
         ```
-        [START] → generate_query → retrieve → respond → [should_summarize?]
-                                                             ↓
-                                            END ← summarize_conversation
+        [START] → rephrase_query → retrieve → respond → [should_summarize?]
+                                                                ↓
+                                                END ← summarize_conversation
         ```
 
     Nodes:
@@ -557,21 +559,21 @@ def get_retrieval_graph() -> CompiledStateGraph:
         # Create StateGraph with proper schemas
         builder = StateGraph(
             RetrievalState, 
-            input=InputState, 
+            input_schema=InputState, 
             config_schema=Configuration
         )
 
         # Add nodes
         retrievalAgentLogger.debug("Adding graph nodes")
-        builder.add_node(generate_query)
+        builder.add_node(rephrase_query)
         builder.add_node(retrieve)
         builder.add_node(respond)
         builder.add_node(summarize_conversation)
 
         # Define edges
         retrievalAgentLogger.debug("Defining graph edges")
-        builder.add_edge("__start__", "generate_query")
-        builder.add_edge("generate_query", "retrieve")
+        builder.add_edge("__start__", "rephrase_query")
+        builder.add_edge("rephrase_query", "retrieve")
         builder.add_edge("retrieve", "respond")
         builder.add_conditional_edges("respond", should_summarize)
 

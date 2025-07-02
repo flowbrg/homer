@@ -1,5 +1,5 @@
-from src.utils.logging import setup_logging
-setup_logging("INFO")  # or "DEBUG" for more detailed logs
+#from src.utils.logging import setup_logging
+#setup_logging("INFO")  # or "DEBUG" for more detailed logs
 
 import subprocess
 
@@ -9,7 +9,7 @@ from src.utils.utils import ensure_path
 def run_streamlit_app():
     try:
         #subprocess.run(["streamlit", "run", "homer_persistent.py"], check=True)
-        subprocess.run(["streamlit", "run", "homer_inmem.py"], check=True)
+        subprocess.run(["streamlit", "run", "home.py"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Streamlit exited with error: {e}")
 

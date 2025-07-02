@@ -1,4 +1,4 @@
-
+import uuid
 from dataclasses import dataclass, field
 from typing import Annotated, Any, Literal, Optional, Sequence, Union
 
@@ -62,11 +62,6 @@ class IndexState(InputIndexState):
     """A list of documents that the agent can index."""
 
 
-# Optional, the InputState is a restricted version of the State that is used to
-# define a narrower interface to the outside world vs. what is maintained
-# internally.
-
-
 @dataclass(kw_only=True)
 class InputState:
     """Represents the input state for the agent.
@@ -108,14 +103,12 @@ class InputState:
         message from `right` will replace the message from `left`."""
 
 
-# This is the primary state of your agent, where you can store any information
-
 
 @dataclass(kw_only=True)
 class RetrievalState(InputState):
     """The state of your graph / agent."""
 
-    query: list[str] = field(default_factory=list)
+    query: str = field(default_factory=str)
     """A list of search queries that the agent has generated."""
 
     retrieved_docs: list[Document] = field(default_factory=list)

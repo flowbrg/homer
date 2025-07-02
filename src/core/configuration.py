@@ -59,7 +59,7 @@ class Configuration:
     )
 
     query_model: str = field(
-        default = "gemma3:1b",   #"qwen3:0.6b",
+        default = "gemma3:4b-it-qat",   #"qwen3:0.6b",
     )
 
     outline_model: str = field(

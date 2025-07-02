@@ -2,6 +2,9 @@
 [global]
 developmentMode = false
 
+[logger]
+level = "info"
+
 [server]
 port = 8501
 enableCORS = false

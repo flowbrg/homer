@@ -1,4 +1,8 @@
-import logging
+from src.utils.logging import setup_logging, get_logger
+#setup_logging("DEBUG")  # or "DEBUG" for more detailed logs
+# Configure logger
+indexAgentLogger = get_logger(__name__)
+
 from typing import Optional
 from pathlib import Path
 from tqdm import tqdm
@@ -12,13 +16,12 @@ from src.core.configuration import Configuration
 from src.core.states import IndexState, InputIndexState
 from src.core.models import load_embedding_model
 from src.utils.utils import remove_duplicates, make_document_batch
-from src.utils.logging import get_logger
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.document_loaders import PyMuPDFLoader
 
-# Configure logger
-indexAgentLogger = get_logger("indexAgent")
+
 
 
 def parse_pdfs(
@@ -68,13 +71,21 @@ def parse_pdfs(
         
         indexAgentLogger.info(f"Found {len(pdf_files)} new PDF files to process")
         
+        embeddings = load_embedding_model(model=Configuration.embedding_model, host=Configuration.ollama_host)
+
         # Configure text splitter
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=512,
-            chunk_overlap=50,
-            length_function=len,
-            is_separator_regex=False
+        text_splitter = SemanticChunker(
+            embeddings=embeddings,
+            breakpoint_threshold_type="percentile",
+            min_chunk_size=265,
         )
+        
+        #RecursiveCharacterTextSplitter(
+        #    chunk_size=512,
+        #    chunk_overlap=50,
+        #    length_function=len,
+        #    is_separator_regex=False
+        #)
 
         if not pdf_files:
             indexAgentLogger.info("No new PDF files to process")

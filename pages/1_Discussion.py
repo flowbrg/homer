@@ -16,6 +16,10 @@ from src.env import OLLAMA_CLIENT
 
 ############################## Initialize session state ##############################
 
+_SERVER_REASONING_MODEL = "qwen3:30b-a3b" 
+_SERVER_MODEL = "gemma3:4b-it-qat"
+_LOCAL_REASONING_MODEL = "qwen3:0.6b"
+_LOCAL_MODEL = "gemma3:1b"
 
 st.set_page_config(page_title="Discussion")
 
@@ -61,7 +65,7 @@ def _stream_with_thinking_separation(query: str):
         query: The user query to process
     """
     accumulated_text = ""
-    if st.session_state.baseConfig.response_model == "qwen3:30b-a3b" or st.session_state.baseConfig.response_model == "qwen3:0.6b":
+    if st.session_state.baseConfig.response_model == _SERVER_REASONING_MODEL or st.session_state.baseConfig.response_model == _LOCAL_REASONING_MODEL:
         thinking_placeholder = st.expander("Show Thinking")
     response_placeholder = st.empty()
     
@@ -175,17 +179,21 @@ def _build_sidebar():
     st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
         
     # Model selection toggle
-    reasoningModelButton = st.sidebar.toggle(label="Thinking model")
+    reasoningModelButton = st.sidebar.pills(
+            label="Choose mode",
+            options=["Reasoning"],
+            key="thinking_mode"
+        ) or []
 
     # Configure model based on server type and thinking preference
     if reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
-        st.session_state.baseConfig.response_model = "qwen3:0.6b"
+        st.session_state.baseConfig.response_model = _LOCAL_REASONING_MODEL
     elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
-        st.session_state.baseConfig.response_model = "gemma3:1b"
+        st.session_state.baseConfig.response_model = _LOCAL_MODEL
     elif reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
-        st.session_state.baseConfig.response_model = "qwen3:30b-a3b"
+        st.session_state.baseConfig.response_model = _SERVER_REASONING_MODEL
     else:
-        st.session_state.baseConfig.response_model = "gemma3:12b"
+        st.session_state.baseConfig.response_model = _SERVER_MODEL
 
     st.sidebar.write(f"using model {st.session_state.baseConfig.response_model}")
 

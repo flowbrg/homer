@@ -1,6 +1,6 @@
 from src.utils.logging import get_logger
 
-logger = get_logger(__name__)
+modelLogger = get_logger(__name__)
 
 ######################################## Embedding model ########################################
 
@@ -11,7 +11,7 @@ def load_embedding_model(
         host: str = None   #"http://localhost:11434"
     ) -> Embeddings:   
     from langchain_ollama import OllamaEmbeddings
-    logger.info(f"Loading embedding model: {model}")
+    modelLogger.info(f"Loading embedding model: {model}")
     return OllamaEmbeddings(model = model, base_url = host)
 
 ######################################## Chat model ########################################
@@ -23,5 +23,5 @@ def load_chat_model(
         host: str = "http://localhost:11434"
     )-> BaseChatModel:
     from langchain_ollama import ChatOllama
-    logger.info(f"Loading chat model: {model}")
+    modelLogger.info(f"Loading chat model: {model}")
     return ChatOllama(model = model, temperature=0, base_url = host)

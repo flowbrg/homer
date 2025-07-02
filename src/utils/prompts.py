@@ -1,12 +1,11 @@
 RESPONSE_SYSTEM_PROMPT = """
 You are a helpful AI assistant. Answer questions clearly using fact-based and statistical information where possible.
 
-Use only the following information to answer the question enclosed in <question> tags:
+Use only the following information to answer the user's query:
 
 {context}
 
-If the answer is not present in the context, say "I don't know"—do not make anything up.
-
+If there is no context available, answer that no information is available. Do not make things up.
 Here is the summary of the previous discussion:
 
 {summary}
@@ -16,16 +15,22 @@ Your response should be concise, specific, and rely on numerical or factual data
 """
 
 
-IMPROVE_QUERY_SYSTEM_PROMPT = """
-You are a helpful AI assistant. Improve the user’s query to make it more precise and effective for information retrieval.
+REPHRASE_QUERY_SYSTEM_PROMPT = """
+You are rephrasing user queries to make them suitable for information retrieval.
 
-If available, use the previous 2 messages to better understand user intent:
+Given the user's latest query and previous conversation context, output a clear, standalone query that captures what the user is actually asking for.
 
-{previous_messages}
+RULES:
+1. If the query is already complete and specific, return it unchanged or with minimal context
+2. If the query is implicit/incomplete (like "tell me more", "what about X", etc) or when the user is clearly refering to the previous message, expand it using context from previous messages
+3. Make the query self-contained - someone reading just the query should understand what's being asked
+4. Keep it concise - add only necessary context, don't over-expand
 
-Return only the improved query—do not explain your changes.
+PREVIOUS MESSAGES:
+{previous_messages} 
+
+REPHRASED QUERY:
 """
-
 
 OUTLINE_SYSTEM_PROMPT = """
 You are assisting with the creation of a highly technical report on the topic of the user query.
