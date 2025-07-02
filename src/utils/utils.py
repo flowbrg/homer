@@ -307,3 +307,13 @@ def ensure_path(path_str: str):
     else:
         # C'est un fichier, créer le répertoire parent
         path.parent.mkdir(parents=True, exist_ok=True)
+
+######################################## Combine system and user prompt ########################################
+
+def combine_prompts(
+    system: Optional[str],
+    user: str,
+) -> str:
+    if not system:
+        system=""
+    return f"SYSTEM:\n {system}\n"+f"USER:\n {user}"

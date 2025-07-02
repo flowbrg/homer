@@ -26,7 +26,7 @@ from src.core import retrieval
 from src.core.states import InputState, RetrievalState
 from src.core.configuration import Configuration
 from src.core.models import load_chat_model, load_embedding_model
-from src.utils.utils import format_docs, format_messages, format_sources, get_connection
+from src.utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts
 from src.utils import prompts
 
 
@@ -94,12 +94,6 @@ def rephrase_query(
             raise ValueError("Configuration is required for query generation")
         
         retrievalAgentLogger.debug(f"Using query model: {configuration.query_model}")
-        
-        # Setup prompt template
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", prompts.REPHRASE_QUERY_SYSTEM_PROMPT),
-            ("human", "{message}"),
-        ])
 
         # Load and configure model
         model = load_chat_model(
@@ -108,23 +102,26 @@ def rephrase_query(
         ).with_structured_output(SearchQuery)
         
         # Prepare message context
-        current_message = format_messages(state.messages[-1:])
         previous_messages = (
             format_messages(state.messages[-3:-1]) 
             if len(state.messages) >= 3 
             else "There were no previous messages."
         )
-        
-        retrievalAgentLogger.debug(f"Processing {len(state.messages)} total messages")
 
-        # Generate prompt
-        message_value = prompt.invoke({
-            "message": current_message,
-            "previous_messages": previous_messages,
-        }, config)
+        # Create prompt
+        system_prompt = prompts.REPHRASE_QUERY_SYSTEM_PROMPT.format(
+            previous_messages= previous_messages,
+        )
+        user_prompt = state.messages[-1].content
 
-        # Generate query
-        generated = cast(SearchQuery, model.invoke(message_value, config))
+        messages = [
+            ("human", combine_prompts(system_prompt,user_prompt)),
+            #BaseMessage(type="system", content=system_prompt),
+            #BaseMessage(type="human", content=user_prompt)
+        ]
+
+        # Generate rephrased query
+        generated = cast(SearchQuery, model.invoke(messages, config))
         
         retrievalAgentLogger.info(f"Generated query: '{generated.query}'")
         
@@ -284,12 +281,6 @@ def respond(
         
         retrievalAgentLogger.debug(f"Using response model: {configuration.response_model}")
         
-        # Setup prompt template
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", prompts.RESPONSE_SYSTEM_PROMPT),
-            ("human", "{messages}"),
-        ])
-        
         # Load model
         model = load_chat_model(
             model=configuration.response_model, 
@@ -314,15 +305,19 @@ def respond(
 
         context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
         
-        # Generate response
-        message_value = prompt.invoke({
-            "messages": state.query,
-            "context": context_docs,
-            "previous_messages": previous_messages,
-            "summary": state.summary if state.summary else "",
-        }, config)
+        # Create prompt
+        system_prompt = prompts.RESPONSE_SYSTEM_PROMPT.format(
+            context = context_docs,
+            previous_messages = previous_messages,
+            summary = state.summary if state.summary else "",
+        )
+        user_prompt = state.query
+        messages = [
+            ("human", combine_prompts(system=system_prompt, user=user_prompt))
+        ]
 
-        response = model.invoke(message_value, config)
+        # Generate response
+        response = model.invoke(input=messages, config=config)
         
         retrievalAgentLogger.info("Response generated successfully")
         

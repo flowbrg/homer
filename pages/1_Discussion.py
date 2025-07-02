@@ -19,7 +19,7 @@ from src.env import OLLAMA_CLIENT
 _SERVER_REASONING_MODEL = "qwen3:30b-a3b" 
 _SERVER_MODEL = "gemma3:4b-it-qat"
 _LOCAL_REASONING_MODEL = "qwen3:0.6b"
-_LOCAL_MODEL = "gemma3:1b"
+_LOCAL_MODEL = "gemma3n:e2b"
 
 st.set_page_config(page_title="Discussion")
 
