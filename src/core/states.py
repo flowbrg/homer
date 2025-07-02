@@ -133,7 +133,16 @@ def add_sections(
 
 
 @dataclass(kw_only=True)
-class ReportState(InputState):
+class InputReportState(InputState):
+
+    writing_style: Optional[Literal["technical", "general"]] = "technical"
+    """Defines the writing style for the report. Can be 'technical' or 'general'."""
+
+    number_of_parts: Optional[int] = 3
+
+
+@dataclass(kw_only=True)
+class ReportState(InputReportState):
     """The state of your report graph / agent."""
 
     outlines: list[dict[str, str]] = field(default_factory=list)
@@ -147,3 +156,6 @@ class ReportState(InputState):
 
     current_section_index: int = 0
     """Track which section is being processed."""
+
+    raw_section_content: str = field(default_factory=str)
+    """Stores the raw content of the current section being processed."""

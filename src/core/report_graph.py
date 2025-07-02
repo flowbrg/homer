@@ -14,7 +14,7 @@ The report generation follows a structured workflow:
    - Content review and polishing
 4. Iterative processing until all sections are complete
 
-The graph supports both technical and generic writing styles, with appropriate
+The graph supports both technical and general writing styles, with appropriate
 prompts and formatting for each style.
 """
 
@@ -151,7 +151,7 @@ def generate_outline(
             - messages: Conversation messages with the main user query
             - retrieved_docs: Documents retrieved in initial_retrieval step
             - number_of_parts: Desired number of sections in the report
-            - writing_style: Style preference ("technical" or "generic")
+            - writing_style: Style preference ("technical" or "general")
         config (RunnableConfig): Configuration containing:
             - report_model: Model identifier for outline generation
             - ollama_host: Host URL for Ollama models (if applicable)
@@ -339,7 +339,7 @@ def synthesize_section(
     
     This function generates the initial content for the current report section
     using the documents retrieved specifically for that section. It applies the
-    appropriate writing style (technical or generic) and creates comprehensive
+    appropriate writing style (technical or general) and creates comprehensive
     content that addresses the section topic using the available context.
 
     Args:
@@ -348,7 +348,7 @@ def synthesize_section(
             - current_section_index: Index of section being processed
             - retrieved_docs: Documents retrieved for current section
             - messages: Original user query for context
-            - writing_style: Style preference ("technical" or "generic")
+            - writing_style: Style preference ("technical" or "general")
         config (RunnableConfig): Configuration containing:
             - report_model: Model identifier for content generation
             - ollama_host: Host URL for Ollama models (if applicable)
@@ -407,7 +407,7 @@ def synthesize_section(
 
         # Select appropriate prompt based on writing style
         prompt = prompts.TECHNICAL_SECTION_SYSTEM_PROMPT if state.writing_style == "technical" else prompts.GENERIC_SECTION_SYSTEM_PROMPT
-        reportAgentLogger.debug(f"Using {'technical' if state.writing_style == 'technical' else 'generic'} section prompt")
+        reportAgentLogger.debug(f"Using {'technical' if state.writing_style == 'technical' else 'general'} section prompt")
         
         # Format prompt with context and section information
         formatted_prompt = prompt.format(
@@ -625,7 +625,7 @@ def get_report_graph() -> CompiledStateGraph:
             - Proper state management and type safety
             - Sequential and conditional workflow transitions
             - Comprehensive error handling throughout the pipeline
-            - Support for both technical and generic writing styles
+            - Support for both technical and general writing styles
 
     Graph Architecture:
         ```
@@ -665,13 +665,8 @@ def get_report_graph() -> CompiledStateGraph:
         builder = StateGraph(ReportState, input=InputState, config_schema=Configuration)
 
         # Add nodes following the mermaid diagram flow
-        reportAgentLogger.debug("Adding graph nodes for report generation pipeline")
         builder.add_node("initial_retrieval", initial_retrieval)
-        reportAgentLogger.debug("Added initial_retrieval node")
-        
         builder.add_node("generate_outline", generate_outline)
-        reportAgentLogger.debug("Added generate_outline node")
-        
         builder.add_node("retrieve_for_section", retrieve_for_section)
         builder.add_node("synthesize_section", synthesize_section)
         builder.add_node("review_section", review_section)
@@ -680,17 +675,11 @@ def get_report_graph() -> CompiledStateGraph:
         builder.add_edge("__start__", "initial_retrieval")
         builder.add_edge("initial_retrieval", "generate_outline")
         builder.add_edge("generate_outline", "retrieve_for_section")
-        builder.add_edge("retrieve_for_section", "synthesize_section")
-        reportAgentLogger.debug("Added edge: retrieve_for_section → synthesize_section")
-        
+        builder.add_edge("retrieve_for_section", "synthesize_section")    
         builder.add_edge("synthesize_section", "review_section")
-        reportAgentLogger.debug("Added edge: synthesize_section → review_section")
-        
         builder.add_conditional_edges("review_section", should_continue)
-        reportAgentLogger.debug("Added conditional edge: review_section → should_continue")
 
         # Compile the graph with no interrupts for continuous processing
-        reportAgentLogger.debug("Compiling report generation graph")
         graph = builder.compile(
             interrupt_before=[],  # No interrupts - continuous processing
             interrupt_after=[],   # No interrupts - single-shot execution
@@ -699,11 +688,10 @@ def get_report_graph() -> CompiledStateGraph:
         # Set graph name for identification
         graph.name = "ReportGraph"
         reportAgentLogger.info("Successfully compiled report generation graph")
-        reportAgentLogger.debug(f"Graph name set to: {graph.name}")
         
         return graph
         
     except Exception as e:
         reportAgentLogger.error(f"Error building report graph: {str(e)}")
         reportAgentLogger.error("Graph compilation failed - check configuration and dependencies")
-        raise
+        raise ValueError(f"Error compiling the report graph: {e}")
