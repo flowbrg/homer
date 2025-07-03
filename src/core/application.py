@@ -1,6 +1,5 @@
 #DEPRECATED
 
-# src/core/application.py
 
 
 from langchain_core.messages.human import HumanMessage

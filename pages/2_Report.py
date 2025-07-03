@@ -10,21 +10,18 @@ from src.utils.utils import is_connected
 from src.env import OUTPUT_DIR, OLLAMA_CLIENT
 
 
-############################## Initialize session state ##############################
-
+############################## Initialization ##############################
 
 st.set_page_config(page_title="Report Generator", layout="wide")
 
 if "baseConfig" not in st.session_state:
     st.session_state.baseConfig = load_config()
 if "reportAgent" not in st.session_state:
-    st.session_state.reportAgent = ReportAgent(st.session_state.baseConfig)
+    st.session_state.reportAgent = ReportAgent()
 if "report_history" not in st.session_state:
     st.session_state.report_history = []
 
-
 ############################## Private methods ##############################
-
 
 def _is_ollama_client_available(url: str) -> bool:
     import requests
@@ -45,8 +42,11 @@ def _create_report(query=str):
     Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
     
     # Generate the report
-    output = st.session_state.reportAgent.generate_report(
-        main_query=query,
+    output = st.session_state.reportAgent.invoke(
+        query=query,
+        writing_style= "general",
+        number_of_parts= 3,
+        configuration=st.session_state.baseConfig,
     )
 
     if output:
@@ -81,9 +81,7 @@ def _create_report(query=str):
     else:
         st.error("No report content was generated.")
 
-
 ############################## Page builders ##############################
-
 
 def _build_sidebar():
     connectionButton = st.sidebar.toggle(
@@ -118,7 +116,7 @@ def _build_query_input():
     # Create the query input area
     query = st.chat_input(
         placeholder="Enter your query:",
-        disabled=True,
+        #disabled=True,
         )
 
     if query:

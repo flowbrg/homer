@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
-from typing import Optional, Type, TypeVar, Literal, Any, Dict
+from typing import Optional, Type, TypeVar
 
 from src.env import OLLAMA_CLIENT
 
 from langchain_core.runnables import RunnableConfig, ensure_config
-
-import os
-import requests
 
 from src.utils.logging import get_logger
 
@@ -62,10 +59,10 @@ class Configuration:
         default = "gemma3:4b-it-qat",   #"qwen3:0.6b",
     )
 
-    outline_model: str = field(
+    report_model: str = field(
         default = "gemma3:1b",   #"qwen3:0.6b",
     )
-
+!
     def asdict(self) -> dict[str, any]:
         """Convert the instance to a dictionary.
 

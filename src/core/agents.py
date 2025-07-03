@@ -2,7 +2,7 @@
 All agents wrappers
 """
 
-from typing import Literal, List, Any, Dict, Optional
+from typing import Literal, Any, Dict, Optional
 
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
@@ -21,7 +21,7 @@ class RetrievalAgent:
     Wrapper class for the retrieval agent.
     """
     def __init__(self):
-        self._graph = get_retrieval_graph()
+        self._graph = get_retrieval_graph() # Compile the retrieval agent graph
 
 
     def get_messages(

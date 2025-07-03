@@ -1,29 +1,29 @@
 import streamlit as st
 from PIL import Image
 
-
 from src.core.configuration import load_config
+
+
+############################## Initialization ##############################
 
 def _init():
     if "baseConfig" not in st.session_state:
         st.session_state.baseConfig = load_config()
-    #if "backend" not in st.session_state:
-    #    st.session_state.backend = Application(config=st.session_state.baseConfig)
 
-
+############################## Page builder ##############################
 def main():
-    logo = Image.open("./static/homerlogo-nobg.png")  # Remplace par le bon chemin si besoin
+    logo = Image.open("static/homerlogo-nobg.png")
     st.markdown("""
         <br>
         <br>
         
         
         """,unsafe_allow_html=True)
-    # Deux colonnes : image à gauche, texte à droite
-    col1, col2 = st.columns([1, 2])  # [1,2] = image prend 1/3, texte 2/3
+    # Image on the left, text on the right
+    col1, col2 = st.columns([1, 2])  # [1,2] = Image takes 1/3, text 2/3
     
     with col1:
-        st.image(logo, width=150)  # Ajuste la taille si besoin
+        st.image(logo, width=150)
 
     with col2:
         st.markdown("""
@@ -32,7 +32,7 @@ def main():
         <div style="display: flex; align-items: center; gap: 15px;">
             <span>Start by uploading your documents</span>
             <a href="./Documents" target="_self">
-                <button style="padding:0.3em 0.8em; font-size:16px; background-color:#984a9c; color:white; border:none; border-radius:5px; cursor:pointer;">
+                <button style="padding:0.3em 0.8em; font-size:16px; background-color:#512967; color:white; border:none; border-radius:5px; cursor:pointer;">
                     HERE
                 </button>
             </a>
@@ -52,7 +52,7 @@ def main():
     text-align: center;
     font-size: 12px;
     color: black;
-    background-color: #f4f3ed;
+    background-color: #f5f5f5;
     padding: 10px 0;
     border-top: 1px solid #ddd;
     z-index: 100;
@@ -60,7 +60,7 @@ def main():
 </style>
 
 <div class="footer">
-    Designed by <strong>Florent Bergé & Mathieu de la Barre</strong>
+    Designed by Florent Bergé & Mathieu de la Barre (IMT Atlantique) for SCK CEN
 </div>
 """, unsafe_allow_html=True)
     

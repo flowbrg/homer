@@ -14,8 +14,9 @@ from src.core.configuration import load_config
 from src.env import OLLAMA_CLIENT
 
 
-############################## Initialize session state ##############################
+############################## Initialization ##############################
 
+# Name of the models for server/local execution and classic/reasoning
 _SERVER_REASONING_MODEL = "qwen3:30b-a3b" 
 _SERVER_MODEL = "gemma3:4b-it-qat"
 _LOCAL_REASONING_MODEL = "qwen3:0.6b"
