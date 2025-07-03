@@ -9,9 +9,10 @@ If there is no context available, answer that no information is available. Do no
 Here is the summary of the previous discussion:
 
 {summary}
-{previous_messages}
 
 Your response should be concise, specific, and rely on numerical or factual data when available.
+
+You are provided with the last interaction between you and the user. Use it as context if needed.
 """
 
 

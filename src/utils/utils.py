@@ -101,6 +101,15 @@ def format_messages(messages: Optional[list[AnyMessage]])-> str:
 {formatted}
 <messages>"""
 
+def list_previous_interaction(messages=list[AnyMessage]):
+    if not messages:
+        return []
+    return [
+        ("human",messages[0].content),
+        ("ai",messages[1].content),
+    ]
+
+
 ######################################## format sources ########################################
 
 from pathlib import Path

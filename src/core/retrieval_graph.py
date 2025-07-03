@@ -26,7 +26,7 @@ from src.core import retrieval
 from src.core.states import InputState, RetrievalState
 from src.core.configuration import Configuration
 from src.core.models import load_chat_model, load_embedding_model
-from src.utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts
+from src.utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, list_previous_interaction
 from src.utils import prompts
 
 
@@ -288,33 +288,23 @@ def respond(
         )
         
         # Calculate message context
-        nb_messages = len(state.messages) % 6  # Messages since last summary
         total_messages = len(state.messages)
         docs_count = len(state.retrieved_docs) if state.retrieved_docs else 0
         
-        retrievalAgentLogger.info(f"Processing response with {total_messages} total messages, "
-                   f"{nb_messages} recent messages, {docs_count} retrieved documents")
-        
         # Prepare context
 
-        previous_messages = (
-            format_messages(state.messages[-nb_messages:-1])
-            if  state.messages[-nb_messages:-1]
-            else "There were no previous messages."
-        )
+        previous_messages = list_previous_interaction(state.messages[-3:-1] if len(state.messages)>2 else [])
+
 
         context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
         
         # Create prompt
         system_prompt = prompts.RESPONSE_SYSTEM_PROMPT.format(
             context = context_docs,
-            previous_messages = previous_messages,
             summary = state.summary if state.summary else "",
         )
         user_prompt = state.query
-        messages = [
-            ("human", combine_prompts(system=system_prompt, user=user_prompt))
-        ]
+        messages = [("system", system_prompt)] + previous_messages + [("human", state.messages[-1].content)]
 
         # Generate response
         response = model.invoke(input=messages, config=config)
