@@ -62,7 +62,7 @@ class Configuration:
     report_model: str = field(
         default = "gemma3:1b",   #"qwen3:0.6b",
     )
-!
+
     def asdict(self) -> dict[str, any]:
         """Convert the instance to a dictionary.
 
