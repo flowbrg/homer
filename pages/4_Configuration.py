@@ -34,7 +34,6 @@ if "models" not in st.session_state:
         "local_standard": _LOCAL_MODEL,
     }
 
-
 ######################################## Form ########################################
 
 
@@ -86,6 +85,11 @@ def _render_config_editor():
             value=st.session_state.models["server_standard"],
             help="Reasoning model for server execution"
         )
+        server_vision_model = st.text_input(
+            "Vision model",
+            value=config.vision_model,
+            help="Vision model used to parse pdf, only if connected to server ollama client"
+        )
         
 
         submitted = st.form_submit_button("Save Configuration", type="primary")
@@ -100,6 +104,8 @@ def _render_config_editor():
         "local_standard": local_standard_model,            
         }        
         st.session_state.ollama_host = ollama_host
+        st.session_state.baseConfig.vision_model = server_vision_model
+
         st.success("Configuration saved successfully!")
         st.rerun()
 
