@@ -13,7 +13,7 @@ from src.core.configuration import Configuration
 ######################################## Report Agent ########################################
 
 
-from src.core.retrieval_graph import get_retrieval_graph
+from src.core.graphs.retrieval_graph import get_retrieval_graph
 
 
 class RetrievalAgent:
@@ -68,7 +68,7 @@ class RetrievalAgent:
 ######################################## Report Agent ########################################
 
 
-from src.core.index_graph import get_index_graph
+from src.core.graphs.index_graph import get_index_graph
 
 
 class IndexAgent:
@@ -78,14 +78,14 @@ class IndexAgent:
     def __init__(self):
         self._graph = get_index_graph()
 
-    def invoke(self, path: str):
-        self._graph.invoke(input={"path": path})
+    def invoke(self, path: str, configuration: Configuration):
+        self._graph.invoke(input={"path": path}, config = {"configurable": configuration.asdict()})
 
 
 ######################################## Report Agent ########################################
 
 
-from src.core.report_graph import get_report_graph
+from src.core.graphs.report_graph import get_report_graph
 
 
 class ReportAgent:

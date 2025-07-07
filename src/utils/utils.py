@@ -1,4 +1,4 @@
-from src.env import *
+from src.constant import *
 
 ######################################## connect to database ########################################
 
@@ -101,13 +101,25 @@ def format_messages(messages: Optional[list[AnyMessage]])-> str:
 {formatted}
 <messages>"""
 
-def list_previous_interaction(messages=list[AnyMessage]):
+from langchain_core.messages import AIMessage
+from langchain_core.messages.human import HumanMessage
+
+
+def ya_format_messages(messages=list[AnyMessage]):
+    "yet another format messages function"
+    
     if not messages:
         return []
-    return [
-        ("human",messages[0].content),
-        ("ai",messages[1].content),
-    ]
+    
+    formated_list = []
+    for m in messages:
+        if isinstance(m, HumanMessage):
+            formated_list.append(("human", m.content))
+        elif isinstance(m, AIMessage):
+            formated_list.append(("ai", m.content))
+        else:
+            formated_list.append(("system", m.content)) 
+    return formated_list
 
 
 ######################################## format sources ########################################
@@ -267,7 +279,7 @@ def make_document_batch_oneliner(documents: List[Document], size: int = 100) -> 
 ######################################## Streamlit connection button state ########################################
 
 from streamlit.runtime.state.session_state_proxy import SessionStateProxy
-from src.env import OLLAMA_CLIENT
+from src.constant import OLLAMA_CLIENT
 
 def is_connected(session_state: SessionStateProxy) -> bool:
     if "baseConfig" not in session_state:

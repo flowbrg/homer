@@ -11,16 +11,12 @@ import streamlit as st
 from src.utils.utils import is_connected, extract_think_and_answer
 from src.core.agents import RetrievalAgent
 from src.core.configuration import load_config
-from src.env import OLLAMA_CLIENT
+from src.constant import OLLAMA_CLIENT
 
 
 ############################## Initialization ##############################
 
-# Name of the models for server/local execution and classic/reasoning
-_SERVER_REASONING_MODEL = "qwen3:30b-a3b" 
-_SERVER_MODEL = "gemma3:4b-it-qat"
-_LOCAL_REASONING_MODEL = "qwen3:0.6b"
-_LOCAL_MODEL = "gemma3n:e2b"
+
 
 st.set_page_config(page_title="Discussion")
 
@@ -30,7 +26,8 @@ if "retrievalAgent" not in st.session_state:
     st.session_state.retrievalAgent = RetrievalAgent()
 if "currentThread" not in st.session_state:
     st.session_state.currentThread = 1
-
+if "ollama_host" not in st.session_state:
+    st.session_state.ollama_host = OLLAMA_CLIENT
 
 ############################## Private methods ##############################
 
@@ -180,11 +177,9 @@ def _build_sidebar():
     st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
         
     # Model selection toggle
-    reasoningModelButton = st.sidebar.pills(
-            label="Choose mode",
-            options=["Reasoning"],
-            key="thinking_mode"
-        ) or []
+    reasoningModelButton = st.sidebar.toggle(
+            label="Reasoning model",
+        )
 
     # Configure model based on server type and thinking preference
     if reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":

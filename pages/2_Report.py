@@ -7,7 +7,7 @@ from src.core.agents import ReportAgent
 from src.core.configuration import load_config
 from src.utils.dict_to_pdf import str_to_pdf
 from src.utils.utils import is_connected
-from src.env import OUTPUT_DIR, OLLAMA_CLIENT
+from src.constant import OUTPUT_DIR, OLLAMA_CLIENT
 
 
 ############################## Initialization ##############################
@@ -20,7 +20,9 @@ if "reportAgent" not in st.session_state:
     st.session_state.reportAgent = ReportAgent()
 if "report_history" not in st.session_state:
     st.session_state.report_history = []
-
+if "ollama_host" not in st.session_state:
+    st.session_state.ollama_host = OLLAMA_CLIENT
+    
 ############################## Private methods ##############################
 
 def _is_ollama_client_available(url: str) -> bool:

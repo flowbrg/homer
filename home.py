@@ -2,16 +2,34 @@ import streamlit as st
 from PIL import Image
 
 from src.core.configuration import load_config
-
+from src.constant import OLLAMA_CLIENT
 
 ############################## Initialization ##############################
 
-def _init():
-    if "baseConfig" not in st.session_state:
-        st.session_state.baseConfig = load_config()
+from src.utils.logging import setup_logging, get_logger
+setup_logging("INFO")  # or "DEBUG" for more detailed logs
+
+# Default values of the models for server/local execution and classic/reasoning
+_SERVER_REASONING_MODEL = "qwen3:30b-a3b" 
+_SERVER_MODEL = "gemma3:4b-it-qat"
+_LOCAL_REASONING_MODEL = "qwen3:0.6b"
+_LOCAL_MODEL = "gemma3n:e2b"
+
+if "baseConfig" not in st.session_state:
+    st.session_state.baseConfig = load_config()
+if "ollama_host" not in st.session_state:
+    st.session_state.ollama_host = OLLAMA_CLIENT
+if "models" not in st.session_state:
+    st.session_state.models = {
+        "server_reasoning": _SERVER_REASONING_MODEL,
+        "server_standard": _SERVER_MODEL,
+        "local_reasoning": _LOCAL_REASONING_MODEL,
+        "local_standard": _LOCAL_MODEL,
+    }
 
 ############################## Page builder ##############################
-def main():
+
+def build():
     logo = Image.open("static/homerlogo-nobg.png")
     st.markdown("""
         <br>
@@ -68,5 +86,4 @@ def main():
 
 
 if __name__ == "__main__":
-    _init()
-    main()
+    build()

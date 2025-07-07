@@ -6,7 +6,7 @@ from pathlib import Path
 from src.core.configuration import load_config
 from src.core.agents import IndexAgent
 from src.core.retrieval import delete_documents, get_existing_documents
-from src.env import UPLOAD_DIR, OLLAMA_CLIENT
+from src.constant import UPLOAD_DIR, OLLAMA_CLIENT
 from src.core.retrieval import get_existing_documents
 from src.utils.utils import is_connected
 
@@ -17,7 +17,8 @@ def _init():
         st.session_state.baseConfig = load_config()
     if "indexAgent" not in st.session_state:
         st.session_state.indexAgent = IndexAgent()
-
+    if "ollama_host" not in st.session_state:
+        st.session_state.ollama_host = OLLAMA_CLIENT
 st.set_page_config(page_title="Documents")
 
 st.markdown("# Documents")
@@ -71,7 +72,7 @@ def _process_files(uploaded_files):
 
     with st.spinner("Updating database..."):
         try:
-            st.session_state.indexAgent.invoke(path = UPLOAD_DIR)
+            st.session_state.indexAgent.invoke(path = UPLOAD_DIR, configuration = st.session_state.baseConfig)
         except Exception as e:
             st.error(f"Error updating database: {str(e)}")
         
@@ -86,26 +87,28 @@ def _process_files(uploaded_files):
     if error_count > 0:
         st.warning(f"Failed to upload {error_count} file(s)")
 
-############################## Builder functions ##############################
+############################## Page builders ##############################
 
 def _build_sidebar():
-    if st.sidebar.toggle(
+    connectionButton = st.sidebar.toggle(
         label = "Server execution",
         value = is_connected(st.session_state)
-    ):
-        conn = _is_ollama_client_available(OLLAMA_CLIENT)
+    )
+
+    if connectionButton:
+        conn = _is_ollama_client_available(st.session_state.ollama_host)
         if conn:
-            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
-            st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
+            st.sidebar.write(f"using distant ollama client {st.session_state.ollama_host}")
+            st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
         else:
-            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
+            st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
             st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
     else:
         st.sidebar.write(f"using localhost")
         st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
 
     st.sidebar.button(
-        label="reset database",
+        label="🗑️ Reset database",
         type="primary",
         use_container_width=True,
         on_click=_reset_vector_store

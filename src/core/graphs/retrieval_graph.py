@@ -6,7 +6,7 @@ and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
 from src.utils.logging import setup_logging, get_logger
-setup_logging("INFO")  # or "DEBUG" for more detailed logs
+#setup_logging("INFO")  # or "DEBUG" for more detailed logs
 # Initialize retrievalAgentLogger
 retrievalAgentLogger = get_logger(__name__)
 
@@ -15,7 +15,6 @@ from pydantic import BaseModel
 
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableConfig
 
 from langgraph.graph import StateGraph, END
@@ -26,7 +25,7 @@ from src.core import retrieval
 from src.core.states import InputState, RetrievalState
 from src.core.configuration import Configuration
 from src.core.models import load_chat_model, load_embedding_model
-from src.utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, list_previous_interaction
+from src.utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, ya_format_messages
 from src.utils import prompts
 
 
@@ -116,8 +115,6 @@ def rephrase_query(
 
         messages = [
             ("human", combine_prompts(system_prompt,user_prompt)),
-            #BaseMessage(type="system", content=system_prompt),
-            #BaseMessage(type="human", content=user_prompt)
         ]
 
         # Generate rephrased query
@@ -287,15 +284,8 @@ def respond(
             host=configuration.ollama_host
         )
         
-        # Calculate message context
-        total_messages = len(state.messages)
-        docs_count = len(state.retrieved_docs) if state.retrieved_docs else 0
-        
         # Prepare context
-
-        previous_messages = list_previous_interaction(state.messages[-3:-1] if len(state.messages)>2 else [])
-
-
+        previous_messages = ya_format_messages(state.messages[-3:-1] if len(state.messages)>2 else [])
         context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
         
         # Create prompt
@@ -303,8 +293,12 @@ def respond(
             context = context_docs,
             summary = state.summary if state.summary else "",
         )
-        user_prompt = state.query
-        messages = [("system", system_prompt)] + previous_messages + [("human", state.messages[-1].content)]
+
+        messages = [
+            ("system", system_prompt)
+        ] + previous_messages + [
+            ("human", state.messages[-1].content)
+        ]
 
         # Generate response
         response = model.invoke(input=messages, config=config)
@@ -392,7 +386,7 @@ def summarize_conversation(
         
         # Get existing summary
         existing_summary = state.summary if state.summary else ""
-        messages_to_summarize = state.messages[-6:]  # Last 6 messages
+        messages_to_summarize = ya_format_messages(state.messages[-6:])  # Last 6 messages
         
         retrievalAgentLogger.info(f"Summarizing {len(messages_to_summarize)} messages, "
                    f"existing summary: {'Yes' if existing_summary else 'No'}")
@@ -404,7 +398,7 @@ def summarize_conversation(
 {existing_summary}
 </summary>
 
-Extend the summary by taking into account the new messages above:"""
+Extend the summary by taking into account the new messages:"""
             retrievalAgentLogger.debug("Extending existing summary")
         else:
             summary_system_prompt = "Create a summary of the conversation:"
@@ -416,18 +410,13 @@ Extend the summary by taking into account the new messages above:"""
             host=configuration.ollama_host
         )
         
-        # Setup prompt
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", summary_system_prompt),
-            ("human", "{messages}"),
-        ])
+        # Create prompt
+        messages = [
+            ('system', summary_system_prompt)
+        ] + messages_to_summarize
+
         
-        # Generate summary
-        message_value = prompt.invoke({
-            "messages": messages_to_summarize,
-        }, config)
-        
-        response = model.invoke(message_value, config)
+        response = model.invoke(messages, config)
         
         retrievalAgentLogger.info("Conversation summary generated successfully")
         retrievalAgentLogger.debug(f"Summary length: {len(response.content)} characters")

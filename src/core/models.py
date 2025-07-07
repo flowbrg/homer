@@ -20,7 +20,7 @@ from langchain.chat_models.base import BaseChatModel
 
 def load_chat_model(
         model: str,
-        host: str = "http://localhost:11434"
+        host: str = None #"http://localhost:11434"
     )-> BaseChatModel:
     from langchain_ollama import ChatOllama
     modelLogger.info(f"Loading chat model: {model}")

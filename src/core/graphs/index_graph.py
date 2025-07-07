@@ -1,7 +1,6 @@
-from src.utils.logging import setup_logging, get_logger
-#setup_logging("DEBUG")  # or "DEBUG" for more detailed logs
+from src.utils.logging import get_logger
 # Configure logger
-indexAgentLogger = get_logger(__name__)
+logger = get_logger(__name__)
 
 from typing import Optional
 from pathlib import Path
@@ -18,11 +17,41 @@ from src.core.models import load_embedding_model
 from src.utils.utils import remove_duplicates, make_document_batch
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_experimental.text_splitter import SemanticChunker
+#from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.document_loaders import PyMuPDFLoader
 
+############################## Private methods ##############################
+
+def _process_local(pdf_file=str):
+    """
+    Parse a pdf using fitz.
+    """
+    loader = PyMuPDFLoader(
+        file_path=str(pdf_file),
+        extract_tables='markdown',
+        mode= "single"
+    )
+    return loader.load()
+
+def _process_server(pdf_file=str, configuration = Configuration):
+    """
+    Parse a pdf using a vision model on a distant ollama client.
+    the configuration must have vision_model and a ollama_host value different
+    from localhost:11434
+    """
+    from langchain_core.documents import Document
+    from src.parser import parser
+    pipeline = parser.PDFToMarkdownPipeline(
+        ollama_model=configuration.vision_model,
+        ollama_base_url=configuration.ollama_host,
+        enable_validation=False
+        dpi=400  # Higher resolution
+    )
+    result = pipeline.convert_pdf(pdf_file)
+    return [Document(page_content = "\n\n".join(result.pages))]
 
 
+############################## Parse PDF node ##############################
 
 def parse_pdfs(
     state: InputIndexState, *, config: Optional[RunnableConfig] = None
@@ -53,12 +82,12 @@ def parse_pdfs(
         >>> result = parse_pdfs(state)
         >>> print(len(result["docs"]))  # Number of document chunks
     """
-    indexAgentLogger.info(f"Starting PDF parsing from directory: {state.path}")
+    logger.info(f"Starting PDF parsing from directory: {state.path}")
     
     try:
         path = Path(state.path)
         if not path.is_dir():
-            indexAgentLogger.error(f"Directory not found: {state.path}")
+            logger.error(f"Directory not found: {state.path}")
             raise FileNotFoundError(f"Directory not found: {state.path}")
 
         documents = []
@@ -69,52 +98,60 @@ def parse_pdfs(
             new=[str(p) for p in list(path.glob("*.pdf"))]
         )
         
-        indexAgentLogger.info(f"Found {len(pdf_files)} new PDF files to process")
+        logger.info(f"Found {len(pdf_files)} new PDF files to process")
         
-        embeddings = load_embedding_model(model=Configuration.embedding_model, host=Configuration.ollama_host)
+        #embeddings = load_embedding_model(model=Configuration.embedding_model, host=Configuration.ollama_host)
 
         # Configure text splitter
-        text_splitter = SemanticChunker(
-            embeddings=embeddings,
-            breakpoint_threshold_type="percentile",
-            min_chunk_size=265,
-        )
-        
-        #RecursiveCharacterTextSplitter(
-        #    chunk_size=512,
-        #    chunk_overlap=50,
-        #    length_function=len,
-        #    is_separator_regex=False
+        #text_splitter = SemanticChunker(
+        #    embeddings=embeddings,
+        #    breakpoint_threshold_type="percentile",
+        #    min_chunk_size=256,
         #)
+        
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=4000,
+            chunk_overlap=200,
+            length_function=len,
+            is_separator_regex=False
+        )
 
         if not pdf_files:
-            indexAgentLogger.info("No new PDF files to process")
+            logger.info("No new PDF files to process")
             return {"docs": documents}
 
         # Process each PDF file
         for pdf_file in tqdm(pdf_files, desc="Loading files..."):
             try:
-                indexAgentLogger.debug(f"Processing file: {pdf_file}")
+                logger.debug(f"Processing file: {pdf_file}")
                 
                 # Load the file into a Document object
-                loader = PyMuPDFLoader(str(pdf_file))
+                if Configuration.ollama_host not in ["http://localhost:11434","http://127.0.0.1:11434","127.0.0.1:11434"]:
+                    doc=_process_server()
+                else:
+                    doc=_process_local
                 # Split the Document content into smaller chunks
-                document = text_splitter.split_documents(loader.load())
+                document = text_splitter.split_documents(doc)
+                #ensure metadata
+                document.metadata={"source": pdf_file}
                 # Add them to the list of Documents
                 documents.extend(document)
                 
-                indexAgentLogger.debug(f"Successfully processed {pdf_file}, created {len(document)} chunks")
+                logger.debug(f"Successfully processed {pdf_file}, created {len(document)} chunks")
                 
             except Exception as e:
-                indexAgentLogger.error(f"Failed to process file {pdf_file}: {str(e)}")
+                logger.error(f"Failed to process file {pdf_file}: {str(e)}")
                 continue
 
-        indexAgentLogger.info(f"PDF parsing completed. Total document chunks created: {len(documents)}")
+        logger.info(f"PDF parsing completed. Total document chunks created: {len(documents)}")
         return {"docs": documents}
     
     except Exception as e:
-        indexAgentLogger.error(f"Error in parse_pdfs: {str(e)}")
+        logger.error(f"Error in parse_pdfs: {str(e)}")
         raise
+
+
+############################## Index Document node ##############################
 
 
 def index_docs(
@@ -152,24 +189,24 @@ def index_docs(
         This function uses the configured embedding model to create vector
         representations of the documents for efficient similarity search.
     """
-    indexAgentLogger.info("Starting document indexing process")
+    logger.info("Starting document indexing process")
     
     try:
         # Get configuration
         configuration = Configuration.from_runnable_config(config)
 
         if not configuration:
-            indexAgentLogger.error("Configuration required but not provided")
+            logger.error("Configuration required but not provided")
             raise ValueError("Configuration required to run index_docs.")
         
-        indexAgentLogger.info(f"Using embedding model: {configuration.embedding_model}")
+        logger.info(f"Using embedding model: {configuration.embedding_model}")
         
         # Prepare document batches
-        documents_batch = make_document_batch(documents=state.docs)
+        documents_batch = make_document_batch(documents=state.docs, size= 20)
         total_batches = len(documents_batch)
         total_documents = len(state.docs)
         
-        indexAgentLogger.info(f"Processing {total_documents} documents in {total_batches} batches")
+        logger.info(f"Processing {total_documents} documents in {total_batches} batches")
 
         # Index documents using the retriever
         with retrieval.make_retriever(
@@ -179,17 +216,17 @@ def index_docs(
             for i, batch in enumerate(tqdm(documents_batch, desc="Adding document batch..."), 1):
                 try:
                     retriever.add_documents(batch)
-                    indexAgentLogger.debug(f"Successfully indexed batch {i}/{total_batches} ({len(batch)} documents)")
+                    logger.debug(f"Successfully indexed batch {i}/{total_batches} ({len(batch)} documents)")
                     
                 except Exception as e:
-                    indexAgentLogger.error(f"Failed to index batch {i}/{total_batches}: {str(e)}")
+                    logger.error(f"Failed to index batch {i}/{total_batches}: {str(e)}")
                     raise
         
-        indexAgentLogger.info(f"Document indexing completed successfully. Indexed {total_documents} documents")
+        logger.info(f"Document indexing completed successfully. Indexed {total_documents} documents")
         return {"docs": "delete"}
     
     except Exception as e:
-        indexAgentLogger.error(f"Error in index_docs: {str(e)}")
+        logger.error(f"Error in index_docs: {str(e)}")
         raise
 
 
@@ -222,10 +259,10 @@ def should_index(state: IndexState, *, config: RunnableConfig) -> str:
         to control the flow based on the presence of documents.
     """
     if not state.docs:
-        indexAgentLogger.info("No documents to index, ending workflow")
+        logger.info("No documents to index, ending workflow")
         return END
     
-    indexAgentLogger.info(f"Found {len(state.docs)} documents, proceeding to indexing")
+    logger.info(f"Found {len(state.docs)} documents, proceeding to indexing")
     return "index_docs"
 
 
@@ -259,7 +296,7 @@ def get_index_graph() -> CompiledStateGraph:
         The graph uses the Configuration schema for type safety and
         validation of configuration parameters.
     """
-    indexAgentLogger.info("Building document indexing graph")
+    logger.info("Building document indexing graph")
     
     try:
         # Create the StateGraph with IndexState and Configuration schema
@@ -277,9 +314,9 @@ def get_index_graph() -> CompiledStateGraph:
         graph = builder.compile()
         graph.name = "IndexGraph"
         
-        indexAgentLogger.info("Successfully built and compiled IndexGraph")
+        logger.info("Successfully built and compiled IndexGraph")
         return graph
     
     except Exception as e:
-        indexAgentLogger.error(f"Error building index graph: {str(e)}")
+        logger.error(f"Error building index graph: {str(e)}")
         raise

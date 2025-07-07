@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, fields
 from typing import Optional, Type, TypeVar
 
-from src.env import OLLAMA_CLIENT
+from src.constant import OLLAMA_CLIENT
 
 from langchain_core.runnables import RunnableConfig, ensure_config
 
@@ -38,13 +38,9 @@ class Configuration:
     )
     
     # Retriever configuration
-    #retriever_search_type: Literal["similarity","mmr","similarity_score_threshold"] = field(
-    #    default_factory = str,
-    #)
-
-    #retriever_search_kwargs: dict[str,Any] = field(
-    #    default_factory= Dict #{"k":8, "score_threshold_score_threshold": 0.5},
-    #)
+    retriever_top_k: int = field(
+        default = 4,
+    )
 
     # Models
     embedding_model: str = field(
@@ -56,11 +52,15 @@ class Configuration:
     )
 
     query_model: str = field(
-        default = "gemma3:4b-it-qat",   #"qwen3:0.6b",
+        default = "gemma3:1b",   #"qwen3:0.6b",
     )
 
     report_model: str = field(
         default = "gemma3:1b",   #"qwen3:0.6b",
+    )
+
+    vision_model: str = field(
+        default = "qwen2.5vl:3b-q4_K_M"
     )
 
     def asdict(self) -> dict[str, any]:
