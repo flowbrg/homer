@@ -1,24 +1,44 @@
 import streamlit as st
-from dataclasses import fields
-from typing import get_origin, get_args
-import requests
-
-from src.core.configuration import Configuration, load_config
+from src.core.configuration import load_config
+from src.constant import OLLAMA_CLIENT
 
 
+############################## Initialization ##############################
 
 
+from src.utils.logging import setup_logging
+setup_logging("INFO")  # or "DEBUG" for more detailed logs
+
+st.set_page_config(
+        page_title="Configuration Editor",
+        layout="wide"
+    )
+
+# Default values of the models for server/local execution and classic/reasoning
+_SERVER_REASONING_MODEL = "qwen3:30b-a3b" 
+_SERVER_MODEL = "gemma3:4b-it-qat"
+_LOCAL_REASONING_MODEL = "qwen3:0.6b"
+_LOCAL_MODEL = "gemma3n:e2b"
+
+# Ensure session variables are instantiated
+
+if "baseConfig" not in st.session_state:
+    st.session_state.baseConfig = load_config()
+if "ollama_host" not in st.session_state:
+    st.session_state.ollama_host = OLLAMA_CLIENT
+if "models" not in st.session_state:
+    st.session_state.models = {
+        "server_reasoning": _SERVER_REASONING_MODEL,
+        "server_standard": _SERVER_MODEL,
+        "local_reasoning": _LOCAL_REASONING_MODEL,
+        "local_standard": _LOCAL_MODEL,
+    }
 
 
-def validate_url(url: str) -> bool:
-    """Validate if the URL is reachable."""
-    try:
-        response = requests.get(url, timeout=2)
-        return response.ok
-    except requests.RequestException:
-        return False
+######################################## Form ########################################
 
-def render_config_editor():
+
+def _render_config_editor():
     """Render the configuration editor interface."""
     st.title("🔧 Configuration Editor")
     st.markdown("Configure your indexing and retrieval settings below.")
@@ -39,38 +59,10 @@ def render_config_editor():
         with col1:
             if ollama_host:
                 if ollama_host.startswith(('http://', 'https://')):
-                    st.success("✅ Valid URL format")
+                    st.success("Valid URL format")
                 else:
-                   st.warning("⚠️ URL should start with http:// or https://")    
-    #    st.subheader("📊 Report Configuration")
-    #    
-    #    # Number of parts
-    #    number_of_parts = st.number_input(
-    #        "Number of Report Parts",
-    #        min_value=1,
-    #        max_value=20,
-    #        value=config.number_of_parts,
-    #        help="The number of parts in the report outline. Must be a positive integer."
-    #    )
-    #    
-    #    st.subheader("🔗 Ollama Configuration")
-    #    
-    #    # Ollama host
-    #    ollama_host = st.text_input(
-    #        "Ollama Host URL",
-    #        value=config.ollama_host,
-    #        help="The host URL for the Ollama service. Must be a valid URL."
-    #    )
-    #    
-    #    # Test connection button (outside form to avoid form submission)
-    #    col1, col2 = st.columns([3, 1])
-    #    with col1:
-    #        if ollama_host:
-    #            if ollama_host.startswith(('http://', 'https://')):
-    #                st.success("✅ Valid URL format")
-    #            else:
-    #               st.warning("⚠️ URL should start with http:// or https://")
-    #    
+                   st.warning("URL should start with http:// or https://")    
+
         st.subheader("Model Configuration")
        
         # Model configurations
@@ -80,24 +72,23 @@ def render_config_editor():
             help="Reasoning model for local execution"
         )
         local_standard_model = st.text_input(
-            "Local Reasoning Model",
+            "Local Standard Model",
             value=st.session_state.models["local_standard"],
             help="Standard model for local execution"
         )
         server_reasoning_model = st.text_input(
-            "Local Reasoning Model",
+            "Server Reasoning Model",
             value=st.session_state.models["server_reasoning"],
             help="Reasoning model for server execution"
         )
-        
         server_standard_model = st.text_input(
-            "Local Reasoning Model",
+            "Server Standard Model",
             value=st.session_state.models["server_standard"],
             help="Reasoning model for server execution"
         )
         
 
-        submitted = st.form_submit_button("💾 Save Configuration", type="primary")
+        submitted = st.form_submit_button("Save Configuration", type="primary")
     
     # Handle form submissions
     if submitted:
@@ -109,16 +100,10 @@ def render_config_editor():
         "local_standard": local_standard_model,            
         }        
         st.session_state.ollama_host = ollama_host
-        st.success("✅ Configuration saved successfully!")
+        st.success("Configuration saved successfully!")
         st.rerun()
 
 def main():
-    """Main function to run the Streamlit app."""
-    st.set_page_config(
-        page_title="Configuration Editor",
-        page_icon="⚙️",
-        layout="wide"
-    )
     
     # Custom CSS for better styling
     st.markdown("""
@@ -135,7 +120,7 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    render_config_editor()
+    _render_config_editor()
 
 if __name__ == "__main__":
     main()

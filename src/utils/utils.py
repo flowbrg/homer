@@ -9,12 +9,6 @@ from contextlib import contextmanager
 def get_connection() -> sqlite3.Connection:
     return sqlite3.connect(':memory:', check_same_thread=False)
 
-import aiosqlite
-
-def aget_connection() -> aiosqlite.Connection:
-    """Asynchronous version of get_connection."""
-    return aiosqlite.connect(PERSISTENT_DIR)
-
 ######################################## connect to database ########################################
 
 from chromadb import PersistentClient

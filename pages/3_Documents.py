@@ -12,14 +12,17 @@ from src.utils.utils import is_connected
 
 ############################## Initialize session state ##############################
 
-def _init():
-    if "baseConfig" not in st.session_state:
-        st.session_state.baseConfig = load_config()
-    if "indexAgent" not in st.session_state:
-        st.session_state.indexAgent = IndexAgent()
-    if "ollama_host" not in st.session_state:
-        st.session_state.ollama_host = OLLAMA_CLIENT
-st.set_page_config(page_title="Documents")
+st.set_page_config(
+    page_title="Documents",
+    layout="wide",
+)
+
+if "baseConfig" not in st.session_state:
+    st.session_state.baseConfig = load_config()
+if "indexAgent" not in st.session_state:
+    st.session_state.indexAgent = IndexAgent()
+if "ollama_host" not in st.session_state:
+    st.session_state.ollama_host = OLLAMA_CLIENT
 
 st.markdown("# Documents")
 
@@ -82,8 +85,6 @@ def _process_files(uploaded_files):
         st.success("Database has been updated.")
     
     # Show results
-    if success_count > 0:
-        st.success(f"Successfully uploaded {success_count} file(s)")
     if error_count > 0:
         st.warning(f"Failed to upload {error_count} file(s)")
 
@@ -144,7 +145,6 @@ def _list_documents():
                     st.rerun()
 
 if __name__ == "__main__":
-    _init()
     _build_sidebar()
     _build_uploader()
     _list_documents()

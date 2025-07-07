@@ -19,36 +19,7 @@ from src.utils.utils import remove_duplicates, make_document_batch
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 #from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.document_loaders import PyMuPDFLoader
-
-############################## Private methods ##############################
-
-def _process_local(pdf_file=str):
-    """
-    Parse a pdf using fitz.
-    """
-    loader = PyMuPDFLoader(
-        file_path=str(pdf_file),
-        extract_tables='markdown',
-        mode= "single"
-    )
-    return loader.load()
-
-def _process_server(pdf_file=str, configuration = Configuration):
-    """
-    Parse a pdf using a vision model on a distant ollama client.
-    the configuration must have vision_model and a ollama_host value different
-    from localhost:11434
-    """
-    from langchain_core.documents import Document
-    from src.parser import parser
-    pipeline = parser.PDFToMarkdownPipeline(
-        ollama_model=configuration.vision_model,
-        ollama_base_url=configuration.ollama_host,
-        enable_validation=False
-        dpi=400  # Higher resolution
-    )
-    result = pipeline.convert_pdf(pdf_file)
-    return [Document(page_content = "\n\n".join(result.pages))]
+from src.parser import VisionLoader
 
 
 ############################## Parse PDF node ##############################
@@ -85,6 +56,9 @@ def parse_pdfs(
     logger.info(f"Starting PDF parsing from directory: {state.path}")
     
     try:
+
+        configuration = Configuration.from_runnable_config(config)
+
         path = Path(state.path)
         if not path.is_dir():
             logger.error(f"Directory not found: {state.path}")
@@ -126,14 +100,26 @@ def parse_pdfs(
                 logger.debug(f"Processing file: {pdf_file}")
                 
                 # Load the file into a Document object
-                if Configuration.ollama_host not in ["http://localhost:11434","http://127.0.0.1:11434","127.0.0.1:11434"]:
-                    doc=_process_server()
+                if configuration.ollama_host != "http://127.0.0.1:11434/":
+                    logger.info("using server parser")
+                    loader = VisionLoader(
+                        file_path=str(pdf_file),
+                        mode = 'single',
+                        ollama_base_url= configuration.ollama_host,
+                        ollama_model=configuration.vision_model,
+                    )
                 else:
-                    doc=_process_local
+                    logger.info("distant client not found, falling back to local parser")
+                    loader = PyMuPDFLoader(
+                        file_path=str(pdf_file),
+                        extract_tables='markdown',
+                        mode= "single"
+                    )
+                
                 # Split the Document content into smaller chunks
-                document = text_splitter.split_documents(doc)
+                document = text_splitter.split_documents(loader.load())
                 #ensure metadata
-                document.metadata={"source": pdf_file}
+                document[0].metadata={"source": pdf_file}
                 # Add them to the list of Documents
                 documents.extend(document)
                 

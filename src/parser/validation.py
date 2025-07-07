@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from collections import Counter
 import unicodedata
-from src.logger_config import get_logger
+from src.utils.logging import get_logger
 
 @dataclass
 class ValidationResult:
@@ -227,7 +227,11 @@ class TextValidator:
         missing = extracted_set - llm_set
         
         # Filter for "important" words (longer words, not common stopwords)
-        stopwords = {'the', 'and', 'are', 'for', 'this', 'that', 'with', 'from', 'they', 'have', 'been', 'will', 'their', 'said', 'each', 'which', 'what', 'there', 'more', 'can', 'may', 'also', 'some', 'time', 'very', 'when', 'much', 'new', 'two', 'way', 'who', 'its', 'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'part', 'over'}
+        stopwords = {'the', 'and', 'are', 'for', 'this', 'that', 'with', 'from',
+                     'they', 'have', 'been', 'will', 'their', 'said', 'each', 'which', 
+                     'what', 'there', 'more', 'can', 'may', 'also', 'some', 'time',
+                     'very', 'when', 'much', 'new', 'two', 'way', 'who', 'its', 'now',
+                     'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'part', 'over'}
         
         important_missing = {word for word in missing 
                            if len(word) > 4 and word not in stopwords}

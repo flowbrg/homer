@@ -7,8 +7,8 @@ from langchain_core.messages import HumanMessage
 import base64
 import io
 from PIL import Image
-from src.logger_config import setup_logging, get_logger
-from src.vision_parser.validation import TextValidator, ValidationResult  # Add this import
+from src.parser.validation import TextValidator, ValidationResult  # Add this import
+from src.utils.logging import get_logger
 
 @dataclass
 class ConversionResult:

@@ -17,8 +17,10 @@ from src.constant import OLLAMA_CLIENT
 ############################## Initialization ##############################
 
 
-
-st.set_page_config(page_title="Discussion")
+st.set_page_config(
+    page_title="Discussion",
+    layout="wide",
+)
 
 if "baseConfig" not in st.session_state:
     st.session_state.baseConfig = load_config()
@@ -28,6 +30,7 @@ if "currentThread" not in st.session_state:
     st.session_state.currentThread = 1
 if "ollama_host" not in st.session_state:
     st.session_state.ollama_host = OLLAMA_CLIENT
+
 
 ############################## Private methods ##############################
 
@@ -63,7 +66,7 @@ def _stream_with_thinking_separation(query: str):
         query: The user query to process
     """
     accumulated_text = ""
-    if st.session_state.baseConfig.response_model == _SERVER_REASONING_MODEL or st.session_state.baseConfig.response_model == _LOCAL_REASONING_MODEL:
+    if st.session_state.baseConfig.response_model == st.session_state.models["server_reasoning"] or st.session_state.baseConfig.response_model == st.session_state.models["local_reasoning"]:
         thinking_placeholder = st.expander("Show Thinking")
     response_placeholder = st.empty()
     
@@ -183,13 +186,13 @@ def _build_sidebar():
 
     # Configure model based on server type and thinking preference
     if reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
-        st.session_state.baseConfig.response_model = _LOCAL_REASONING_MODEL
+        st.session_state.baseConfig.response_model = st.session_state.models["local_reasoning"]
     elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
-        st.session_state.baseConfig.response_model = _LOCAL_MODEL
+        st.session_state.baseConfig.response_model = st.session_state.models["local_standard"]
     elif reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
-        st.session_state.baseConfig.response_model = _SERVER_REASONING_MODEL
+        st.session_state.baseConfig.response_model = st.session_state.models["server_reasoning"]
     else:
-        st.session_state.baseConfig.response_model = _SERVER_MODEL
+        st.session_state.baseConfig.response_model = st.session_state.models["server_standard"]
 
     st.sidebar.write(f"using model {st.session_state.baseConfig.response_model}")
 

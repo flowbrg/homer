@@ -2,11 +2,12 @@ import streamlit as st
 from PIL import Image
 
 from src.core.configuration import load_config
-from src.constant import OLLAMA_CLIENT
+
 
 ############################## Initialization ##############################
 
-from src.utils.logging import setup_logging, get_logger
+
+from src.utils.logging import setup_logging
 setup_logging("INFO")  # or "DEBUG" for more detailed logs
 
 # Default values of the models for server/local execution and classic/reasoning
@@ -18,6 +19,7 @@ _LOCAL_MODEL = "gemma3n:e2b"
 if "baseConfig" not in st.session_state:
     st.session_state.baseConfig = load_config()
 if "ollama_host" not in st.session_state:
+    from src.constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
 if "models" not in st.session_state:
     st.session_state.models = {
@@ -27,9 +29,11 @@ if "models" not in st.session_state:
         "local_standard": _LOCAL_MODEL,
     }
 
+
 ############################## Page builder ##############################
 
-def build():
+
+def _build():
     logo = Image.open("static/homerlogo-nobg.png")
     st.markdown("""
         <br>
@@ -86,4 +90,4 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    _build()

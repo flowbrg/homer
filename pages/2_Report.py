@@ -12,7 +12,11 @@ from src.constant import OUTPUT_DIR, OLLAMA_CLIENT
 
 ############################## Initialization ##############################
 
-st.set_page_config(page_title="Report Generator", layout="wide")
+
+st.set_page_config(
+    page_title="Report Generator",
+    layout="wide"
+)
 
 if "baseConfig" not in st.session_state:
     st.session_state.baseConfig = load_config()
@@ -23,7 +27,9 @@ if "report_history" not in st.session_state:
 if "ollama_host" not in st.session_state:
     st.session_state.ollama_host = OLLAMA_CLIENT
     
+
 ############################## Private methods ##############################
+
 
 def _is_ollama_client_available(url: str) -> bool:
     import requests
@@ -54,7 +60,7 @@ def _create_report(query=str):
     if output:
         
         # Generate PDF
-        with st.spinner("📄 Creating PDF..."):
+        with st.spinner("Creating PDF..."):
             pdf_path = str_to_pdf(
                 data = output,
                 filename = filename,
@@ -62,8 +68,8 @@ def _create_report(query=str):
             )
         
         # Success message
-        st.success(f"✅ Report generated successfully!")
-        st.info(f"📁 Saved to: {pdf_path}")
+        st.success(f"Report generated successfully!")
+        st.info(f"Saved to: {pdf_path}")
         
         # Add to history
         st.session_state.report_history.append({
@@ -75,7 +81,7 @@ def _create_report(query=str):
         # Offer download
         with open(output_path, "rb") as pdf_file:
             st.download_button(
-                label="📥 Download Report",
+                label="Download Report",
                 data=pdf_file.read(),
                 file_name=filename,
                 mime="application/pdf"
@@ -135,7 +141,7 @@ def _build_query_input():
                     try:
                         _create_report(query=query)                            
                     except Exception as e:
-                        st.error(f"❌ Error generating the report: {str(e)}")
+                        st.error(f"Error generating the report: {str(e)}")
                         st.info("Please check the logs for more details.")
 
 
