@@ -1,25 +1,31 @@
 from src.constant import *
 
+
 ######################################## connect to database ########################################
+
 
 import sqlite3
 
-from contextlib import contextmanager
 
 def get_connection() -> sqlite3.Connection:
     return sqlite3.connect(':memory:', check_same_thread=False)
 
+
 ######################################## connect to database ########################################
+
 
 from chromadb import PersistentClient
 
 def get_chroma_client() -> PersistentClient:
     return PersistentClient(path=VECTORSTORE_DIR)
 
+
 ######################################## format documents ########################################
+
 
 from langchain_core.documents import Document
 from typing import Optional
+
 
 def _format_doc(doc: Document) -> str:
     """Format a single document as XML.
@@ -36,6 +42,7 @@ def _format_doc(doc: Document) -> str:
         meta = f" {meta}"
 
     return f"<document{meta}>\n{doc.page_content}\n</document>"
+
 
 def format_docs(docs: Optional[list[Document]]) -> str:
     """Format a list of documents as XML.
@@ -70,12 +77,15 @@ def format_docs(docs: Optional[list[Document]]) -> str:
 {formatted}
 </documents>"""
 
+
 ######################################## format messages ########################################
+
 
 import re
 
 from langchain_core.messages import AnyMessage, AIMessage
 from langchain_core.messages.human import HumanMessage
+
 
 def _format_message(message: AnyMessage) -> str:
     text = re.sub(r'<think>.*?</think>', '', message.content, flags=re.DOTALL)
@@ -94,6 +104,7 @@ def format_messages(messages: Optional[list[AnyMessage]])-> str:
     return f"""<messages>
 {formatted}
 <messages>"""
+
 
 from langchain_core.messages import AIMessage
 from langchain_core.messages.human import HumanMessage
@@ -118,7 +129,9 @@ def ya_format_messages(messages=list[AnyMessage]):
 
 ######################################## format sources ########################################
 
+
 from pathlib import Path
+
 
 def format_sources_markdown(documents: Optional[list[Document]])-> str:
     """
@@ -145,6 +158,7 @@ def format_sources_markdown(documents: Optional[list[Document]])-> str:
     
     return "\n".join(markdown_lines)
 
+
 def format_sources(documents: Optional[list[Document]])-> str:
     """
     Convert a list of documents to a string of unique sources.
@@ -170,9 +184,12 @@ def format_sources(documents: Optional[list[Document]])-> str:
     
     return "\n".join(sources_lines)
 
+
 ######################################## Structured messages ########################################
 
+
 from langchain_core.messages import AnyMessage
+
 
 def get_message_text(msg: AnyMessage) -> str:
     """Get the text content of a message.
@@ -202,17 +219,22 @@ def get_message_text(msg: AnyMessage) -> str:
     else:
         txts = [c if isinstance(c, str) else (c.get("text") or "") for c in content]
         return "".join(txts).strip()
-    
+
+
 ######################################## Remove duplicates ########################################
+
 
 def remove_duplicates(base: list[str], new: list[str]) -> list[str]:
     base_set = set(base)
     return [item for item in new if item not in base_set]
 
+
 ######################################## Make document batch ########################################
 
+
 from itertools import islice
-from typing import Iterator, List
+from typing import List
+
 
 def make_document_batch(documents: List[Document], size: int = 100) -> List[List[Document]]:
     """
@@ -248,29 +270,8 @@ def make_document_batch(documents: List[Document], size: int = 100) -> List[List
     return batches
 
 
-# Alternative generator version for memory efficiency with large datasets
-def make_document_batch_generator(documents: List[Document], size: int = 100) -> Iterator[List[Document]]:
-    """
-    Generator version that yields batches one at a time.
-    Memory efficient for very large document lists.
-    """
-    if size < 1:
-        raise ValueError("Batch size must be at least 1")
-    
-    doc_iter = iter(documents)
-    while True:
-        batch = list(islice(doc_iter, size))
-        if not batch:
-            break
-        yield batch
-
-
-# One-liner alternative using list comprehension (less readable but very concise)
-def make_document_batch_oneliner(documents: List[Document], size: int = 100) -> List[List[Document]]:
-    """Concise one-liner version."""
-    return [documents[i:i + size] for i in range(0, len(documents), size)]
-
 ######################################## Streamlit connection button state ########################################
+
 
 from streamlit.runtime.state.session_state_proxy import SessionStateProxy
 from src.constant import OLLAMA_CLIENT
@@ -282,9 +283,12 @@ def is_connected(session_state: SessionStateProxy) -> bool:
         return True
     return False
 
+
 ######################################## Clean thinking part ########################################
 
+
 import re
+
 
 def extract_think_and_answer(text: str) -> tuple[Optional[str], str]:
     """
@@ -309,7 +313,9 @@ def extract_think_and_answer(text: str) -> tuple[Optional[str], str]:
         return thinking_part, answer_part
     return None, text
 
+
 ######################################## Ensure path exists ########################################
+
 
 def ensure_path(path_str: str):
     """Crée le répertoire parent si le chemin est un fichier, ou le répertoire lui-même."""
@@ -323,7 +329,9 @@ def ensure_path(path_str: str):
         # C'est un fichier, créer le répertoire parent
         path.parent.mkdir(parents=True, exist_ok=True)
 
+
 ######################################## Combine system and user prompt ########################################
+
 
 def combine_prompts(
     system: Optional[str],

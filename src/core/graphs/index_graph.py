@@ -15,6 +15,7 @@ from src.core.configuration import Configuration
 from src.core.states import IndexState, InputIndexState
 from src.core.models import load_embedding_model
 from src.utils.utils import remove_duplicates, make_document_batch
+from src.constant import OLLAMA_LOCALHOST
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 #from langchain_experimental.text_splitter import SemanticChunker
@@ -100,7 +101,7 @@ def parse_pdfs(
                 logger.debug(f"Processing file: {pdf_file}")
                 
                 # Load the file into a Document object
-                if configuration.ollama_host != "http://127.0.0.1:11434/":
+                if configuration.ollama_host != OLLAMA_LOCALHOST:
                     logger.info("using server parser")
                     loader = VisionLoader(
                         file_path=str(pdf_file),

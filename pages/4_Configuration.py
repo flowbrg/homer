@@ -1,4 +1,6 @@
 import streamlit as st
+import ollama
+
 from src.core.configuration import load_config
 from src.constant import OLLAMA_CLIENT
 
@@ -33,6 +35,13 @@ if "models" not in st.session_state:
         "local_reasoning": _LOCAL_REASONING_MODEL,
         "local_standard": _LOCAL_MODEL,
     }
+
+
+######################################## Models availability ########################################
+
+
+
+
 
 ######################################## Form ########################################
 

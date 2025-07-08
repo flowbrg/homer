@@ -11,7 +11,7 @@ import streamlit as st
 from src.utils.utils import is_connected, extract_think_and_answer
 from src.core.agents import RetrievalAgent
 from src.core.configuration import load_config
-from src.constant import OLLAMA_CLIENT
+from src.constant import OLLAMA_LOCALHOST
 
 
 ############################## Initialization ##############################
@@ -29,6 +29,7 @@ if "retrievalAgent" not in st.session_state:
 if "currentThread" not in st.session_state:
     st.session_state.currentThread = 1
 if "ollama_host" not in st.session_state:
+    from src.constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
 
 
@@ -168,14 +169,14 @@ def _build_sidebar():
 
     # Configure server host based on connection preference
     if connectionButton:
-        conn = _is_ollama_client_available(OLLAMA_CLIENT)
+        conn = _is_ollama_client_available(st.session_state.ollama_host)
         if conn:
-            st.session_state.baseConfig.ollama_host = OLLAMA_CLIENT
+            st.session_state.baseConfig.ollama_host = st.session_state.ollama_host
         else:
-            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
-            st.session_state.baseConfig.ollama_host = "http://127.0.0.1:11434/"
+            st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
+            st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
     else:
-        st.session_state.baseConfig.ollama_host = "http://127.0.0.1:11434/"
+        st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
     
     st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
         
@@ -185,11 +186,11 @@ def _build_sidebar():
         )
 
     # Configure model based on server type and thinking preference
-    if reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
+    if reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
         st.session_state.baseConfig.response_model = st.session_state.models["local_reasoning"]
-    elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == "http://127.0.0.1:11434/":
+    elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
         st.session_state.baseConfig.response_model = st.session_state.models["local_standard"]
-    elif reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
+    elif reasoningModelButton and st.session_state.baseConfig.ollama_host == st.session_state.ollama_host:
         st.session_state.baseConfig.response_model = st.session_state.models["server_reasoning"]
     else:
         st.session_state.baseConfig.response_model = st.session_state.models["server_standard"]

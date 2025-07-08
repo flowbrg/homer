@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, fields
 from typing import Optional, Type, TypeVar
 
-from src.constant import OLLAMA_CLIENT
+from src.constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
 
 from langchain_core.runnables import RunnableConfig, ensure_config
 
@@ -31,9 +31,9 @@ class Configuration:
 
     # Ollama configuration
     ollama_host: str = field(
-        default = "http://127.0.0.1:11434/",
+        default = OLLAMA_LOCALHOST,
         metadata = {
-            "description": "The host URL for the Ollama service. Must be a valid URL. Default is http://127.0.0.1:11434/"
+            "description": "The host URL for the Ollama service. Must be a valid URL. Default is OLLAMA_LOCALHOST"
         },
     )
     

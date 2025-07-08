@@ -6,7 +6,7 @@ from pathlib import Path
 from src.core.configuration import load_config
 from src.core.agents import IndexAgent
 from src.core.retrieval import delete_documents, get_existing_documents
-from src.constant import UPLOAD_DIR, OLLAMA_CLIENT
+from src.constant import UPLOAD_DIR, OLLAMA_LOCALHOST
 from src.core.retrieval import get_existing_documents
 from src.utils.utils import is_connected
 
@@ -22,6 +22,7 @@ if "baseConfig" not in st.session_state:
 if "indexAgent" not in st.session_state:
     st.session_state.indexAgent = IndexAgent()
 if "ollama_host" not in st.session_state:
+    from src.constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
 
 st.markdown("# Documents")
@@ -103,10 +104,10 @@ def _build_sidebar():
             st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
         else:
             st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
-            st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+            st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
     else:
         st.sidebar.write(f"using localhost")
-        st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+        st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
 
     st.sidebar.button(
         label="🗑️ Reset database",

@@ -7,7 +7,7 @@ from src.core.agents import ReportAgent
 from src.core.configuration import load_config
 from src.utils.dict_to_pdf import str_to_pdf
 from src.utils.utils import is_connected
-from src.constant import OUTPUT_DIR, OLLAMA_CLIENT
+from src.constant import OUTPUT_DIR, OLLAMA_LOCALHOST
 
 
 ############################## Initialization ##############################
@@ -25,6 +25,7 @@ if "reportAgent" not in st.session_state:
 if "report_history" not in st.session_state:
     st.session_state.report_history = []
 if "ollama_host" not in st.session_state:
+    from src.constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
     
 
@@ -98,16 +99,16 @@ def _build_sidebar():
     )
 
     if connectionButton:
-        conn = _is_ollama_client_available(OLLAMA_CLIENT)
+        conn = _is_ollama_client_available(st.session_state.ollama_host)
         if conn:
-            st.sidebar.write(f"using distant ollama client {OLLAMA_CLIENT}")
-            st.session_state.baseConfig.ollama_host=OLLAMA_CLIENT
+            st.sidebar.write(f"using distant ollama client {st.session_state.ollama_host}")
+            st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
         else:
-            st.sidebar.warning(f"Could not connect to {OLLAMA_CLIENT}")
-            st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+            st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
+            st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
     else:
         st.sidebar.write(f"using localhost")
-        st.session_state.baseConfig.ollama_host="http://127.0.0.1:11434/"
+        st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
 
 
 def _display_reports():
