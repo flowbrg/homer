@@ -15,7 +15,7 @@ from src.constant import OUTPUT_DIR, OLLAMA_LOCALHOST
 
 st.set_page_config(
     page_title="Report Generator",
-    layout="wide"
+    layout="centered"
 )
 
 if "baseConfig" not in st.session_state:
@@ -101,14 +101,14 @@ def _build_sidebar():
     if connectionButton:
         conn = _is_ollama_client_available(st.session_state.ollama_host)
         if conn:
-            st.sidebar.write(f"using distant ollama client {st.session_state.ollama_host}")
             st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
         else:
             st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
             st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
     else:
-        st.sidebar.write(f"using localhost")
         st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+    
+    st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
 
 
 def _display_reports():

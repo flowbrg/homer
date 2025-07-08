@@ -233,19 +233,20 @@ def remove_duplicates(base: list[str], new: list[str]) -> list[str]:
 
 
 from itertools import islice
-from typing import List
+from typing import List, TypeVar
 
+T = TypeVar("T")
 
-def make_document_batch(documents: List[Document], size: int = 100) -> List[List[Document]]:
+def make_batch(list: List[T], size: int = 100) -> List[List[T]]:
     """
-    Split a list of documents into batches of specified size.
+    Split a list into batches of specified size.
     
     Args:
-        documents: List of documents to batch
+        documents: List to batch
         size: Maximum size of each batch (default: 100)
         
     Returns:
-        List of document batches
+        List of batches
         
     Raises:
         ValueError: If size is less than 1
@@ -253,11 +254,11 @@ def make_document_batch(documents: List[Document], size: int = 100) -> List[List
     if size < 1:
         raise ValueError("Batch size must be at least 1")
     
-    if not documents:
+    if not list:
         return []
     
     # Convert to iterator for memory efficiency
-    doc_iter = iter(documents)
+    doc_iter = iter(list)
     
     # Use islice to create batches efficiently
     batches = []

@@ -12,7 +12,7 @@ from src.constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
 
 st.set_page_config(
     page_title="Model",
-    layout="wide",
+    layout="centered",
 )
 
 if "baseConfig" not in st.session_state:

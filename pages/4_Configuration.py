@@ -13,7 +13,7 @@ setup_logging("INFO")  # or "DEBUG" for more detailed logs
 
 st.set_page_config(
         page_title="Configuration Editor",
-        layout="wide"
+        layout="centered"
     )
 
 # Default values of the models for server/local execution and classic/reasoning

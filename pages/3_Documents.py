@@ -8,13 +8,15 @@ from src.core.agents import IndexAgent
 from src.core.retrieval import delete_documents, get_existing_documents
 from src.constant import UPLOAD_DIR, OLLAMA_LOCALHOST
 from src.core.retrieval import get_existing_documents
-from src.utils.utils import is_connected
+from src.utils.utils import is_connected, make_batch
+
 
 ############################## Initialize session state ##############################
 
+
 st.set_page_config(
     page_title="Documents",
-    layout="wide",
+    layout="centered",
 )
 
 if "baseConfig" not in st.session_state:
@@ -31,7 +33,9 @@ st.markdown("# Documents")
 # Ensure upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 ############################## Private methods ##############################
+
 
 def _is_ollama_client_available(url: str) -> bool:
     import requests
@@ -41,15 +45,18 @@ def _is_ollama_client_available(url: str) -> bool:
     except requests.RequestException:
         return False
 
+
 def _reset_vector_store():
     with st.spinner("Updating database..."):
             try:
                 documents = get_existing_documents()
-                delete_documents(docs=documents)
+                for doc in documents:
+                    delete_documents(docs=doc)
             except Exception as e:
                 st.error(f"Error clearing database: {str(e)}")
             else:
                 st.success("Database has been cleared.")
+
 
 def _process_files(uploaded_files):
     success_count = 0
@@ -89,7 +96,9 @@ def _process_files(uploaded_files):
     if error_count > 0:
         st.warning(f"Failed to upload {error_count} file(s)")
 
+
 ############################## Page builders ##############################
+
 
 def _build_sidebar():
     connectionButton = st.sidebar.toggle(
@@ -100,21 +109,15 @@ def _build_sidebar():
     if connectionButton:
         conn = _is_ollama_client_available(st.session_state.ollama_host)
         if conn:
-            st.sidebar.write(f"using distant ollama client {st.session_state.ollama_host}")
             st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
         else:
             st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
             st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
     else:
-        st.sidebar.write(f"using localhost")
         st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
 
-    st.sidebar.button(
-        label="🗑️ Reset database",
-        type="primary",
-        use_container_width=True,
-        on_click=_reset_vector_store
-    )
+    st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+
 
 def _build_uploader():
     # Create the file uploader
@@ -132,6 +135,14 @@ def _build_uploader():
             _process_files(uploaded_files)
 
 def _list_documents():
+
+    st.button(
+        label="🗑️ Reset database",
+        type="primary",
+        use_container_width=True,
+        on_click=_reset_vector_store
+    )
+
     files = [f for f in get_existing_documents()]
     for file in files:
             col1, col2 = st.columns([5, 1])

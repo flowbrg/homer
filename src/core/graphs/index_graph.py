@@ -14,7 +14,7 @@ from src.core import retrieval
 from src.core.configuration import Configuration
 from src.core.states import IndexState, InputIndexState
 from src.core.models import load_embedding_model
-from src.utils.utils import remove_duplicates, make_document_batch
+from src.utils.utils import remove_duplicates, make_batch
 from src.constant import OLLAMA_LOCALHOST
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -189,7 +189,7 @@ def index_docs(
         logger.info(f"Using embedding model: {configuration.embedding_model}")
         
         # Prepare document batches
-        documents_batch = make_document_batch(documents=state.docs, size= 20)
+        documents_batch = make_batch(list=state.docs, size= 20)
         total_batches = len(documents_batch)
         total_documents = len(state.docs)
         
