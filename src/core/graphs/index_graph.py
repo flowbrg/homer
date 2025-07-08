@@ -101,7 +101,7 @@ def parse_pdfs(
                 logger.debug(f"Processing file: {pdf_file}")
                 
                 # Load the file into a Document object
-                if configuration.ollama_host != OLLAMA_LOCALHOST:
+                if configuration.ocr:
                     logger.info("using server parser")
                     loader = VisionLoader(
                         file_path=str(pdf_file),

@@ -24,19 +24,18 @@ class Configuration:
     # Report configuration
     number_of_parts: int = field(
         default = 5,
-        metadata = {
-            "description": "The number of parts in the report outline. Must be a positive integer."
-        },
     )
 
     # Ollama configuration
     ollama_host: str = field(
         default = OLLAMA_LOCALHOST,
-        metadata = {
-            "description": "The host URL for the Ollama service. Must be a valid URL. Default is OLLAMA_LOCALHOST"
-        },
     )
     
+    # Index configuration
+    ocr: bool = field(
+        default = False,
+    )
+
     # Retriever configuration
     retriever_top_k: int = field(
         default = 4,

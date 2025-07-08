@@ -100,63 +100,68 @@ def _process_files(uploaded_files):
 ############################## Page builders ##############################
 
 
-def _build_sidebar():
-    connectionButton = st.sidebar.toggle(
-        label = "Server execution",
-        value = is_connected(st.session_state)
-    )
+connectionButton = st.sidebar.toggle(
+    label = "Server execution",
+    value = is_connected(st.session_state)
+)
 
-    if connectionButton:
-        conn = _is_ollama_client_available(st.session_state.ollama_host)
-        if conn:
-            st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
-        else:
-            st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
-            st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+if connectionButton:
+    conn = _is_ollama_client_available(st.session_state.ollama_host)
+    if conn:
+        st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
     else:
+        st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
         st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+else:
+    st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
 
-    st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+
+visionParserButton = st.sidebar.toggle(
+    label = "Vision Parser",
+    value = st.session_state.baseConfig.ocr,
+    help="Enable or disable the vision analysis for PDF documents"
+)
+
+if visionParserButton:
+    st.session_state.baseConfig.ocr = True
+    if not connectionButton:
+        st.sidebar.warning("It is not recommended to run the vision parser locally. Click 'Server execution' to enable the Ollama server connection.")
+else:
+    st.session_state.baseConfig.ocr = False
 
 
-def _build_uploader():
-    # Create the file uploader
-    uploaded_files = st.file_uploader("Choose PDF files", type=["pdf"], accept_multiple_files=True)
+# Create the file uploader
+uploaded_files = st.file_uploader("Choose PDF files", type=["pdf"], accept_multiple_files=True)
+
+if uploaded_files is not None and len(uploaded_files) > 0:
     
-    if uploaded_files is not None and len(uploaded_files) > 0:
-        
-        # Upload button
-        deleteButton=st.button(
-            label="Upload",
-            type="primary",
-            #on_click=_process_files(uploaded_files)
-        )
-        if deleteButton:
-            _process_files(uploaded_files)
-
-def _list_documents():
-
-    st.button(
-        label="🗑️ Reset database",
+    # Upload button
+    deleteButton=st.button(
+        label="Upload",
         type="primary",
-        use_container_width=True,
-        on_click=_reset_vector_store
+        #on_click=_process_files(uploaded_files)
     )
+    if deleteButton:
+        _process_files(uploaded_files)
 
-    files = [f for f in get_existing_documents()]
-    for file in files:
-            col1, col2 = st.columns([5, 1])
-            with col1:
-                st.write(f"📄 {Path(file).stem}")
-            with col2:
-                if st.button("🗑️ Delete", key=f"delete_{file}"):
-                    try:
-                        delete_documents(docs = file)
-                    except Exception as e:
-                        st.error(f"Error deleting document: {str(e)}")
-                    st.rerun()
 
-if __name__ == "__main__":
-    _build_sidebar()
-    _build_uploader()
-    _list_documents()
+st.button(
+    label="🗑️ Reset database",
+    type="primary",
+    use_container_width=True,
+    on_click=_reset_vector_store
+)
+
+files = [f for f in get_existing_documents()]
+for file in files:
+        col1, col2 = st.columns([5, 1])
+        with col1:
+            st.write(f"📄 {Path(file).stem}")
+        with col2:
+            if st.button("🗑️ Delete", key=f"delete_{file}"):
+                try:
+                    delete_documents(docs = file)
+                except Exception as e:
+                    st.error(f"Error deleting document: {str(e)}")
+                st.rerun()
