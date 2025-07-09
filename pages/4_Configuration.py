@@ -8,9 +8,6 @@ from src.constant import OLLAMA_CLIENT
 ############################## Initialization ##############################
 
 
-from src.utils.logging import setup_logging
-setup_logging("INFO")  # or "DEBUG" for more detailed logs
-
 st.set_page_config(
         page_title="Configuration Editor",
         layout="centered"

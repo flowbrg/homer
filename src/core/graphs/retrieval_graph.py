@@ -5,8 +5,7 @@ retrieval graph. It includes the main graph definition, state management,
 and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
-from src.utils.logging import setup_logging, get_logger
-#setup_logging("INFO")  # or "DEBUG" for more detailed logs
+from src.utils.logging import get_logger
 # Initialize retrievalAgentLogger
 retrievalAgentLogger = get_logger(__name__)
 

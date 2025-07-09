@@ -9,6 +9,7 @@ import io
 from PIL import Image
 from src.parser.validation import TextValidator, ValidationResult  # Add this import
 from src.utils.logging import get_logger
+from src.utils import prompts
 
 @dataclass
 class ConversionResult:
@@ -48,18 +49,7 @@ class VisionProcessor:
     def process_page(self, image_base64: str) -> str:
         """Process page image and return markdown"""
         
-        prompt = """Extract and convert all content from this PDF page to clean markdown format.
-
-INSTRUCTIONS:
-1. Extract all visible text accurately
-2. Convert tables to proper markdown table format with | separators and --- headers
-3. Convert mathematical formulas to LaTeX notation ($...$ for inline, $$...$$ for display)
-4. Describe any diagrams, charts, or images with appropriate markdown formatting
-5. Maintain document structure with proper headers (#, ##, ###)
-6. Preserve lists and formatting
-7. Ensure LaTeX formulas use correct syntax (e.g., P_i not P_i_i)
-
-Return only the markdown content, no additional commentary."""
+        prompt = prompts.VISION_SYSTEM_PROMPT
 
         try:
             content = [
@@ -305,7 +295,6 @@ def convert_pdf_to_markdown(pdf_path: str,
                                   ollama_base_url: str = "http://localhost:11434",
                                   output_dir: str = "./output",
                                   dpi: int = 300,
-                                  log_level: str = "INFO",
                                   enable_validation: bool = True,
                                   validation_threshold: float = 0.6) -> ConversionResult:
     """
@@ -324,8 +313,6 @@ def convert_pdf_to_markdown(pdf_path: str,
     Returns:
         ConversionResult with pages, metadata, and validation results
     """
-    # Set up logging
-    logger = setup_logging(log_level=log_level)
     
     pipeline = PDFToMarkdownPipeline(
         ollama_model, 

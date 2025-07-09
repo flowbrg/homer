@@ -3,7 +3,7 @@ OLLAMA_LOCALHOST = "http://127.0.0.1:11434/" # DO NOT CHANGE
 UPLOAD_DIR = "./user_data/temp"
 OUTPUT_DIR = "./user_data/outputs"
 VECTORSTORE_DIR = "./user_data/vectorstore/"
-
+LOG_LEVEL = "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
 # To list available models on the distant ollama client

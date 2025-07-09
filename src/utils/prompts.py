@@ -33,6 +33,7 @@ PREVIOUS MESSAGES:
 REPHRASED QUERY:
 """
 
+
 OUTLINE_SYSTEM_PROMPT = """
 You are assisting with the creation of a highly technical report on the topic of the user query.
 
@@ -63,6 +64,7 @@ GUIDELINES:
 Write an informative and coherent section using the available material:
 """
 
+
 TECHNICAL_SECTION_SYSTEM_PROMPT = """
 You are writing section "{current_section}" for a technical report on <user_query>{main_query}</user_query>.
 
@@ -91,3 +93,18 @@ DRAFT:
 
 EDITED VERSION:
 """
+
+
+VISION_SYSTEM_PROMPT="""
+Extract and convert all content from this PDF page to clean markdown format.
+
+INSTRUCTIONS:
+1. Extract all visible text accurately
+2. Convert tables to proper markdown table format with | separators and --- headers
+3. Convert mathematical formulas to LaTeX notation ($...$ for inline, $$...$$ for display)
+4. Describe any diagrams, charts, or images with appropriate markdown formatting
+5. Maintain document structure with proper headers (#, ##, ###)
+6. Preserve lists and formatting
+7. Ensure LaTeX formulas use correct syntax (e.g., P_i not P_i_i)
+
+Return only the markdown content, no additional commentary."""

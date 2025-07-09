@@ -8,7 +8,8 @@ from src.core.configuration import load_config
 
 
 from src.utils.logging import setup_logging
-setup_logging("INFO")  # or "DEBUG" for more detailed logs
+from src.constant import LOG_LEVEL
+setup_logging(LOG_LEVEL)  # or "DEBUG" for more detailed logs
 
 # Default values of the models for server/local execution and classic/reasoning
 _SERVER_REASONING_MODEL = "qwen3:30b-a3b" 

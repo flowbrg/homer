@@ -18,8 +18,7 @@ The graph supports both technical and general writing styles, with appropriate
 prompts and formatting for each style.
 """
 
-from src.utils.logging import setup_logging, get_logger
-setup_logging("INFO")  # or "DEBUG" for more detailed logs
+from src.utils.logging import get_logger
 # Initialize retrievalAgentLogger
 reportAgentLogger = get_logger(__name__)
 
