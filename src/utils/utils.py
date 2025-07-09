@@ -237,7 +237,7 @@ from typing import List, TypeVar
 
 T = TypeVar("T")
 
-def make_batch(list: List[T], size: int = 100) -> List[List[T]]:
+def make_batch(obj: List[T], size: int = 100) -> List[List[T]]:
     """
     Split a list into batches of specified size.
     
@@ -254,16 +254,16 @@ def make_batch(list: List[T], size: int = 100) -> List[List[T]]:
     if size < 1:
         raise ValueError("Batch size must be at least 1")
     
-    if not list:
+    if not obj:
         return []
     
     # Convert to iterator for memory efficiency
-    doc_iter = iter(list)
+    obj_iter = iter(obj)
     
     # Use islice to create batches efficiently
     batches = []
     while True:
-        batch = list(islice(doc_iter, size))
+        batch = list(islice(obj_iter, size))
         if not batch:
             break
         batches.append(batch)

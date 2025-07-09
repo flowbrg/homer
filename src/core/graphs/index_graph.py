@@ -102,7 +102,7 @@ def parse_pdfs(
                 
                 # Load the file into a Document object
                 if configuration.ocr:
-                    logger.info("using server parser")
+                    logger.debug("using server parser")
                     loader = VisionLoader(
                         file_path=str(pdf_file),
                         mode = 'single',
@@ -110,7 +110,7 @@ def parse_pdfs(
                         ollama_model=configuration.vision_model,
                     )
                 else:
-                    logger.info("distant client not found, falling back to local parser")
+                    logger.debug("distant client not found, falling back to local parser")
                     loader = PyMuPDFLoader(
                         file_path=str(pdf_file),
                         extract_tables='markdown',
@@ -189,7 +189,7 @@ def index_docs(
         logger.info(f"Using embedding model: {configuration.embedding_model}")
         
         # Prepare document batches
-        documents_batch = make_batch(list=state.docs, size= 20)
+        documents_batch = make_batch(obj=state.docs, size= 20)
         total_batches = len(documents_batch)
         total_documents = len(state.docs)
         
