@@ -117,9 +117,6 @@ if pullButton and model:
             except ollama.ResponseError as e:
                 if e.status_code == 500:
                     st.warning(f"Model {model} does not exist, visit https://ollama.com/ to find a compatible model.")
-    except ollama.ResponseError as e:
-        if e.status_code == 500:
-            st.warning(f"The model {model} does not exist, visit")
 
 
 # Already available models

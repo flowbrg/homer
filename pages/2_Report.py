@@ -5,7 +5,7 @@ from datetime import datetime
 
 from src.core.agents import ReportAgent
 from src.core.configuration import load_config
-from src.utils.dict_to_pdf import str_to_pdf
+from src.utils.dict_to_pdf import dict_to_pdf
 from src.utils.utils import is_connected
 from src.constant import OUTPUT_DIR, OLLAMA_LOCALHOST
 
@@ -41,7 +41,7 @@ def _is_ollama_client_available(url: str) -> bool:
         return False
 
 
-def _create_report(query=str):
+def _create_report(query:str):
     # Create a unique filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"report_{timestamp}.pdf"
@@ -62,9 +62,9 @@ def _create_report(query=str):
         
         # Generate PDF
         with st.spinner("Creating PDF..."):
-            pdf_path = str_to_pdf(
+            pdf_path = dict_to_pdf(
                 data = output,
-                filename = filename,
+                output_filename = filename,
                 output_dir = OUTPUT_DIR,
             )
         
@@ -88,7 +88,7 @@ def _create_report(query=str):
                 mime="application/pdf"
             )
     else:
-        st.error("No report content was generated.")
+        st.error(f"No report content was generated: output:{output}")
 
 ############################## Page builders ##############################
 

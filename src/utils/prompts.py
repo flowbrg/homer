@@ -87,6 +87,7 @@ EDITING GOALS:
 - Remove ALL internal headings and formatting artifacts
 - Combine choppy sentences into flowing analytical prose
 - Ensure logical progression of ideas
+- Do not explain your edits or provide commentary, just return the edited section
 
 DRAFT:
 {draft_section}

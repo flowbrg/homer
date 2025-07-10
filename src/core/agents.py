@@ -6,6 +6,7 @@ from typing import Literal, Any, Dict, Optional
 
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
+from langchain_core.runnables import RunnableConfig
 
 from src.core.configuration import Configuration
 
@@ -120,4 +121,5 @@ class ReportAgent:
             "writing_style": writing_style,
             "number_of_parts": number_of_parts,
         }
-        self._graph.invoke(input=input, config=config)
+        output = self._graph.invoke(input=input, config=config)
+        return output["report"]
