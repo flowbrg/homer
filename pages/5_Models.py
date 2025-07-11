@@ -69,6 +69,7 @@ client = ollama.Client(
     host = host
 )
 
+
 ############################## Page ##############################
 
 
@@ -120,7 +121,8 @@ if pullButton and model:
 
 
 # Already available models
-st.markdown(f"Available models at: {host}")
+availableModels = f"Available models at {host}\n"
 models = client.list().models
 for m in models:
-    st.markdown(f"-{m.model}")
+    availableModels += f"- {m.model}\n"
+st.info(availableModels)

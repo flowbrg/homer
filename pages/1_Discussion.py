@@ -23,16 +23,14 @@ st.set_page_config(
 )
 
 if "baseConfig" not in st.session_state:
-    st.session_state.baseConfig = load_config()
+    st.session_state.baseConfig = load_config() 
 if "retrievalAgent" not in st.session_state:
-    st.session_state.retrievalAgent = RetrievalAgent()
-if "currentThread" not in st.session_state:
-    st.session_state.currentThread = 1
+    st.session_state.retrievalAgent = RetrievalAgent() # Instantiate the retrieval agent
 if "ollama_host" not in st.session_state:
     from src.constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
 
-
+_THREAD = 1
 ############################## Private methods ##############################
 
 
@@ -67,7 +65,10 @@ def _stream_with_thinking_separation(query: str):
         query: The user query to process
     """
     accumulated_text = ""
-    if st.session_state.baseConfig.response_model == st.session_state.models["server_reasoning"] or st.session_state.baseConfig.response_model == st.session_state.models["local_reasoning"]:
+    if (
+        st.session_state.baseConfig.response_model == st.session_state.models["server_reasoning"]
+        or st.session_state.baseConfig.response_model == st.session_state.models["local_reasoning"]
+    ):
         thinking_placeholder = st.expander("Show Thinking")
     response_placeholder = st.empty()
     
@@ -76,13 +77,14 @@ def _stream_with_thinking_separation(query: str):
         for chunk in st.session_state.retrievalAgent.stream(
             query=query,
             configuration=st.session_state.baseConfig,
-            thread_id=st.session_state.currentThread,
+            thread_id=_THREAD,
         ):
             accumulated_text += chunk
             
             # Check if thinking is complete
             if "</think>" in accumulated_text.lower():
-                # Extract thinking and reset the accumulated text to get the actual answer (only one thinking part)
+                # Extract thinking and reset the accumulated text to get the actual answer
+                # (only one thinking part)
                 thinking_content, accumulated_text = extract_think_and_answer(accumulated_text)
 
                 # Show expander with thinking content if it exists
@@ -101,131 +103,95 @@ def _stream_with_thinking_separation(query: str):
         response_placeholder.markdown(error_message)
 
 
-############################## Page builders ##############################
+############################## Page ##############################
 
 
-def _display_conversation(thread_id: int):
-    """
-    Display conversation history for the specified thread.
-    
-    Shows all messages in the current thread with proper formatting:
-    - Human messages: displayed as user chat messages
-    - AI messages: displayed as assistant chat messages with thinking expanders
-    - System messages: displayed as system chat messages
-    
-    Args:
-        thread_id: The conversation thread to display
-    """
-    if thread_id is None:
-        return
-    
-    messages = st.session_state.retrievalAgent.get_messages(
-        configuration=st.session_state.baseConfig,
-        thread_id=st.session_state.currentThread,
-    )
+# Retrieve existing messages
+messages = st.session_state.retrievalAgent.get_messages(
+    configuration=st.session_state.baseConfig,
+    thread_id=_THREAD,
+)
 
-    for message in messages:
-        from langchain_core.messages import AIMessage
-        from langchain_core.messages.human import HumanMessage
+for message in messages:
+    from langchain_core.messages import AIMessage
+    from langchain_core.messages.human import HumanMessage
+    
+    if isinstance(message, AIMessage):
+        name = "ai"
+        # Extract thinking and response content
+        thoughts, answer = extract_think_and_answer(message.content)
         
-        if isinstance(message, AIMessage):
-            name = "ai"
-            # Extract thinking and response content
-            thoughts, answer = extract_think_and_answer(message.content)
-            
-            with st.chat_message(name):
-                # Display thinking content in expander if available
-                if thoughts:
-                    with st.expander("Show thinking"):
-                        st.write(thoughts)
-                # Display the main response
-                st.markdown(answer if answer else message.content)
+        with st.chat_message(name):
+            # Display thinking content in expander if available
+            if thoughts:
+                with st.expander("Show thinking"):
+                    st.write(thoughts)
+            # Display the main response
+            st.markdown(answer if answer else message.content)
 
-        elif isinstance(message, HumanMessage):
-            name = "human"
-            with st.chat_message(name):
-                st.markdown(message.content)
-        else:
-            name = "system"
-            with st.chat_message(name):
-                st.markdown(message.content)
-
-                
-def _build_sidebar():
-    """
-    Build sidebar interface for configuration options.
-    
-    Provides controls for:
-    - Server execution toggle (local vs remote)
-    - Model selection toggle (thinking vs standard models)
-    - Connection status display
-    - Current model display
-    """
-    # Server connection toggle
-    connectionButton = st.sidebar.toggle(
-        label="Server execution",
-        value=is_connected(st.session_state)
-    )
-
-    # Configure server host based on connection preference
-    if connectionButton:
-        conn = _is_ollama_client_available(st.session_state.ollama_host)
-        if conn:
-            st.session_state.baseConfig.ollama_host = st.session_state.ollama_host
-        else:
-            st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
-            st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
+    elif isinstance(message, HumanMessage):
+        name = "human"
+        with st.chat_message(name):
+            st.markdown(message.content)
     else:
+        name = "system"
+        with st.chat_message(name):
+            st.markdown(message.content)
+
+
+# Display the chat input box for user queries
+query = st.chat_input("Enter your query:")
+if query:
+    # Display user message immediately
+    with st.chat_message("user"):
+        st.markdown(query)
+
+    # Display assistant response with streaming thinking separation
+    with st.chat_message("assistant"):
+        with st.spinner("Processing your query..."):
+            _stream_with_thinking_separation(query)
+
+
+############################## Sidebar ##############################
+
+
+# Server connection toggle
+connectionButton = st.sidebar.toggle(
+    label="Server execution",
+    value=is_connected(st.session_state)
+)
+
+# Configure server host based on connection preference
+if connectionButton:
+    conn = _is_ollama_client_available(st.session_state.ollama_host)
+    if conn:
+        st.session_state.baseConfig.ollama_host = st.session_state.ollama_host
+    else:
+        st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
         st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
+else:
+    st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
+
+# Display the current server connection status
+st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
     
-    st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
-        
-    # Model selection toggle
-    reasoningModelButton = st.sidebar.toggle(
-            label="Reasoning model",
-        )
+# Model selection toggle
+reasoningModelButton = st.sidebar.toggle(
+        label="Reasoning model",
+    )
 
-    # Configure model based on server type and thinking preference
-    if reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
-        st.session_state.baseConfig.response_model = st.session_state.models["local_reasoning"]
-    elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
-        st.session_state.baseConfig.response_model = st.session_state.models["local_standard"]
-    elif reasoningModelButton and st.session_state.baseConfig.ollama_host == st.session_state.ollama_host:
-        st.session_state.baseConfig.response_model = st.session_state.models["server_reasoning"]
-    else:
-        st.session_state.baseConfig.response_model = st.session_state.models["server_standard"]
+# Configure model based on server type and thinking preference
+if reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
+    st.session_state.baseConfig.response_model = st.session_state.models["local_reasoning"]
 
-    st.sidebar.write(f"using model {st.session_state.baseConfig.response_model}")
+elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
+    st.session_state.baseConfig.response_model = st.session_state.models["local_standard"]
 
+elif reasoningModelButton and st.session_state.baseConfig.ollama_host == st.session_state.ollama_host:
+    st.session_state.baseConfig.response_model = st.session_state.models["server_reasoning"]
 
-def _build_chat_input():
-    """
-    Build chat input interface with streaming response handling.
-    
-    Creates the chat input widget and processes user queries with:
-    - Immediate display of user messages
-    - Real-time streaming of AI responses
-    - Separation of thinking content and final answers
-    - Error handling with user feedback
-    """
-    query = st.chat_input("Enter your query:")
-    if query:
-        # Display user message immediately
-        with st.chat_message("user"):
-            st.markdown(query)
+else:
+    st.session_state.baseConfig.response_model = st.session_state.models["server_standard"]
 
-        # Display assistant response with streaming thinking separation
-        with st.chat_message("assistant"):
-            with st.spinner("Processing your query..."):
-                _stream_with_thinking_separation(query)
-
-
-if __name__ == "__main__":
-    # Display current conversation
-    _display_conversation(thread_id=st.session_state.currentThread)
-
-    # Build sidebar controls
-    _build_sidebar()
-
-    # Build chat input interface
-    _build_chat_input()
+# Display the currently selected model in the sidebar
+st.sidebar.write(f"using model {st.session_state.baseConfig.response_model}")

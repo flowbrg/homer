@@ -97,7 +97,7 @@ def _process_files(uploaded_files):
         st.warning(f"Failed to upload {error_count} file(s)")
 
 
-############################## Page builders ##############################
+############################## Sidebar ##############################
 
 
 connectionButton = st.sidebar.toggle(
@@ -131,21 +131,25 @@ else:
     st.session_state.baseConfig.ocr = False
 
 
+############################## Page ##############################
+
+
 # Create the file uploader
 uploaded_files = st.file_uploader("Choose PDF files", type=["pdf"], accept_multiple_files=True)
 
 if uploaded_files is not None and len(uploaded_files) > 0:
     
     # Upload button
-    deleteButton=st.button(
+    uploadButton=st.button(
         label="Upload",
         type="primary",
         #on_click=_process_files(uploaded_files)
     )
-    if deleteButton:
+    if uploadButton:
         _process_files(uploaded_files)
 
 
+# Reset button
 st.button(
     label="🗑️ Reset database",
     type="primary",
@@ -153,6 +157,7 @@ st.button(
     on_click=_reset_vector_store
 )
 
+# Display existing documents
 files = [f for f in get_existing_documents()]
 for file in files:
         col1, col2 = st.columns([5, 1])

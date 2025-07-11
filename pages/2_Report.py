@@ -90,66 +90,59 @@ def _create_report(query:str):
     else:
         st.error(f"No report content was generated: output:{output}")
 
-############################## Page builders ##############################
 
-def _build_sidebar():
-    connectionButton = st.sidebar.toggle(
-        label = "Server execution",
-        value = is_connected(st.session_state)
+############################## Sidebar ##############################
+
+
+connectionButton = st.sidebar.toggle(
+    label = "Server execution",
+    value = is_connected(st.session_state)
+)
+
+if connectionButton:
+    conn = _is_ollama_client_available(st.session_state.ollama_host)
+    if conn:
+        st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
+    else:
+        st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
+        st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+else:
+    st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+
+st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+
+
+############################## Page ##############################
+
+
+st.title("Report Generator")
+
+# Display previous reports if any
+if st.session_state.report_history:
+    with st.expander("Previous Reports"):
+        for idx, report_info in enumerate(st.session_state.report_history):
+            st.write(f"{idx + 1}. {report_info['query']} - {report_info['timestamp']}")
+
+
+# Create the query input area
+query = st.chat_input(
+    placeholder="Enter your query:",
+    #disabled=True,
     )
 
-    if connectionButton:
-        conn = _is_ollama_client_available(st.session_state.ollama_host)
-        if conn:
-            st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
-        else:
-            st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
-            st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
-    else:
-        st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+if query:
+    # Display user query
+    with st.chat_message("user"):
+        st.write(query)
     
-    st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
-
-
-def _display_reports():
-    st.title("Report Generator")
-    
-    # Display previous reports if any
-    if st.session_state.report_history:
-        with st.expander("Previous Reports"):
-            for idx, report_info in enumerate(st.session_state.report_history):
-                st.write(f"{idx + 1}. {report_info['query']} - {report_info['timestamp']}")
-
-
-def _build_query_input():
-    # Create the query input area
-    query = st.chat_input(
-        placeholder="Enter your query:",
-        #disabled=True,
-        )
-
-    if query:
-        # Display user query
-        with st.chat_message("user"):
-            st.write(query)
+    # Generate report with progress tracking
+    with st.chat_message("assistant"):
+        progress_container = st.container()
         
-        # Generate report with progress tracking
-        with st.chat_message("assistant"):
-            progress_container = st.container()
-            
-            with progress_container:
-                with st.spinner("Generating report..."):
-                    try:
-                        _create_report(query=query)                            
-                    except Exception as e:
-                        st.error(f"Error generating the report: {str(e)}")
-                        st.info("Please check the logs for more details.")
-
-
-if __name__ == "__main__":
-    
-    _build_sidebar()
-
-    _display_reports()
-
-    _build_query_input()
+        with progress_container:
+            with st.spinner("Generating report..."):
+                try:
+                    _create_report(query=query)                            
+                except Exception as e:
+                    st.error(f"Error generating the report: {str(e)}")
+                    st.info("Please check the logs for more details.")
