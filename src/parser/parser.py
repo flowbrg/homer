@@ -9,7 +9,7 @@ import io
 from PIL import Image
 from parser.validation import TextValidator, ValidationResult  # Add this import
 from utils.logging import get_logger
-from utils import prompts
+from core import prompts
 
 @dataclass
 class ConversionResult:

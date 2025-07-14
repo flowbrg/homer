@@ -25,7 +25,7 @@ from core.states import InputState, RetrievalState
 from core.configuration import Configuration
 from core.models import load_chat_model, load_embedding_model
 from utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, ya_format_messages
-from utils import prompts
+from core import prompts
 
 
 

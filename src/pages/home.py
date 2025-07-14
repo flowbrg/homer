@@ -31,7 +31,7 @@ if "models" not in st.session_state:
     }
 
 
-############################## Main page ##############################
+############################## Page ##############################
 
 
 logo = Image.open("static/homerlogo-nobg.png")

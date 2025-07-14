@@ -38,7 +38,7 @@ from core.configuration import Configuration
 from core import retrieval
 from core.models import load_chat_model, load_embedding_model
 from utils.utils import format_docs, get_message_text, combine_prompts
-from utils import prompts
+from core import prompts
 
 
 class Outline(BaseModel):
