@@ -1,6 +1,6 @@
 # Homer
-Homer is a small academic project of a RAG application using Ollama and Langgraph as well as streamlit for the UI.
 
+Homer is a small academic project of a RAG application using Ollama and Langgraph as well as streamlit for the UI.
 
 ## Environment
 
@@ -21,3 +21,7 @@ python -m venv .venv
 source .\.venv\bin\activate
 pip install -r ./requirements.txt
 ```
+
+## Dependencies
+
+- [Ollama](https://ollama.com) 
