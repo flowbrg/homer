@@ -31,7 +31,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 
-from core.states import ReportState, InputState
+from core.states import ReportState, InputReportState
 from core.configuration import Configuration
 from core import retrieval
 from core.models import load_chat_model, load_embedding_model
@@ -659,7 +659,7 @@ def get_report_graph() -> CompiledStateGraph:
     try:
         # Create StateGraph with proper schemas
         reportAgentLogger.debug("Initializing StateGraph with ReportState and InputState schemas")
-        builder = StateGraph(ReportState, input=InputState, config_schema=Configuration)
+        builder = StateGraph(ReportState, input=InputReportState, config_schema=Configuration)
 
         # Add nodes following the mermaid diagram flow
         builder.add_node("initial_retrieval", initial_retrieval)
