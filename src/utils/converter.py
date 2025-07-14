@@ -1,3 +1,11 @@
+""" Markdown to PDF Converter
+
+Convert dictionaries of Markdown content to PDF using ReportLab.
+Used in the report page of the streamlit app to turn the report
+agent output into a downloadable PDF.
+"""
+
+
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer

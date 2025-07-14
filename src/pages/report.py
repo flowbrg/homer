@@ -1,3 +1,10 @@
+"""Streamlit page to generate reports based on user queries.
+
+This page allows users to input queries, generates reports using the ReportAgent,
+and provides options to download the generated reports in PDF format.
+"""
+
+
 import streamlit as st
 
 from pathlib import Path
@@ -5,7 +12,7 @@ from datetime import datetime
 
 from core.agents import ReportAgent
 from core.configuration import load_config
-from utils.dict_to_pdf import dict_to_pdf
+from utils.converter import dict_to_pdf
 from utils.utils import is_connected
 from constant import OUTPUT_DIR, OLLAMA_LOCALHOST
 
