@@ -126,7 +126,7 @@
         <mxCell id="ADXfEhsZGg0La7iw1zWm-31" value="prompts" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="545" y="230" width="100" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="ADXfEhsZGg0La7iw1zWm-32" value="dict_to_pdf" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="ADXfEhsZGg0La7iw1zWm-32" value="converter" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="545" y="520" width="100" height="30" as="geometry" />
         </mxCell>
         <mxCell id="ADXfEhsZGg0La7iw1zWm-33" value="logging" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">

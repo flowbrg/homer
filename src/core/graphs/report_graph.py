@@ -26,8 +26,6 @@ from pydantic import BaseModel
 from typing import cast, Any
 
 from langchain_core.documents import Document
-from langchain_core.messages import BaseMessage
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableConfig
 
 from langgraph.graph import StateGraph, END

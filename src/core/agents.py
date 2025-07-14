@@ -6,23 +6,35 @@ from typing import Literal, Any, Dict, Optional
 
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
-from langchain_core.runnables import RunnableConfig
 
 from core.configuration import Configuration
 
+from langgraph.graph.state import CompiledStateGraph
 
-######################################## Report Agent ########################################
+
+######################################## BaseAgent ########################################
+
+
+class BaseAgent:
+    """
+    Base class for all agents.
+    """
+    def __init__(self, graph: CompiledStateGraph):
+        self._graph = graph
+
+
+######################################## Rerieval Agent ########################################
 
 
 from core.graphs.retrieval_graph import get_retrieval_graph
 
 
-class RetrievalAgent:
+class RetrievalAgent(BaseAgent):
     """
     Wrapper class for the retrieval agent.
     """
     def __init__(self):
-        self._graph = get_retrieval_graph() # Compile the retrieval agent graph
+        super().__init__(get_retrieval_graph()) # Compile the retrieval agent graph
 
 
     def get_messages(
@@ -66,18 +78,18 @@ class RetrievalAgent:
                 yield message_chunk.content
 
 
-######################################## Report Agent ########################################
+######################################## Index Agent ########################################
 
 
 from core.graphs.index_graph import get_index_graph
 
 
-class IndexAgent:
+class IndexAgent(BaseAgent):
     """
     Wrapper Class for the index graph.
     """
     def __init__(self):
-        self._graph = get_index_graph()
+        super().__init__(get_retrieval_graph()) # Compile the retrieval agent graph
 
     def invoke(self, path: str, configuration: Configuration):
         self._graph.invoke(input={"path": path}, config = {"configurable": configuration.asdict()})
@@ -89,12 +101,12 @@ class IndexAgent:
 from core.graphs.report_graph import get_report_graph
 
 
-class ReportAgent:
+class ReportAgent(BaseAgent):
     """
     Wrapper Class for the Report graph.
     """
     def __init__(self):
-        self._graph = get_report_graph()
+        super().__init__(get_report_graph())
 
     def invoke(
         self,
