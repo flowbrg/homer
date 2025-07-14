@@ -1,4 +1,4 @@
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 
 modelLogger = get_logger(__name__)
 

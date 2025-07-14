@@ -1,11 +1,11 @@
 import subprocess
 
-from src.constant import *
-from src.utils.utils import ensure_path
+from constant import *
+from utils.utils import ensure_path
 
 def run_streamlit_app():
     try:
-        subprocess.run(["streamlit", "run", "home.py"], check=True)
+        subprocess.run(["streamlit", "run", "src/home.py"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Streamlit exited with error: {e}")
 

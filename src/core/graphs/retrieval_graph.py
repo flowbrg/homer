@@ -5,7 +5,7 @@ retrieval graph. It includes the main graph definition, state management,
 and key functions for processing user inputs, generating queries, retrieving
 relevant documents, and formulating responses.
 """
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 # Initialize retrievalAgentLogger
 retrievalAgentLogger = get_logger(__name__)
 
@@ -20,12 +20,12 @@ from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-from src.core import retrieval
-from src.core.states import InputState, RetrievalState
-from src.core.configuration import Configuration
-from src.core.models import load_chat_model, load_embedding_model
-from src.utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, ya_format_messages
-from src.utils import prompts
+from core import retrieval
+from core.states import InputState, RetrievalState
+from core.configuration import Configuration
+from core.models import load_chat_model, load_embedding_model
+from utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, ya_format_messages
+from utils import prompts
 
 
 

@@ -3,7 +3,7 @@ from langchain_core.documents import Document
 from pathlib import Path
 from typing import Literal, List
 
-from src.parser import parser
+from parser import parser
 
 class VisionLoader(BaseLoader):
     

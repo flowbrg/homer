@@ -8,10 +8,10 @@ The interface allows users to configure server connections and model settings.
 
 import streamlit as st
 
-from src.utils.utils import is_connected, extract_think_and_answer
-from src.core.agents import RetrievalAgent
-from src.core.configuration import load_config
-from src.constant import OLLAMA_LOCALHOST
+from utils.utils import is_connected, extract_think_and_answer
+from core.agents import RetrievalAgent
+from core.configuration import load_config
+from constant import OLLAMA_LOCALHOST
 
 
 ############################## Initialization ##############################
@@ -27,7 +27,7 @@ if "baseConfig" not in st.session_state:
 if "retrievalAgent" not in st.session_state:
     st.session_state.retrievalAgent = RetrievalAgent() # Instantiate the retrieval agent
 if "ollama_host" not in st.session_state:
-    from src.constant import OLLAMA_CLIENT
+    from constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
 
 _THREAD = 1

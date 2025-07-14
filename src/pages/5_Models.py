@@ -2,9 +2,9 @@ import streamlit as st
 import ollama
 
 from tqdm import tqdm
-from src.utils.utils import is_connected
-from src.core.configuration import load_config
-from src.constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
+from utils.utils import is_connected
+from core.configuration import load_config
+from constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
 
 
 ############################## Initialization ##############################

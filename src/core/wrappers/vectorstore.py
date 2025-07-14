@@ -11,8 +11,8 @@
 #from langchain_community.docstore.in_memory import InMemoryDocstore
 #from langchain_community.vectorstores import FAISS
 
-#from src.parser.parser import simple_parser
-#from src.utils.utils import load_embeddings
+#from parser.parser import simple_parser
+#from utils.utils import load_embeddings
 #from schemas.configuration import AppConfig
 #from langchain_core.vectorstores import VectorStore
 

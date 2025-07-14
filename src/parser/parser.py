@@ -7,9 +7,9 @@ from langchain_core.messages import HumanMessage
 import base64
 import io
 from PIL import Image
-from src.parser.validation import TextValidator, ValidationResult  # Add this import
-from src.utils.logging import get_logger
-from src.utils import prompts
+from parser.validation import TextValidator, ValidationResult  # Add this import
+from utils.logging import get_logger
+from utils import prompts
 
 @dataclass
 class ConversionResult:

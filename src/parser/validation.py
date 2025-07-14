@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from collections import Counter
 import unicodedata
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 
 @dataclass
 class ValidationResult:

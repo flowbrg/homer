@@ -5,11 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field, fields
 from typing import Optional, Type, TypeVar
 
-from src.constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
+from constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
 
 from langchain_core.runnables import RunnableConfig, ensure_config
 
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 
 logger = get_logger(__name__)
 

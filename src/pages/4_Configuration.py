@@ -1,8 +1,8 @@
 import streamlit as st
 import ollama
 
-from src.core.configuration import load_config
-from src.constant import OLLAMA_CLIENT
+from core.configuration import load_config
+from constant import OLLAMA_CLIENT
 
 
 ############################## Initialization ##############################

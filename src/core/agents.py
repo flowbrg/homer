@@ -8,13 +8,13 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 
-from src.core.configuration import Configuration
+from core.configuration import Configuration
 
 
 ######################################## Report Agent ########################################
 
 
-from src.core.graphs.retrieval_graph import get_retrieval_graph
+from core.graphs.retrieval_graph import get_retrieval_graph
 
 
 class RetrievalAgent:
@@ -69,7 +69,7 @@ class RetrievalAgent:
 ######################################## Report Agent ########################################
 
 
-from src.core.graphs.index_graph import get_index_graph
+from core.graphs.index_graph import get_index_graph
 
 
 class IndexAgent:
@@ -86,7 +86,7 @@ class IndexAgent:
 ######################################## Report Agent ########################################
 
 
-from src.core.graphs.report_graph import get_report_graph
+from core.graphs.report_graph import get_report_graph
 
 
 class ReportAgent:

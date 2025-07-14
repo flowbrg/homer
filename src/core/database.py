@@ -3,11 +3,11 @@ import os
 
 from pathlib import Path
 
-from src.schemas.database import DB_SCHEMA, REQUIRED_TABLES
-from src.utils.utils import get_connection
-from src.constant import PERSISTENT_DIR
+from schemas.database import DB_SCHEMA, REQUIRED_TABLES
+from utils.utils import get_connection
+from constant import PERSISTENT_DIR
 
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 databaseLogger = get_logger("database")
 
 def _database_has_required_tables(conn: sqlite3.Connection) -> bool:

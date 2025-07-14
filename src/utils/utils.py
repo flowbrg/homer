@@ -1,4 +1,4 @@
-from src.constant import *
+from constant import *
 
 
 ######################################## connect to database ########################################
@@ -275,7 +275,7 @@ def make_batch(obj: List[T], size: int = 100) -> List[List[T]]:
 
 
 from streamlit.runtime.state.session_state_proxy import SessionStateProxy
-from src.constant import OLLAMA_CLIENT
+from constant import OLLAMA_CLIENT
 
 def is_connected(session_state: SessionStateProxy) -> bool:
     if "baseConfig" not in session_state:

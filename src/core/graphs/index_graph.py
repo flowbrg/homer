@@ -1,4 +1,4 @@
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 # Configure logger
 logger = get_logger(__name__)
 
@@ -10,17 +10,17 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 
-from src.core import retrieval
-from src.core.configuration import Configuration
-from src.core.states import IndexState, InputIndexState
-from src.core.models import load_embedding_model
-from src.utils.utils import remove_duplicates, make_batch
-from src.constant import OLLAMA_LOCALHOST
+from core import retrieval
+from core.configuration import Configuration
+from core.states import IndexState, InputIndexState
+from core.models import load_embedding_model
+from utils.utils import remove_duplicates, make_batch
+from constant import OLLAMA_LOCALHOST
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 #from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.document_loaders import PyMuPDFLoader
-from src.parser import VisionLoader
+from parser import VisionLoader
 
 
 ############################## Parse PDF node ##############################

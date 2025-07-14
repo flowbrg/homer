@@ -18,7 +18,7 @@ The graph supports both technical and general writing styles, with appropriate
 prompts and formatting for each style.
 """
 
-from src.utils.logging import get_logger
+from utils.logging import get_logger
 # Initialize retrievalAgentLogger
 reportAgentLogger = get_logger(__name__)
 
@@ -33,12 +33,12 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
 
-from src.core.states import ReportState, InputState
-from src.core.configuration import Configuration
-from src.core import retrieval
-from src.core.models import load_chat_model, load_embedding_model
-from src.utils.utils import format_docs, get_message_text, combine_prompts
-from src.utils import prompts
+from core.states import ReportState, InputState
+from core.configuration import Configuration
+from core import retrieval
+from core.models import load_chat_model, load_embedding_model
+from utils.utils import format_docs, get_message_text, combine_prompts
+from utils import prompts
 
 
 class Outline(BaseModel):

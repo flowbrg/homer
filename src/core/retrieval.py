@@ -12,7 +12,7 @@ from typing import Generator
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
 
-from src.utils.utils import VECTORSTORE_DIR, get_chroma_client
+from utils.utils import VECTORSTORE_DIR, get_chroma_client
 
 
 _COLLECTION = "HOMER"

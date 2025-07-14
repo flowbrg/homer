@@ -3,11 +3,11 @@ import streamlit as st
 from pathlib import Path
 from datetime import datetime
 
-from src.core.agents import ReportAgent
-from src.core.configuration import load_config
-from src.utils.dict_to_pdf import dict_to_pdf
-from src.utils.utils import is_connected
-from src.constant import OUTPUT_DIR, OLLAMA_LOCALHOST
+from core.agents import ReportAgent
+from core.configuration import load_config
+from utils.dict_to_pdf import dict_to_pdf
+from utils.utils import is_connected
+from constant import OUTPUT_DIR, OLLAMA_LOCALHOST
 
 
 ############################## Initialization ##############################
@@ -25,7 +25,7 @@ if "reportAgent" not in st.session_state:
 if "report_history" not in st.session_state:
     st.session_state.report_history = []
 if "ollama_host" not in st.session_state:
-    from src.constant import OLLAMA_CLIENT
+    from constant import OLLAMA_CLIENT
     st.session_state.ollama_host = OLLAMA_CLIENT
     
 

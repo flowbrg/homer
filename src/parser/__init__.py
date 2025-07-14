@@ -1,3 +1,3 @@
-from src.parser.vision_loader import VisionLoader
+from parser.vision_loader import VisionLoader
 
 __all__ = ["VisionLoader"]
