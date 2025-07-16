@@ -8,8 +8,8 @@ relevant documents, and formulating responses.
 
 
 from utils.logging import get_logger
-# Initialize retrievalAgentLogger
-retrievalAgentLogger = get_logger(__name__)
+# Initialize logger
+logger = get_logger(__name__)
 
 from typing import cast, Dict, List, Union
 from pydantic import BaseModel
@@ -84,16 +84,16 @@ def rephrase_query(
         The function uses conversation history (last 3 messages) to provide context
         for better query generation, improving retrieval relevance.
     """
-    retrievalAgentLogger.info("Starting query generation")
+    logger.info("Starting query generation")
     
     try:
         # Get configuration
         configuration = Configuration.from_runnable_config(config)
         if not configuration:
-            retrievalAgentLogger.error("Configuration not found in config")
+            logger.error("Configuration not found in config")
             raise ValueError("Configuration is required for query generation")
         
-        retrievalAgentLogger.debug(f"Using query model: {configuration.query_model}")
+        logger.debug(f"Using query model: {configuration.query_model}")
 
         # Load and configure model
         model = load_chat_model(
@@ -121,7 +121,7 @@ def rephrase_query(
         # Generate rephrased query
         generated = cast(SearchQuery, model.invoke(messages, config))
         
-        retrievalAgentLogger.info(f"Generated query: '{generated.query}'")
+        logger.info(f"Generated query: '{generated.query}'")
         
         return {
             "query": generated.query,
@@ -129,17 +129,17 @@ def rephrase_query(
         }
         
     except Exception as e:
-        retrievalAgentLogger.error(f"Error in generate_query: {str(e)}")
+        logger.error(f"Error in generate_query: {str(e)}")
         # Return a fallback query based on the last user message
         try:
             fallback_query = state.messages[-1].content if state.messages else "general search"
-            retrievalAgentLogger.warning(f"Using fallback query: '{fallback_query}'")
+            logger.warning(f"Using fallback query: '{fallback_query}'")
             return {
                 "query": fallback_query,
                 "retrieved_docs": "delete" if state.retrieved_docs else [],
             }
         except Exception as fallback_error:
-            retrievalAgentLogger.error(f"Fallback query generation failed: {str(fallback_error)}")
+            logger.error(f"Fallback query generation failed: {str(fallback_error)}")
             raise e
 
 
@@ -180,21 +180,21 @@ def retrieve(
         The function uses a context manager for the retriever to ensure proper
         resource cleanup after document retrieval.
     """
-    retrievalAgentLogger.info(f"Starting document retrieval for query: '{state.query}'")
+    logger.info(f"Starting document retrieval for query: '{state.query}'")
     
     try:
         # Validate query
         if not state.query or not state.query.strip():
-            retrievalAgentLogger.warning("Empty or whitespace-only query provided")
+            logger.warning("Empty or whitespace-only query provided")
             return {"retrieved_docs": []}
         
         # Get configuration
         configuration = Configuration.from_runnable_config(config)
         if not configuration:
-            retrievalAgentLogger.error("Configuration not found in config")
+            logger.error("Configuration not found in config")
             raise ValueError("Configuration is required for document retrieval")
         
-        retrievalAgentLogger.debug(f"Using embedding model: {configuration.embedding_model}")
+        logger.debug(f"Using embedding model: {configuration.embedding_model}")
         
         # Load embedding model
         embeddings = load_embedding_model(
@@ -207,17 +207,17 @@ def retrieve(
             response = retriever.invoke(state.query, config)
             
             if response:
-                retrievalAgentLogger.info(f"Successfully retrieved {len(response)} documents")
+                logger.info(f"Successfully retrieved {len(response)} documents")
                 for doc in response:
-                    retrievalAgentLogger.debug(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
+                    logger.debug(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
             else:
-                retrievalAgentLogger.warning("No documents retrieved for the query")
+                logger.warning("No documents retrieved for the query")
             
             return {"retrieved_docs": response}
     
     except Exception as e:
-        retrievalAgentLogger.error(f"Error in retrieve: {str(e)}")
-        retrievalAgentLogger.warning("Returning empty document list due to retrieval error")
+        logger.error(f"Error in retrieve: {str(e)}")
+        logger.warning("Returning empty document list due to retrieval error")
         return {"retrieved_docs": []}
 
 
@@ -268,16 +268,16 @@ def respond(
         Uses modulo arithmetic (len(messages) % 6) to determine which recent
         messages to include, working with the summarization cycle.
     """
-    retrievalAgentLogger.info("Starting response generation")
+    logger.info("Starting response generation")
     
     try:
         # Get configuration
         configuration = Configuration.from_runnable_config(config)
         if not configuration:
-            retrievalAgentLogger.error("Configuration not found in config")
+            logger.error("Configuration not found in config")
             raise ValueError("Configuration is required for response generation")
         
-        retrievalAgentLogger.debug(f"Using response model: {configuration.response_model}")
+        logger.debug(f"Using response model: {configuration.response_model}")
         
         # Load model
         model = load_chat_model(
@@ -304,15 +304,15 @@ def respond(
         # Generate response
         response = model.invoke(input=messages, config=config)
         
-        retrievalAgentLogger.info("Response generated successfully")
+        logger.info("Response generated successfully")
         
         # Display sources for debugging
         if state.retrieved_docs:
-            retrievalAgentLogger.info("Displaying source information")
+            logger.info("Displaying source information")
             print("[info] Sources retrieved for current thread")
             print(format_sources(documents=state.retrieved_docs))
         else:
-            retrievalAgentLogger.debug("No retrieved documents to display")
+            logger.debug("No retrieved documents to display")
 
         return {
             "messages": [response],
@@ -321,19 +321,19 @@ def respond(
         }
         
     except Exception as e:
-        retrievalAgentLogger.error(f"Error in respond: {str(e)}")
+        logger.error(f"Error in respond: {str(e)}")
         # Create a fallback response
         try:
             from langchain_core.messages import AIMessage
             fallback_response = AIMessage(content="I apologize, but I encountered an error while generating a response. Please try rephrasing your question.")
-            retrievalAgentLogger.warning("Using fallback response due to error")
+            logger.warning("Using fallback response due to error")
             return {
                 "messages": [fallback_response],
                 "retrieved_docs": [],
                 "query": "",
             }
         except Exception as fallback_error:
-            retrievalAgentLogger.error(f"Fallback response generation failed: {str(fallback_error)}")
+            logger.error(f"Fallback response generation failed: {str(fallback_error)}")
             raise e
 
 
@@ -376,20 +376,20 @@ def summarize_conversation(
         - Uses different prompts for creating new summaries vs. extending existing ones
         - Helps maintain conversation context while reducing prompt length
     """
-    retrievalAgentLogger.info("Starting conversation summarization")
+    logger.info("Starting conversation summarization")
     
     try:
         # Get configuration
         configuration = Configuration.from_runnable_config(config)
         if not configuration:
-            retrievalAgentLogger.error("Configuration not found in config")
+            logger.error("Configuration not found in config")
             raise ValueError("Configuration is required for conversation summarization")
         
         # Get existing summary
         existing_summary = state.summary if state.summary else ""
         messages_to_summarize = ya_format_messages(state.messages[-6:])  # Last 6 messages
         
-        retrievalAgentLogger.info(f"Summarizing {len(messages_to_summarize)} messages, "
+        logger.info(f"Summarizing {len(messages_to_summarize)} messages, "
                    f"existing summary: {'Yes' if existing_summary else 'No'}")
         
         # Determine prompt based on existing summary
@@ -400,10 +400,10 @@ def summarize_conversation(
 </summary>
 
 Extend the summary by taking into account the new messages:"""
-            retrievalAgentLogger.debug("Extending existing summary")
+            logger.debug("Extending existing summary")
         else:
             summary_system_prompt = "Create a summary of the conversation:"
-            retrievalAgentLogger.debug("Creating new summary")
+            logger.debug("Creating new summary")
 
         # Load model
         model = load_chat_model(
@@ -419,16 +419,16 @@ Extend the summary by taking into account the new messages:"""
         
         response = model.invoke(messages, config)
         
-        retrievalAgentLogger.info("Conversation summary generated successfully")
-        retrievalAgentLogger.debug(f"Summary length: {len(response.content)} characters")
+        logger.info("Conversation summary generated successfully")
+        logger.debug(f"Summary length: {len(response.content)} characters")
         
         return {"summary": response.content}
         
     except Exception as e:
-        retrievalAgentLogger.error(f"Error in summarize_conversation: {str(e)}")
+        logger.error(f"Error in summarize_conversation: {str(e)}")
         # Return existing summary or empty string as fallback
         fallback_summary = state.summary if state.summary else ""
-        retrievalAgentLogger.warning(f"Using fallback summary due to error: {'existing' if fallback_summary else 'empty'}")
+        logger.warning(f"Using fallback summary due to error: {'existing' if fallback_summary else 'empty'}")
         return {"summary": fallback_summary}
 
 
@@ -464,14 +464,14 @@ def should_summarize(
     message_count = len(state.messages)
     should_trigger = message_count % 6 == 0
     
-    retrievalAgentLogger.info(f"Summarization check: {message_count} messages, "
+    logger.info(f"Summarization check: {message_count} messages, "
                f"trigger: {'Yes' if should_trigger else 'No'}")
     
     if should_trigger:
-        retrievalAgentLogger.info("Triggering conversation summarization")
+        logger.info("Triggering conversation summarization")
         return "summarize_conversation"
     else:
-        retrievalAgentLogger.debug("Continuing without summarization")
+        logger.debug("Continuing without summarization")
         return END
 
 
@@ -528,7 +528,7 @@ def get_retrieval_graph() -> CompiledStateGraph:
         The graph uses Configuration schema for type safety and includes
         comprehensive logging throughout the execution flow.
     """
-    retrievalAgentLogger.info("Building conversational retrieval graph")
+    logger.info("Building conversational retrieval graph")
     
     try:
         # Create StateGraph with proper schemas
@@ -539,21 +539,21 @@ def get_retrieval_graph() -> CompiledStateGraph:
         )
 
         # Add nodes
-        retrievalAgentLogger.debug("Adding graph nodes")
+        logger.debug("Adding graph nodes")
         builder.add_node(rephrase_query)
         builder.add_node(retrieve)
         builder.add_node(respond)
         builder.add_node(summarize_conversation)
 
         # Define edges
-        retrievalAgentLogger.debug("Defining graph edges")
+        logger.debug("Defining graph edges")
         builder.add_edge("__start__", "rephrase_query")
         builder.add_edge("rephrase_query", "retrieve")
         builder.add_edge("retrieve", "respond")
         builder.add_conditional_edges("respond", should_summarize)
 
         # Setup memory/checkpointer
-        retrievalAgentLogger.debug("Setting up SQLite checkpointer")
+        logger.debug("Setting up SQLite checkpointer")
         memory = SqliteSaver(get_connection())
 
         # Compile graph
@@ -563,9 +563,9 @@ def get_retrieval_graph() -> CompiledStateGraph:
             interrupt_after=[],
         )
         
-        retrievalAgentLogger.info("Successfully compiled conversational retrieval graph")
+        logger.info("Successfully compiled conversational retrieval graph")
         return graph
         
     except Exception as e:
-        retrievalAgentLogger.error(f"Error building retrieval graph: {str(e)}")
+        logger.error(f"Error building retrieval graph: {str(e)}")
         raise

@@ -1,5 +1,6 @@
 from constant import *
 
+#TODO: Improve the format_ functions by turning them into a single function
 
 ######################################## connect to database ########################################
 
