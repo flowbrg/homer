@@ -8,7 +8,14 @@ from langgraph.graph import add_messages
 
 
 ######################################## Reducers ########################################
-
+# These methods allow to modify the value of the state they are associated with
+# (e.g.messages: Annotated[List[Anymessages], messages_reducer]), without overwriting the value.
+# It allows parallel modification in case of parallel nodes.
+#
+# With reducer:
+#   return {messages: agent_message}
+# Without reducer:
+#   return {mesages: state.messages + [agent_message]}
 
 def reduce_docs(
     existing: Optional[Sequence[Document]],
@@ -112,7 +119,7 @@ class RetrievalState(InputState):
     """Populated by the retriever. This is a list of documents that the agent can reference."""
 
     summary: str = field(default_factory=str)
-    """A summary of the retrieved documents or the conversation history."""
+    """A summary of the conversation history for additional context."""
 
 
 ######################################## Report States ########################################

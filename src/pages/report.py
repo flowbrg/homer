@@ -49,7 +49,7 @@ def _is_ollama_client_available(url: str) -> bool:
         return False
 
 
-def _create_report(query:str, writing_style: Literal["technical", "general"], number_of_parts: int):
+def _create_report(query:str):
     # Create a unique filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"report_{timestamp}.pdf"
@@ -61,8 +61,6 @@ def _create_report(query:str, writing_style: Literal["technical", "general"], nu
     # Generate the report
     output, header = st.session_state.reportAgent.invoke(
         query=query,
-        writing_style= writing_style,
-        number_of_parts= number_of_parts,
         configuration=st.session_state.baseConfig,
     )
 
@@ -141,6 +139,9 @@ else:
         "Use this mode when aiming for clarity and synthesis for a broader audience."
     )
 
+# Update the configuration
+st.session_state.baseConfig.writing_style = writingControl
+
 st.sidebar.divider()
 
 # Number of parts slider
@@ -150,6 +151,9 @@ numberOfPartsSlider = st.sidebar.slider(
     max_value=10,
     value=3,
 )
+
+# Update the configuration
+st.session_state.baseConfig.number_of_parts = numberOfPartsSlider
 
 
 ############################## Page ##############################
@@ -182,7 +186,7 @@ if query:
         with progress_container:
             with st.spinner("Generating report..."):
                 try:
-                    _create_report(query=query, writing_style=writingControl, number_of_parts=numberOfPartsSlider)                            
+                    _create_report(query=query)                            
                 except Exception as e:
                     st.error(f"Error generating the report: {str(e)}")
                     st.info("Please check the logs for more details.")

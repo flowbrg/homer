@@ -39,6 +39,9 @@ from utils.utils import format_docs, get_message_text, combine_prompts
 from core import prompts
 
 
+######################################## Structured output class ########################################
+
+
 class Outline(BaseModel):
     """
     Represents an outline for a report with multiple entries.
@@ -61,6 +64,9 @@ class Outline(BaseModel):
         ... ])
     """
     entries: list[str]
+
+
+######################################## Initial retrieval node ########################################
 
 
 def initial_retrieval(
@@ -133,6 +139,9 @@ def initial_retrieval(
         return {"retrieved_docs": []}
     
 
+######################################## Generate outline node ########################################
+
+
 def generate_outline(
     state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
     """
@@ -150,6 +159,7 @@ def generate_outline(
         config (RunnableConfig): Configuration containing:
             - report_model: Model identifier for outline generation
             - ollama_host: Host URL for Ollama models (if applicable)
+            - writing_style: Style preference ("technical" or "general")
 
     Returns:
         dict[str, Any]: Dictionary containing:
@@ -242,6 +252,9 @@ def generate_outline(
         }
 
 
+######################################## Retrieve for section node ########################################
+
+
 def retrieve_for_section(
     state: ReportState, *, config: RunnableConfig
 ) -> dict[str, list[Document]]:
@@ -323,6 +336,9 @@ def retrieve_for_section(
         reportAgentLogger.error(f"Error in retrieve_for_section: {str(e)}")
         reportAgentLogger.warning("Returning empty document list due to section retrieval error")
         return {"retrieved_docs": []}
+
+
+######################################## Synthesize section node ########################################
 
 
 def synthesize_section(
@@ -427,6 +443,9 @@ def synthesize_section(
         error_content = f"Error synthesizing section: {str(e)}"
         reportAgentLogger.warning(f"Returning error content: {error_content}")
         return {"raw_section_content": error_content}
+
+
+######################################## Review section node ########################################
 
 
 def review_section(
@@ -549,6 +568,9 @@ def review_section(
         }
 
 
+######################################## Should continue conditional edge ########################################
+
+
 def should_continue(state: ReportState, *, config: RunnableConfig):
     """
     Determine whether to continue generating sections or complete the report.
@@ -603,6 +625,9 @@ def should_continue(state: ReportState, *, config: RunnableConfig):
         return "retrieve_for_section"
 
 
+######################################## Graph compiler ########################################
+
+
 def get_report_graph() -> CompiledStateGraph:
     """
     Build and compile the report generation graph.
@@ -618,15 +643,6 @@ def get_report_graph() -> CompiledStateGraph:
             - Sequential and conditional workflow transitions
             - Comprehensive error handling throughout the pipeline
             - Support for both technical and general writing styles
-
-    Graph Architecture:
-        ```
-        [START] → initial_retrieval → generate_outline → retrieve_for_section
-                                                              ↓
-        [END] ← should_continue ← review_section ← synthesize_section
-               (conditional)              ↑                    ↓
-                   ↑___________________ [loop back if more sections]
-        ```
 
     Nodes:
         - initial_retrieval: Gathers documents for outline generation

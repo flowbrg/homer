@@ -16,13 +16,52 @@ from typing import List, Dict, Literal
 import os
 
 
+######################################## Constants ########################################
+
+
+# List of tuples used for flags conversion (pattern, replacement)
+_CONVERSIONS = [
+    # Bold: **text** or __text__
+    (r'\*\*(.*?)\*\*', r'<b>\1</b>'),
+    (r'__(.*?)__', r'<b>\1</b>'),
+    
+    # Italic: *text* or _text_ (avoid matching bold patterns)
+    (r'(?<!\*)\*([^*\n]+?)\*(?!\*)', r'<i>\1</i>'),
+    (r'(?<!_)_([^_\n]+?)_(?!_)', r'<i>\1</i>'),
+    
+    # Code: `text`
+    (r'`([^`]+?)`', r'<font name="Courier" size="10">\1</font>'),
+    
+    # Strikethrough: ~~text~~
+    (r'~~(.*?)~~', r'<strike>\1</strike>'),
+    
+    # Headers
+    (r'^### (.*?)$', r'<font size="13"><b>\1</b></font><br/>', re.MULTILINE),
+    (r'^## (.*?)$', r'<font size="15"><b>\1</b></font><br/>', re.MULTILINE),
+    (r'^# (.*?)$', r'<font size="17"><b>\1</b></font><br/>', re.MULTILINE),
+    
+    # Links: [text](url) -> underlined text
+    (r'\[([^\]]+?)\]\([^)]+?\)', r'<u>\1</u>'),
+    
+    # Line breaks
+    (r'\n', '<br/>'),
+]
+
+_IGNORED_TOKENS = [
+    '<|endoftext|>', '<|startoftext|>', '<pad>', '<unk>', '<s>', '</s>',
+    '<mask>', '<cls>', '<sep>', '<|im_start|>', '<|im_end|>', '<text>',
+    'assistant', 'human', '<think>', '</think>','</message>','</messages>',
+    '<message>','<messages>',
+]
+
+
+######################################## Converter class ########################################
+
+
 class MarkdownToPDF:
     """Convert list of dictionaries with Markdown content to PDF."""
     
-    _IGNORED_TOKENS = ['<|endoftext|>', '<|startoftext|>', '<pad>', '<unk>', '<s>', '</s>',
-                       '<mask>', '<cls>', '<sep>', '<|im_start|>', '<|im_end|>', '<text>',
-                       'assistant', 'human', '<think>', '</think>','</message>','</messages>',
-                       '<message>','<messages>']
+    
 
     def __init__(self, page_size=letter):
         self.page_size = page_size
@@ -59,12 +98,12 @@ class MarkdownToPDF:
         if not text:
             return text
 
-        for token in self._IGNORED_TOKENS:
+        for token in _IGNORED_TOKENS:
             text = text.replace(token, '')
 
         return text.strip()
 
-    def _clean_think_tags(self, text: str) -> str:
+    def _clean_think_tags(self, text: str) -> str: #In case the agent is running a reasoning model
         """Remove <think>...</think> blocks from text."""
         return re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL | re.IGNORECASE).strip()
     
@@ -84,42 +123,17 @@ class MarkdownToPDF:
                    .replace('<', '&lt;')
                    .replace('>', '&gt;'))
         
-        # Convert Markdown formatting
-        conversions = [
-            # Bold: **text** or __text__
-            (r'\*\*(.*?)\*\*', r'<b>\1</b>'),
-            (r'__(.*?)__', r'<b>\1</b>'),
-            
-            # Italic: *text* or _text_ (avoid matching bold patterns)
-            (r'(?<!\*)\*([^*\n]+?)\*(?!\*)', r'<i>\1</i>'),
-            (r'(?<!_)_([^_\n]+?)_(?!_)', r'<i>\1</i>'),
-            
-            # Code: `text`
-            (r'`([^`]+?)`', r'<font name="Courier" size="10">\1</font>'),
-            
-            # Strikethrough: ~~text~~
-            (r'~~(.*?)~~', r'<strike>\1</strike>'),
-            
-            # Headers
-            (r'^### (.*?)$', r'<font size="13"><b>\1</b></font><br/>', re.MULTILINE),
-            (r'^## (.*?)$', r'<font size="15"><b>\1</b></font><br/>', re.MULTILINE),
-            (r'^# (.*?)$', r'<font size="17"><b>\1</b></font><br/>', re.MULTILINE),
-            
-            # Links: [text](url) -> underlined text
-            (r'\[([^\]]+?)\]\([^)]+?\)', r'<u>\1</u>'),
-            
-            # Line breaks
-            (r'\n', '<br/>'),
-        ]
-        
-        for pattern, replacement, *flags in conversions:
+        for pattern, replacement, *flags in _CONVERSIONS:
             flag = flags[0] if flags else 0
             text = re.sub(pattern, replacement, text, flags=flag)
         
         return text
     
-    def generate_pdf(self, data: List[Dict[str, str]], filename: str = "output.pdf", 
-                 output_dir: str = None, header: str = "") -> str:
+    def generate_pdf(self,
+                     data: List[Dict[str, str]],
+                    header: str = "",
+                     filename: str = "output.pdf",
+                     output_dir: str = "",) -> str:
         """
         Generate PDF from list of dictionaries.
         
@@ -177,6 +191,9 @@ class MarkdownToPDF:
         return os.path.abspath(filepath)
 
 
+######################################## Interface method ########################################
+
+
 def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf", 
                 output_dir: str = None, header: str ="") -> str:
     """
@@ -194,7 +211,9 @@ def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf",
     return converter.generate_pdf(data, output_filename, output_dir,header)
 
 
-# Example usage
+######################################## Example usage ########################################
+
+
 if __name__ == "__main__":
     sample_data = [
         {

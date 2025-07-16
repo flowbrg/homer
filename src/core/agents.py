@@ -112,8 +112,6 @@ class ReportAgent(BaseAgent):
         self,
         query: str,
         configuration: Configuration,
-        writing_style: Literal["technical", "general"] = "techinical",
-        number_of_parts: int = 2,
     )-> Dict[str, Any]:
         """
         Invoke the report graph with a query and thread ID.
@@ -130,8 +128,6 @@ class ReportAgent(BaseAgent):
         config = {"configurable": configuration.asdict()}
         input = {
             "messages": query,
-            "writing_style": writing_style,
-            "number_of_parts": number_of_parts,
         }
         output = self._graph.invoke(input=input, config=config)
         return output["report"], output["report_header"]

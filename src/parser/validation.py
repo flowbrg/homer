@@ -7,6 +7,16 @@ from collections import Counter
 import unicodedata
 from utils.logging import get_logger
 
+logger = get_logger(__name__)
+
+
+STOPWORDS = {'the', 'and', 'are', 'for', 'this', 'that', 'with', 'from',
+             'they', 'have', 'been', 'will', 'their', 'said', 'each', 'which', 
+             'what', 'there', 'more', 'can', 'may', 'also', 'some', 'time',
+             'very', 'when', 'much', 'new', 'two', 'way', 'who', 'its', 'now',
+             'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'part', 'over'}
+
+
 @dataclass
 class ValidationResult:
     """Result of text validation comparison"""
@@ -39,71 +49,15 @@ class TextValidator:
             sentence_threshold: Minimum sentence overlap ratio (0-1)
             overall_threshold: Minimum overall validation score (0-1)
         """
-        self.logger = get_logger(__name__)
         self.word_threshold = word_threshold
         self.char_threshold = char_threshold
         self.sentence_threshold = sentence_threshold
         self.overall_threshold = overall_threshold
-        
-    def validate_page(self, page: fitz.Page, llm_markdown: str) -> ValidationResult:
-        """Validate LLM output against PyMuPDF extraction for a single page"""
-        
-        # Extract text from PyMuPDF
-        extracted_text = self._extract_clean_text(page)
-        
-        # Clean LLM markdown (remove markdown formatting, image descriptions)
-        llm_text = self._clean_llm_output(llm_markdown)
-        
-        # Perform various overlap calculations
-        word_overlap = self._calculate_word_overlap(extracted_text, llm_text)
-        char_overlap = self._calculate_char_overlap(extracted_text, llm_text)
-        sentence_overlap = self._calculate_sentence_overlap(extracted_text, llm_text)
-        semantic_sim = self._calculate_semantic_similarity(extracted_text, llm_text)
-        
-        # Calculate word counts
-        extracted_words = self._get_words(extracted_text)
-        llm_words = self._get_words(llm_text)
-        
-        # Find missing important words
-        missing_words = self._find_missing_important_words(extracted_words, llm_words)
-        
-        # Calculate extra content ratio
-        extra_content = self._calculate_extra_content_ratio(extracted_text, llm_text)
-        
-        # Calculate overall validation score
-        validation_score = self._calculate_validation_score(
-            word_overlap, char_overlap, sentence_overlap, semantic_sim
-        )
-        
-        # Check if it passes threshold
-        passed = validation_score >= self.overall_threshold
-        
-        result = ValidationResult(
-            word_overlap_ratio=word_overlap,
-            char_overlap_ratio=char_overlap,
-            sentence_overlap_ratio=sentence_overlap,
-            semantic_similarity=semantic_sim,
-            extracted_word_count=len(extracted_words),
-            llm_word_count=len(llm_words),
-            missing_words=missing_words,
-            extra_content_ratio=extra_content,
-            validation_score=validation_score,
-            passed_threshold=passed,
-            metadata={
-                "extracted_text_length": len(extracted_text),
-                "llm_text_length": len(llm_text),
-                "thresholds": {
-                    "word": self.word_threshold,
-                    "char": self.char_threshold,
-                    "sentence": self.sentence_threshold,
-                    "overall": self.overall_threshold
-                }
-            }
-        )
-        
-        self._log_validation_result(result)
-        return result
     
+
+    #################### Public methods ####################
+
+
     def _extract_clean_text(self, page: fitz.Page) -> str:
         """Extract and clean text from PyMuPDF"""
         text = page.get_text()
@@ -227,14 +181,9 @@ class TextValidator:
         missing = extracted_set - llm_set
         
         # Filter for "important" words (longer words, not common stopwords)
-        stopwords = {'the', 'and', 'are', 'for', 'this', 'that', 'with', 'from',
-                     'they', 'have', 'been', 'will', 'their', 'said', 'each', 'which', 
-                     'what', 'there', 'more', 'can', 'may', 'also', 'some', 'time',
-                     'very', 'when', 'much', 'new', 'two', 'way', 'who', 'its', 'now',
-                     'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'part', 'over'}
         
         important_missing = {word for word in missing 
-                           if len(word) > 4 and word not in stopwords}
+                           if len(word) > 4 and word not in STOPWORDS}
         
         return important_missing
     
@@ -246,8 +195,11 @@ class TextValidator:
         extra_length = max(0, len(llm_text) - len(extracted))
         return extra_length / len(extracted)
     
-    def _calculate_validation_score(self, word_overlap: float, char_overlap: float, 
-                                  sentence_overlap: float, semantic_sim: float) -> float:
+    def _calculate_validation_score(self,
+                                    word_overlap: float,
+                                    char_overlap: float, 
+                                    sentence_overlap: float,
+                                    semantic_sim: float) -> float:
         """Calculate weighted overall validation score"""
         
         # Weighted combination of different metrics
@@ -271,17 +223,80 @@ class TextValidator:
         """Log validation results"""
         status = "✅ PASSED" if result.passed_threshold else "❌ FAILED"
         
-        self.logger.info(f"Text validation {status} (score: {result.validation_score:.3f})")
-        self.logger.debug(f"  Word overlap: {result.word_overlap_ratio:.3f}")
-        self.logger.debug(f"  Char overlap: {result.char_overlap_ratio:.3f}")
-        self.logger.debug(f"  Sentence overlap: {result.sentence_overlap_ratio:.3f}")
-        self.logger.debug(f"  Semantic similarity: {result.semantic_similarity:.3f}")
+        logger.info(f"Text validation {status} (score: {result.validation_score:.3f})")
+        logger.debug(f"  Word overlap: {result.word_overlap_ratio:.3f}")
+        logger.debug(f"  Char overlap: {result.char_overlap_ratio:.3f}")
+        logger.debug(f"  Sentence overlap: {result.sentence_overlap_ratio:.3f}")
+        logger.debug(f"  Semantic similarity: {result.semantic_similarity:.3f}")
         
         if result.missing_words:
-            self.logger.debug(f"  Missing important words: {list(result.missing_words)[:5]}")
+            logger.debug(f"  Missing important words: {list(result.missing_words)[:5]}")
         
         if result.extra_content_ratio > 0.5:
-            self.logger.debug(f"  Extra content ratio: {result.extra_content_ratio:.3f}")
+            logger.debug(f"  Extra content ratio: {result.extra_content_ratio:.3f}")
+
+
+    #################### Public methods ####################
+
+
+    def validate_page(self, page: fitz.Page, llm_markdown: str) -> ValidationResult:
+        """Validate LLM output against PyMuPDF extraction for a single page"""
+        
+        # Extract text from PyMuPDF
+        extracted_text = self._extract_clean_text(page)
+        
+        # Clean LLM markdown (remove markdown formatting, image descriptions)
+        llm_text = self._clean_llm_output(llm_markdown)
+        
+        # Perform various overlap calculations
+        word_overlap = self._calculate_word_overlap(extracted_text, llm_text)
+        char_overlap = self._calculate_char_overlap(extracted_text, llm_text)
+        sentence_overlap = self._calculate_sentence_overlap(extracted_text, llm_text)
+        semantic_sim = self._calculate_semantic_similarity(extracted_text, llm_text)
+        
+        # Calculate word counts
+        extracted_words = self._get_words(extracted_text)
+        llm_words = self._get_words(llm_text)
+        
+        # Find missing important words
+        missing_words = self._find_missing_important_words(extracted_words, llm_words)
+        
+        # Calculate extra content ratio
+        extra_content = self._calculate_extra_content_ratio(extracted_text, llm_text)
+        
+        # Calculate overall validation score
+        validation_score = self._calculate_validation_score(
+            word_overlap, char_overlap, sentence_overlap, semantic_sim
+        )
+        
+        # Check if it passes threshold
+        passed = validation_score >= self.overall_threshold
+        
+        result = ValidationResult(
+            word_overlap_ratio=word_overlap,
+            char_overlap_ratio=char_overlap,
+            sentence_overlap_ratio=sentence_overlap,
+            semantic_similarity=semantic_sim,
+            extracted_word_count=len(extracted_words),
+            llm_word_count=len(llm_words),
+            missing_words=missing_words,
+            extra_content_ratio=extra_content,
+            validation_score=validation_score,
+            passed_threshold=passed,
+            metadata={
+                "extracted_text_length": len(extracted_text),
+                "llm_text_length": len(llm_text),
+                "thresholds": {
+                    "word": self.word_threshold,
+                    "char": self.char_threshold,
+                    "sentence": self.sentence_threshold,
+                    "overall": self.overall_threshold
+                }
+            }
+        )
+        
+        self._log_validation_result(result)
+        return result
 
     def validate_document(self, pdf_path: str, pages_markdown: List[str]) -> List[ValidationResult]:
         """Validate entire document"""

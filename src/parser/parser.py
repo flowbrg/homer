@@ -4,12 +4,16 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
-import base64
-import io
-from PIL import Image
+
 from parser.validation import TextValidator, ValidationResult  # Add this import
+from parser.utils import extract_page_image
+
 from utils.logging import get_logger
 from core import prompts
+
+
+######################################## Dataclass for structured output ########################################
+
 
 @dataclass
 class ConversionResult:
@@ -20,11 +24,19 @@ class ConversionResult:
     errors: List[str] = None
     validation_results: Optional[List[ValidationResult]] = None  # Add validation results
 
+
+######################################## Vision processor ########################################
+# Processor wrapping an LLVM call to analyze a rasterized page (base64 image).
+
+
 class VisionProcessor:
     """Simple vision processor for PDF content"""
     
-    def __init__(self, model_name: str, base_url: str, temperature: float = 0.1):
-        self.logger = get_logger(__name__)
+    def __init__(self,
+                 model_name: str,
+                 base_url: str,
+                 temperature: float = 0):
+        self.logger = get_logger("VisionProcessor")
         self.model_name = model_name
         self.base_url = base_url
         self.temperature = temperature
@@ -32,7 +44,9 @@ class VisionProcessor:
         
         self.logger.info(f"VisionProcessor initialized with model: {model_name}")
     
-    def _init_ollama(self, model_name: str, base_url: str) -> ChatOllama:
+    def _init_ollama(self,
+                     model_name: str,
+                     base_url: str) -> ChatOllama:
         """Initialize ChatOllama"""
         try:
             chat_model = ChatOllama(
@@ -67,53 +81,21 @@ class VisionProcessor:
             self.logger.error(f"Vision processing failed: {e}")
             raise RuntimeError(f"Vision processing failed: {e}")
 
-class Utils:
-    """Simple utility functions"""
-    
-    @staticmethod
-    def optimize_image_for_vision(image_data: bytes, max_size: tuple = (1024, 1024)) -> str:
-        """Prepare images for vision model processing"""
-        try:
-            img = Image.open(io.BytesIO(image_data))
-            
-            # Resize if too large while maintaining aspect ratio
-            img.thumbnail(max_size, Image.Resampling.LANCZOS)
-            
-            # Convert to RGB if necessary
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
-            
-            # Convert to base64
-            buffer = io.BytesIO()
-            img.save(buffer, format='PNG', optimize=True)
-            img_str = base64.b64encode(buffer.getvalue()).decode()
-            
-            return img_str
-            
-        except Exception as e:
-            raise ValueError(f"Failed to optimize image: {e}")
-    
-    @staticmethod
-    def extract_page_image(page: fitz.Page, dpi: int = 300) -> str:
-        """Convert PDF page to optimized base64 image"""
-        # Create transformation matrix for desired DPI
-        zoom = dpi / 72
-        matrix = fitz.Matrix(zoom, zoom)
-        
-        # Render page as image
-        pix = page.get_pixmap(matrix=matrix, alpha=False)
-        img_data = pix.tobytes("png")
-        pix = None
-        
-        return Utils.optimize_image_for_vision(img_data)
+
+######################################## Pipeline class ########################################
+
 
 class PDFToMarkdownPipeline:
     """Simple vision-only PDF to Markdown pipeline with validation"""
     
-    def __init__(self, ollama_model: str, ollama_base_url: str, dpi: int = 300, 
-                 enable_validation: bool = True, validation_threshold: float = 0.65):
+    def __init__(self,
+                 ollama_model: str,
+                 ollama_base_url: str,
+                 dpi: int = 300, 
+                 enable_validation: bool = True,
+                 validation_threshold: float = 0.65):
         """Initialize the pipeline"""
-        self.logger = get_logger(__name__)
+        self.logger = get_logger("PDFToMarkdownPipeline")
         self.dpi = dpi
         self.enable_validation = enable_validation
         
@@ -162,7 +144,7 @@ class PDFToMarkdownPipeline:
                         self.logger.info(f"Processing page {page_num + 1}/{doc.page_count}")
                         
                         # Convert page to image
-                        page_image = Utils.extract_page_image(page, self.dpi)
+                        page_image = extract_page_image(page, self.dpi)
                         
                         # Process with vision model
                         markdown = self.vision_processor.process_page(page_image)
@@ -289,7 +271,9 @@ class PDFToMarkdownPipeline:
         return saved_files
 
 
-# Convenience function for simple usage
+######################################## Interface method ########################################
+
+
 def convert_pdf_to_markdown(pdf_path: str,
                                   ollama_model: str = "llama3.2-vision:11b", 
                                   ollama_base_url: str = "http://localhost:11434",
@@ -336,14 +320,14 @@ def convert_pdf_to_markdown(pdf_path: str,
             avg_score = sum(r.validation_score for r in result.validation_results) / total_pages
             
             print(f"\nValidation Summary:")
-            print(f"  ✅ Passed: {passed_count}/{total_pages} pages")
-            print(f"  📊 Average score: {avg_score:.3f}")
+            print(f"Passed: {passed_count}/{total_pages} pages")
+            print(f"Average score: {avg_score:.3f}")
             
             # Show pages that failed validation
             failed_pages = [i+1 for i, r in enumerate(result.validation_results) 
                           if not r.passed_threshold]
             if failed_pages:
-                print(f"  ⚠️  Failed pages: {failed_pages}")
+                print(f"Failed pages: {failed_pages}")
     else:
         print("Conversion failed:")
         for error in result.errors or []:
