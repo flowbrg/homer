@@ -272,20 +272,6 @@ def make_batch(obj: List[T], size: int = 100) -> List[List[T]]:
     return batches
 
 
-######################################## Streamlit connection button state ########################################
-
-
-from streamlit.runtime.state.session_state_proxy import SessionStateProxy
-from constant import OLLAMA_CLIENT
-
-def is_connected(session_state: SessionStateProxy) -> bool:
-    if "baseConfig" not in session_state:
-        raise Exception("config not loaded in the session state")
-    elif session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
-        return True
-    return False
-
-
 ######################################## Clean thinking part ########################################
 
 

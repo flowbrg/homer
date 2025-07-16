@@ -14,7 +14,7 @@ from datetime import datetime
 from core.agents import ReportAgent
 from core.configuration import load_config
 from utils.converter import dict_to_pdf
-from utils.utils import is_connected
+from pages.utils import is_ollama_client_available, is_connected
 from constant import OUTPUT_DIR, OLLAMA_LOCALHOST
 
 
@@ -38,15 +38,6 @@ if "ollama_host" not in st.session_state:
     
 
 ############################## Private methods ##############################
-
-
-def _is_ollama_client_available(url: str) -> bool:
-    import requests
-    try:
-        response = requests.get(url, timeout=2)
-        return response.ok
-    except requests.RequestException:
-        return False
 
 
 def _create_report(query:str):
@@ -108,7 +99,7 @@ connectionButton = st.sidebar.toggle(
 )
 
 if connectionButton:
-    conn = _is_ollama_client_available(st.session_state.ollama_host)
+    conn = is_ollama_client_available(st.session_state.ollama_host)
     if conn:
         st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
     else:
