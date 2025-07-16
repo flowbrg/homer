@@ -7,6 +7,9 @@ from langchain_core.messages import AnyMessage
 from langgraph.graph import add_messages
 
 
+######################################## Reducers ########################################
+
+
 def reduce_docs(
     existing: Optional[Sequence[Document]],
     new: Union[
@@ -37,29 +40,21 @@ def reduce_docs(
     return existing or []
 
 
-@dataclass(kw_only=True)
-class InputIndexState:
-    """Represents the input state for document indexing.
+def add_sections(
+    existing: Sequence[dict[str, str]], 
+    new: Union[Sequence[dict[str, str]], dict[str, str]]
+) -> Sequence[dict[str, str]]:
+    """Combine existing sections with new sections."""
+    existing_list = list(existing) if existing else []
+    
+    if isinstance(new, dict):
+        return existing_list + [new]
+    elif isinstance(new, list):
+        return existing_list + new
+    return existing_list
 
-    This class defines the structure of the input index state, which includes
-    the path of the documents to be indexed.
-    """
 
-    path: str
-    """The path to the files."""
-
-
-@dataclass(kw_only=True)
-class IndexState(InputIndexState):
-    """Represents the state for document indexing.
-
-    Attrs:
-        docs (Sequence[Document]): a sequence of documents using a reducer
-        to handle parallel modifications
-    """
-
-    docs: Annotated[Sequence[Document], reduce_docs]
-    """A list of documents that the agent can index."""
+######################################## Input State ########################################
 
 
 @dataclass(kw_only=True)
@@ -103,6 +98,8 @@ class InputState:
         message from `right` will replace the message from `left`."""
 
 
+######################################## Retrieval States ########################################
+
 
 @dataclass(kw_only=True)
 class RetrievalState(InputState):
@@ -118,31 +115,11 @@ class RetrievalState(InputState):
     """A summary of the retrieved documents or the conversation history."""
 
 
-def add_sections(
-    existing: Sequence[dict[str, str]], 
-    new: Union[Sequence[dict[str, str]], dict[str, str]]
-) -> Sequence[dict[str, str]]:
-    """Combine existing sections with new sections."""
-    existing_list = list(existing) if existing else []
-    
-    if isinstance(new, dict):
-        return existing_list + [new]
-    elif isinstance(new, list):
-        return existing_list + new
-    return existing_list
+######################################## Report States ########################################
 
 
 @dataclass(kw_only=True)
-class InputReportState(InputState):
-
-    writing_style: Optional[Literal["technical", "general"]] = "technical"
-    """Defines the writing style for the report. Can be 'technical' or 'general'."""
-
-    number_of_parts: Optional[int] = 3
-
-
-@dataclass(kw_only=True)
-class ReportState(InputReportState):
+class ReportState(InputState):
     """The state of your report graph / agent."""
 
     outlines: list[dict[str, str]] = field(default_factory=list)
@@ -150,6 +127,8 @@ class ReportState(InputReportState):
 
     report: Annotated[list[dict[str, str]], add_sections] = field(default_factory=list[dict[str, str]])
     """The final report as a list of sections, where each section is a dictionary with keys like 'title' and 'content'."""
+
+    report_header: str = field(default_factory=str)
 
     retrieved_docs: list[Document] = field(default_factory=list)
     """Populated by the retriever. This is a list of documents that the agent can reference."""
@@ -159,3 +138,31 @@ class ReportState(InputReportState):
 
     raw_section_content: str = field(default_factory=str)
     """Stores the raw content of the current section being processed."""
+
+
+######################################## Index States ########################################
+
+
+@dataclass(kw_only=True)
+class InputIndexState:
+    """Represents the input state for document indexing.
+
+    This class defines the structure of the input index state, which includes
+    the path of the documents to be indexed.
+    """
+
+    path: str
+    """The path to the files."""
+
+
+@dataclass(kw_only=True)
+class IndexState(InputIndexState):
+    """Represents the state for document indexing.
+
+    Attrs:
+        docs (Sequence[Document]): a sequence of documents using a reducer
+        to handle parallel modifications
+    """
+
+    docs: Annotated[Sequence[Document], reduce_docs]
+    """A list of documents that the agent can index."""

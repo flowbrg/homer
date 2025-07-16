@@ -111,9 +111,9 @@ class ReportAgent(BaseAgent):
     def invoke(
         self,
         query: str,
-        writing_style: Optional[Literal["technical", "general"]],
-        number_of_parts: Optional[int],
         configuration: Configuration,
+        writing_style: Literal["technical", "general"] = "techinical",
+        number_of_parts: int = 2,
     )-> Dict[str, Any]:
         """
         Invoke the report graph with a query and thread ID.
@@ -134,4 +134,4 @@ class ReportAgent(BaseAgent):
             "number_of_parts": number_of_parts,
         }
         output = self._graph.invoke(input=input, config=config)
-        return output["report"]
+        return output["report"], output["report_header"]

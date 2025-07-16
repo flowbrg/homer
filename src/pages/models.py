@@ -42,7 +42,7 @@ def _is_ollama_client_available(url: str) -> bool:
         return False
     
 
-############################## Sibdebar ##############################
+############################## Sidebar ##############################
 
 
 # Server connection toggle
@@ -72,6 +72,8 @@ client = ollama.Client(
 
 ############################## Page ##############################
 
+
+st.info("**INFO**\n\n This page allows you to pull a model from Ollama, either locally or from a host. This depends on the server execution state \n\n \n\n Ollama must be installed where you want to run the model (locally or/and on the cluster) \n\n The model name must be written exactly as listed on the [Ollama model hub](https://ollama.com/library) ", icon="ℹ️")
 
 model = st.text_input("Enter the model you want to pull:")
 pullButton = st.button("Pull")

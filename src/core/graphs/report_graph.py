@@ -147,8 +147,6 @@ def generate_outline(
         state (ReportState): Current report state containing:
             - messages: Conversation messages with the main user query
             - retrieved_docs: Documents retrieved in initial_retrieval step
-            - number_of_parts: Desired number of sections in the report
-            - writing_style: Style preference ("technical" or "general")
         config (RunnableConfig): Configuration containing:
             - report_model: Model identifier for outline generation
             - ollama_host: Host URL for Ollama models (if applicable)
@@ -167,8 +165,6 @@ def generate_outline(
         >>> state = ReportState(
         ...     messages=[query_msg], 
         ...     retrieved_docs=[doc1, doc2],
-        ...     number_of_parts=4,
-        ...     writing_style="technical"
         ... )
         >>> result = generate_outline(state, config=config)
         >>> print(result["outlines"])  # ["Section 1", "Section 2", ...]
@@ -188,7 +184,7 @@ def generate_outline(
         
         reportAgentLogger.info(f"Generating outline for query: '{main_query}'")
         reportAgentLogger.info(f"Using {len(state.retrieved_docs)} documents as context")
-        reportAgentLogger.info(f"Target sections: {state.number_of_parts}, Style: {state.writing_style}")
+        reportAgentLogger.info(f"Target sections: {configuration.number_of_parts}, Style: {configuration.writing_style}")
         reportAgentLogger.debug(f"Using report model: {configuration.report_model}")
         reportAgentLogger.debug(f"Context length: {len(context_text)} characters")
         
@@ -199,7 +195,7 @@ def generate_outline(
         # Create prompt with context and requirements
         system_prompt = prompts.OUTLINE_SYSTEM_PROMPT.format(
             context = format_docs(state.retrieved_docs),
-            number_of_parts = state.number_of_parts
+            number_of_parts = configuration.number_of_parts
         )
         user_prompt = state.messages[-1].content
         messages = [
@@ -216,7 +212,7 @@ def generate_outline(
             reportAgentLogger.debug(f"Section {i}: {entry}")
         
         # Initialize report structure and determine writing style label
-        style_label = "Technical Report" if state.writing_style == "technical" else "Generic Report"
+        style_label = "Technical Report" if configuration.writing_style == "technical" else "General Report"
         report_header = f"{style_label.upper()}\nTITLE: {main_query}\n\n"
         
         reportAgentLogger.info(f"Report header created: {style_label}")
@@ -345,11 +341,11 @@ def synthesize_section(
             - current_section_index: Index of section being processed
             - retrieved_docs: Documents retrieved for current section
             - messages: Original user query for context
-            - writing_style: Style preference ("technical" or "general")
         config (RunnableConfig): Configuration containing:
             - report_model: Model identifier for content generation
             - ollama_host: Host URL for Ollama models (if applicable)
             - Content generation parameters
+            - writing_style: Style preference ("technical" or "general")
 
     Returns:
         dict[str, Any]: Dictionary containing:
@@ -365,7 +361,6 @@ def synthesize_section(
         ...     outlines=["Introduction", "Methods"],
         ...     current_section_index=0,
         ...     retrieved_docs=[doc1, doc2],
-        ...     writing_style="technical"
         ... )
         >>> result = synthesize_section(state, config=config)
         >>> print(result["raw_section_content"])  # Generated introduction content
@@ -393,7 +388,7 @@ def synthesize_section(
         docs_count = len(state.retrieved_docs) if state.retrieved_docs else 0
         
         reportAgentLogger.info(f"Synthesizing content for section: '{current_section}'")
-        reportAgentLogger.info(f"Writing style: {state.writing_style}")
+        reportAgentLogger.info(f"Writing style: {configuration.writing_style}")
         reportAgentLogger.info(f"Using {docs_count} retrieved documents")
         reportAgentLogger.debug(f"Using report model: {configuration.report_model}")
         reportAgentLogger.debug(f"Main query context: '{main_query}'")
@@ -403,8 +398,8 @@ def synthesize_section(
         reportAgentLogger.debug("Content synthesis model loaded successfully")
 
         # Select appropriate prompt based on writing style
-        prompt = prompts.TECHNICAL_SECTION_SYSTEM_PROMPT if state.writing_style == "technical" else prompts.GENERIC_SECTION_SYSTEM_PROMPT
-        reportAgentLogger.debug(f"Using {'technical' if state.writing_style == 'technical' else 'general'} section prompt")
+        prompt = prompts.TECHNICAL_SECTION_SYSTEM_PROMPT if configuration.writing_style == "technical" else prompts.GENERAL_SECTION_SYSTEM_PROMPT
+        reportAgentLogger.debug(f"Using {'technical' if configuration.writing_style == 'technical' else 'general'} section prompt")
         
         # Format prompt with context and section information
         formatted_prompt = prompt.format(
@@ -647,8 +642,6 @@ def get_report_graph() -> CompiledStateGraph:
         >>> result = graph.invoke(
         ...     {
         ...         "messages": [user_query],
-        ...         "number_of_parts": 4,
-        ...         "writing_style": "technical"
         ...     }, 
         ...     config=config
         ... )

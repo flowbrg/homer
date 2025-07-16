@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, Literal
 
 from constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
 
@@ -26,6 +26,8 @@ class Configuration:
         default = 5,
     )
 
+    writing_style: Literal["general", "technical"] = field(default = "technical")
+
     # Ollama configuration
     ollama_host: str = field(
         default = OLLAMA_LOCALHOST,
@@ -34,11 +36,6 @@ class Configuration:
     # Index configuration
     ocr: bool = field(
         default = False,
-    )
-
-    # Retriever configuration
-    retriever_top_k: int = field(
-        default = 4,
     )
 
     # Models

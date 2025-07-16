@@ -7,6 +7,7 @@ and provides options to download the generated reports in PDF format.
 
 import streamlit as st
 
+from typing import Literal
 from pathlib import Path
 from datetime import datetime
 
@@ -48,7 +49,7 @@ def _is_ollama_client_available(url: str) -> bool:
         return False
 
 
-def _create_report(query:str):
+def _create_report(query:str, writing_style: Literal["technical", "general"], number_of_parts: int):
     # Create a unique filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"report_{timestamp}.pdf"
@@ -58,14 +59,14 @@ def _create_report(query:str):
     Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
     
     # Generate the report
-    output = st.session_state.reportAgent.invoke(
+    output, header = st.session_state.reportAgent.invoke(
         query=query,
-        writing_style= "general",
-        number_of_parts= 3,
+        writing_style= writing_style,
+        number_of_parts= number_of_parts,
         configuration=st.session_state.baseConfig,
     )
 
-    if output:
+    if output and header:
         
         # Generate PDF
         with st.spinner("Creating PDF..."):
@@ -73,6 +74,7 @@ def _create_report(query:str):
                 data = output,
                 output_filename = filename,
                 output_dir = OUTPUT_DIR,
+                header = header
             )
         
         # Success message
@@ -101,6 +103,7 @@ def _create_report(query:str):
 ############################## Sidebar ##############################
 
 
+# Connection button
 connectionButton = st.sidebar.toggle(
     label = "Server execution",
     value = is_connected(st.session_state)
@@ -117,6 +120,36 @@ else:
     st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
 
 st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+
+st.sidebar.divider()
+
+# Writing style buttons
+writingControl = st.sidebar.segmented_control(
+    label="Writing style",
+    options=["general","technical"],
+    default="general",
+)
+
+if writingControl == "technical":
+    st.sidebar.info(
+        "This mode is designed to generate detailed technical sections strictly based on the retrieved context.\n\n"
+        "Use this mode when your audience expects precision, completeness, and domain accuracy."
+    )
+else:
+    st.sidebar.info(
+        "This mode focuses on producing accessible and informative content using the available context.\n\n"
+        "Use this mode when aiming for clarity and synthesis for a broader audience."
+    )
+
+st.sidebar.divider()
+
+# Number of parts slider
+numberOfPartsSlider = st.sidebar.slider(
+    label="Number of parts",
+    min_value=1,
+    max_value=10,
+    value=3,
+)
 
 
 ############################## Page ##############################
@@ -149,7 +182,7 @@ if query:
         with progress_container:
             with st.spinner("Generating report..."):
                 try:
-                    _create_report(query=query)                            
+                    _create_report(query=query, writing_style=writingControl, number_of_parts=numberOfPartsSlider)                            
                 except Exception as e:
                     st.error(f"Error generating the report: {str(e)}")
                     st.info("Please check the logs for more details.")

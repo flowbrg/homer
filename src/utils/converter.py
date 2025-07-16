@@ -12,7 +12,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.colors import HexColor
 import re
-from typing import List, Dict
+from typing import List, Dict, Literal
 import os
 
 
@@ -119,7 +119,7 @@ class MarkdownToPDF:
         return text
     
     def generate_pdf(self, data: List[Dict[str, str]], filename: str = "output.pdf", 
-                     output_dir: str = None) -> str:
+                 output_dir: str = None, header: str = "") -> str:
         """
         Generate PDF from list of dictionaries.
         
@@ -147,7 +147,9 @@ class MarkdownToPDF:
             bottomMargin=72
         )
         
-        story = []
+        text = []
+        text.append(Paragraph(header, self.styles['title']))
+        text.append(Spacer(1, 18))
         
         for i, item in enumerate(data):
             title = item.get('title', f'Section {i+1}')
@@ -159,24 +161,24 @@ class MarkdownToPDF:
             # Add title
             if title:
                 title_formatted = self._markdown_to_reportlab(title)
-                story.append(Paragraph(title_formatted, self.styles['title']))
+                text.append(Paragraph(title_formatted, self.styles['title']))
             
             # Add content
             if content:
                 content_formatted = self._markdown_to_reportlab(content)
                 if content_formatted:
-                    story.append(Paragraph(content_formatted, self.styles['content']))
+                    text.append(Paragraph(content_formatted, self.styles['content']))
             
             # Add spacing between sections (except after last item)
             if i < len(data) - 1:
-                story.append(Spacer(1, 24))
+                text.append(Spacer(1, 24))
         
-        doc.build(story)
+        doc.build(text)
         return os.path.abspath(filepath)
 
 
 def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf", 
-                output_dir: str = None) -> str:
+                output_dir: str = None, header: str ="") -> str:
     """
     Simple interface function to convert dictionaries to PDF.
     
@@ -189,58 +191,7 @@ def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf",
         str: Path to the created PDF file
     """
     converter = MarkdownToPDF()
-    return converter.generate_pdf(data, output_filename, output_dir)
-
-
-def str_to_pdf(data: str, output_filename: str = "report.pdf", 
-               output_dir: str = None, title: str = None) -> str:
-    """
-    Convert a single string to PDF.
-    
-    Args:
-        data: String content (supports Markdown)
-        output_filename: Name of the output PDF file
-        output_dir: Directory to save the PDF (optional, defaults to current directory)
-        title: Optional title for the document
-        
-    Returns:
-        str: Path to the created PDF file
-    """
-    # Create full path
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
-        filepath = os.path.join(output_dir, output_filename)
-    else:
-        filepath = output_filename
-    
-    # Use the existing MarkdownToPDF class
-    converter = MarkdownToPDF()
-    
-    doc = SimpleDocTemplate(
-        filepath,
-        pagesize=converter.page_size,
-        rightMargin=72,
-        leftMargin=72,
-        topMargin=72,
-        bottomMargin=72
-    )
-    
-    story = []
-    
-    # Add title if provided
-    if title:
-        title_formatted = converter._markdown_to_reportlab(title)
-        story.append(Paragraph(title_formatted, converter.styles['title']))
-        story.append(Spacer(1, 12))
-    
-    # Add content
-    if data:
-        content_formatted = converter._markdown_to_reportlab(data)
-        if content_formatted:
-            story.append(Paragraph(content_formatted, converter.styles['content']))
-    
-    doc.build(story)
-    return os.path.abspath(filepath)
+    return converter.generate_pdf(data, output_filename, output_dir,header)
 
 
 # Example usage
