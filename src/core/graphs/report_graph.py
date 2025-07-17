@@ -683,14 +683,9 @@ def get_report_graph() -> CompiledStateGraph:
         builder.add_edge("synthesize_section", "review_section")
         builder.add_conditional_edges("review_section", should_continue)
 
-        # Compile the graph with no interrupts for continuous processing
-        graph = builder.compile(
-            interrupt_before=[],  # No interrupts - continuous processing
-            interrupt_after=[],   # No interrupts - single-shot execution
-        )
-        
-        # Set graph name for identification
-        graph.name = "ReportGraph"
+        # Compile the graph 
+        graph = builder.compile()
+
         logger.info("Successfully compiled report generation graph")
         
         return graph

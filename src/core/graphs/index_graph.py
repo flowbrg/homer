@@ -15,7 +15,6 @@ from core.configuration import Configuration
 from core.states import IndexState, InputIndexState
 from core.models import load_embedding_model
 from utils.utils import remove_duplicates, make_batch
-from constant import OLLAMA_LOCALHOST
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 #from langchain_experimental.text_splitter import SemanticChunker

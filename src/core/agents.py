@@ -89,7 +89,7 @@ class IndexAgent(BaseAgent):
     Wrapper Class for the index graph.
     """
     def __init__(self):
-        super().__init__(get_retrieval_graph()) # Compile the retrieval agent graph
+        super().__init__(get_index_graph()) # Compile the retrieval agent graph
 
     def invoke(self, path: str, configuration: Configuration):
         self._graph.invoke(input={"path": path}, config = {"configurable": configuration.asdict()})
