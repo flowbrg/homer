@@ -8,7 +8,7 @@ from core.agents import IndexAgent
 from core.retrieval import delete_documents, get_existing_documents
 from constant import UPLOAD_DIR, OLLAMA_LOCALHOST
 from core.retrieval import get_existing_documents
-from utils.utils import is_connected, make_batch
+from pages.utils import is_ollama_client_available, is_connected
 
 
 ############################## Initialize session state ##############################
@@ -35,15 +35,6 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 ############################## Private methods ##############################
-
-
-def _is_ollama_client_available(url: str) -> bool:
-    import requests
-    try:
-        response = requests.get(url, timeout=2)
-        return response.ok
-    except requests.RequestException:
-        return False
 
 
 def _reset_vector_store():
@@ -106,7 +97,7 @@ connectionButton = st.sidebar.toggle(
 )
 
 if connectionButton:
-    conn = _is_ollama_client_available(st.session_state.ollama_host)
+    conn = is_ollama_client_available(st.session_state.ollama_host)
     if conn:
         st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
     else:

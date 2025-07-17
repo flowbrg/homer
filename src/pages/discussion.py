@@ -8,7 +8,8 @@ The interface allows users to configure server connections and model settings.
 
 import streamlit as st
 
-from utils.utils import is_connected, extract_think_and_answer
+from utils.utils import extract_think_and_answer
+from pages.utils import is_ollama_client_available, is_connected
 from core.agents import RetrievalAgent
 from core.configuration import load_config
 from constant import OLLAMA_LOCALHOST
@@ -31,25 +32,9 @@ if "ollama_host" not in st.session_state:
     st.session_state.ollama_host = OLLAMA_CLIENT
 
 _THREAD = 1
+
+
 ############################## Private methods ##############################
-
-
-def _is_ollama_client_available(url: str) -> bool:
-    """
-    Check if Ollama server is available at the given URL.
-    
-    Args:
-        url: The Ollama server URL to test
-        
-    Returns:
-        True if server responds successfully, False otherwise
-    """
-    import requests
-    try:
-        response = requests.get(url, timeout=2)
-        return response.ok
-    except requests.RequestException:
-        return False
 
 
 def _stream_with_thinking_separation(query: str):
@@ -163,7 +148,7 @@ connectionButton = st.sidebar.toggle(
 
 # Configure server host based on connection preference
 if connectionButton:
-    conn = _is_ollama_client_available(st.session_state.ollama_host)
+    conn = is_ollama_client_available(st.session_state.ollama_host)
     if conn:
         st.session_state.baseConfig.ollama_host = st.session_state.ollama_host
     else:
