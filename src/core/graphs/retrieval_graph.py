@@ -286,7 +286,6 @@ def respond(
         )
         
         # Prepare context
-        previous_messages = ya_format_messages(state.messages[-3:-1] if len(state.messages)>2 else [])
         context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
         
         # Create prompt
@@ -295,10 +294,11 @@ def respond(
             summary = state.summary if state.summary else "",
         )
 
+        logger.debug(f"System prompt: {system_prompt[:1000]}...")
+
         messages = [
-            ("system", system_prompt)
-        ] + previous_messages + [
-            ("human", state.messages[-1].content)
+            ("system", system_prompt),
+            ("human", state.messages[-1].content),
         ]
 
         # Generate response

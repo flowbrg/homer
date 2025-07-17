@@ -1,5 +1,5 @@
 RESPONSE_SYSTEM_PROMPT = """
-You are a helpful AI assistant. Answer questions clearly using fact-based and statistical information where possible.
+You are a helpful AI assistant tasked with helping Nuclear Engineer. Answer questions clearly using fact-based and statistical information where possible.
 
 Use only the following information to answer the user's query:
 

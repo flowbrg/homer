@@ -8,9 +8,8 @@ from utils.utils import ensure_path
 ensure_path(path_str = UPLOAD_DIR)
 ensure_path(path_str = VECTORSTORE_DIR)
 
-# Disable Chromadb telemetry
 import os
-os.environ['ANONYMIZED_TELEMETRY'] = 'False'
+os.environ['ANONYMIZED_TELEMETRY'] = 'False' # Disable Chromadb telemetry
 
 # Run the Streamlit app
 try:
