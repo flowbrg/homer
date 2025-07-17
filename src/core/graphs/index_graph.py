@@ -22,7 +22,7 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from parser import VisionLoader
 
 
-############################## Parse PDF node ##############################
+######################################## Parse PDF node ########################################
 
 def parse_pdfs(
     state: InputIndexState, *, config: Optional[RunnableConfig] = None
@@ -137,7 +137,7 @@ def parse_pdfs(
         raise
 
 
-############################## Index Document node ##############################
+######################################## Index Document node ########################################
 
 
 def index_docs(
@@ -216,6 +216,8 @@ def index_docs(
         raise
 
 
+######################################## Should index conditional edge ########################################
+
 def should_index(state: IndexState, *, config: RunnableConfig) -> str:
     """
     Determine whether to proceed with document indexing based on state content.
@@ -250,6 +252,9 @@ def should_index(state: IndexState, *, config: RunnableConfig) -> str:
     
     logger.info(f"Found {len(state.docs)} documents, proceeding to indexing")
     return "index_docs"
+
+
+######################################## Graph compiler ########################################
 
 
 def get_index_graph() -> CompiledStateGraph:

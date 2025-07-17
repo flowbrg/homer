@@ -30,6 +30,8 @@ from utils.utils import format_docs, format_messages, format_sources, get_connec
 from core import prompts
 
 
+######################################## Structured output class ########################################
+
 
 class SearchQuery(BaseModel):
     """
@@ -42,6 +44,9 @@ class SearchQuery(BaseModel):
         query (str): The generated search query string optimized for document retrieval.
     """
     query: str
+
+
+######################################## Rephrase query node ########################################
 
 
 def rephrase_query(
@@ -143,6 +148,9 @@ def rephrase_query(
             raise e
 
 
+######################################## Retrieve node ########################################
+
+
 def retrieve(
     state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, List[Document]]:
@@ -209,7 +217,7 @@ def retrieve(
             if response:
                 logger.info(f"Successfully retrieved {len(response)} documents")
                 for doc in response:
-                    logger.debug(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
+                    logger.debug(f"Document: {doc.page_content[:500]}... from {doc.metadata.get('source', 'unknown')}\n")
             else:
                 logger.warning("No documents retrieved for the query")
             
@@ -219,6 +227,9 @@ def retrieve(
         logger.error(f"Error in retrieve: {str(e)}")
         logger.warning("Returning empty document list due to retrieval error")
         return {"retrieved_docs": []}
+
+
+######################################## Respond node ########################################
 
 
 def respond(
@@ -337,6 +348,9 @@ def respond(
             raise e
 
 
+######################################## Summarize node ########################################
+
+
 def summarize_conversation(
     state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, str]:
@@ -432,6 +446,9 @@ Extend the summary by taking into account the new messages:"""
         return {"summary": fallback_summary}
 
 
+######################################## Should summarize conditional edge ########################################
+
+
 def should_summarize(
     state: RetrievalState, *, config: RunnableConfig
 ) -> str:
@@ -473,6 +490,9 @@ def should_summarize(
     else:
         logger.debug("Continuing without summarization")
         return END
+
+
+######################################## Graph compiler ########################################
 
 
 def get_retrieval_graph() -> CompiledStateGraph:
