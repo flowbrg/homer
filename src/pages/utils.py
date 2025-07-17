@@ -35,3 +35,26 @@ def is_connected(session_state: SessionStateProxy) -> bool:
     elif session_state.baseConfig.ollama_host == OLLAMA_CLIENT:
         return True
     return False
+
+
+######################################## List ollama models ########################################
+
+
+import ollama
+
+def list_ollama_models(base_url = None) -> list:
+    """
+    List all models available on the Ollama client.
+    
+    Returns:
+        A list of models available on the Ollama client.
+    
+        e.g. [(model='gemma3:1b' modified_at=... digest=... size=... details=ModelDetails(parent_model='', format='gguf', family='gemma3'...))]
+    """
+    try:
+        client = ollama.Client(host=base_url)
+        models = client.list().models
+        return [m.model for m in models]
+    except Exception as e:
+        print(f"Error listing models: {e}")
+        return []

@@ -6,5 +6,14 @@ VECTORSTORE_DIR = "./user_data/vectorstore/"
 LOG_LEVEL = "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
-# To list available models on the distant ollama client
-COMPATIBLE_MODELS = []
+# Compatible models
+VISION_MODELS = ("qwen2.5vl",
+                 "llava",
+                 "minicpm-v",
+                 "llama3.2-vision",
+                 "moondream",
+                 "mistral-small3.1",
+                )
+REASONING_MODELS = ("qwen3",
+                    "deepseek-r1"
+                   )
