@@ -53,7 +53,8 @@ _IGNORED_TOKENS = [
     '<|endoftext|>', '<|startoftext|>', '<pad>', '<unk>', '<s>', '</s>',
     '<mask>', '<cls>', '<sep>', '<|im_start|>', '<|im_end|>', '<text>',
     'assistant', 'human', '<think>', '</think>','</message>','</messages>',
-    '<message>','<messages>',
+    '<message>','<messages>','</endofturn>','<endofturn>','<startofturn>',
+    '<startofturn>',
 ]
 
 
