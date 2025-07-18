@@ -102,13 +102,13 @@
     {\large
     \textbf{SCK CEN} \\
     Belgian Nuclear Research Centre \\
-    March 1st - July 18th, 2025
+    April 1st - July 18th, 2025
     \par}
     
     \vfill
     
     {\large
-    Classification: Public
+    Classification: Restricted
     \par}
     
 \end{titlepage}
@@ -1348,6 +1348,457 @@ else:
 
 This ensures consistent functionality across different deployment scenarios while optimizing resource utilization.
 
+\chapter{Setup}
+
+\section{Homer Git}
+
+To download the project files to your computer, open your terminal or command prompt, and type the following command line that will create a folder with all the files from the project. 
+
+\begin{lstlisting}
+cd your\directory\
+git clone https://github.com/flowbrg/homer.git
+cd homer
+\end{lstlisting}
+
+\section{Python}
+
+The application requires Python version \textbf{3.10} or later. To verify your Python version you can use : 
+\begin{lstlisting}
+python --version
+\end{lstlisting}
+
+
+\section{Virtual Environment}
+
+We highly recommend you to create a \textbf{Python virtual environment}. It's an isolated sapce for a project's Python dependencies. It allows us to install and manage packages without affecting other projects or the system-wide Python setup. We use it for \textbf{isolation} (keeps project dependencies separate), \textbf{consistency} (ensures everyone uses the same packages) and \textbf{clean development} (avoids conflicts between different projects). 
+Here is how to setup : 
+\begin{lstlisting}
+python -m venv .venv #creates the venv named .venv
+.\.venv\Scripts\Activate.ps1 #activates the venv
+\end{lstlisting}
+
+Then you have to install the required packages in the venv using the following line: 
+
+\begin{lstlisting}
+pip install -r requirements.txt
+\end{lstlisting}
+
+\section{Start the Streamlit app}
+
+To launch the HOMER application using Streamlit, simply execute the \texttt{main.py} script with the following command:
+
+\begin{lstlisting}
+python main.py
+\end{lstlisting}
+
+This will start the Streamlit development server and make the application accessible at the default address: \texttt{http://localhost:8501} in your web browser
+
+
+\section{Server execution}
+
+In addition to local execution, Homer also supports running Ollama models on a remote server. This enables faster response times and improves scalability, especially when deploying large language models (LLMs) that require substantial memory and compute resources.
+
+\paragraph{Step 1: Configure the SSH Tunnel (using PuTTY)}
+\begin{itemize}
+    \item Open PuTTY and enter the IP address or hostname of the remote server.
+    \item In the sidebar, navigate to \texttt{Connection > SSH > Tunnels}.
+    \item In the \textbf{Source port}, enter \texttt{6780}.
+    \item In the \textbf{Destination}, enter \texttt{localhost:6780}.
+    \item Click \texttt{Add}.
+    \item Go back to \texttt{Session}, save the session configuration, and click \texttt{Open} to start the tunnel.
+\end{itemize}
+
+
+\paragraph{Step 2 : Server Setup}
+
+To host an Ollama model on a remote server, follow these steps:
+
+\begin{enumerate}
+    \item \textbf{Install Ollama} on the remote machine by following the official installation instructions: \url{https://ollama.com/download}.
+    
+    \item \textbf{Start the Ollama service} on the remote server using the tunnel port 6780 :
+    \begin{lstlisting}
+OLLAMA_HOST=0.0.0.0:6780 ollama serve
+    \end{lstlisting}
+    
+    \item \textbf{Pull the desired model} (e.g., \texttt{llama3}) :
+    \begin{lstlisting}
+OLLAMA_HOST=0.0.0.0:6780 pull llama3
+    \end{lstlisting}
+    
+\end{enumerate}
+
+
+\paragraph{Step 3 : Client Setup}
+
+On the client side (where the HOMER application runs), you can establish a secure SSH tunnel to forward the remote port to your local machine. This is particularly useful for development environments or when working behind firewalls.
+\newline
+\newline
+You can change the \texttt{OLLAMA\_CLIENT} address in the python file \texttt{./src/constant.py} where you will find the following line : 
+
+\begin{lstlisting}
+OLLAMA_CLIENT = "http://127.0.0.1:6780/" #change 6780 if you're using an other tunnel port
+\end{lstlisting}
+
+This tells the application to send all model-related queries to the remote server rather than to the local instance.
+
+
+\chapter{How to use Homer}
+
+\section{Home page}
+
+Once the application is launched (refer to Chapter 4 for details), you will be directed to the \textbf{Home} page. A navigation sidebar appears on the left, allowing users to switch between different sections of the application.
+\\
+\\
+To begin, you must upload your documents by navigating to the \textbf{Documents} page. This step is essential, as the agent's responses are strictly based on the content of the uploaded documents.
+
+\section{Documents page}
+
+The \textbf{Documents} page is where you upload the PDF files you want the application to work with. These documents form the knowledge base that \textbf{Homer} will use to answer your questions or generate reports. If you don't upload any documents, the system will have no information to work from.
+
+
+\subsection*{Step-by-Step Guide}
+
+\begin{enumerate}
+    \item \textbf{Navigate to the Documents Page} \\
+    Use the sidebar on the left to access the \texttt{Documents} section.
+
+    \item \textbf{Enable Server Execution (Recommended)} \\
+    In the sidebar, activate the toggle labeled \texttt{Server Execution}. This enables the application to process and index documents using a \textbf{remote server}, rather than your local machine. \\
+    \textit{Why this matters:} Remote indexing is significantly \textbf{faster and more efficient}, especially when working with large documents or using advanced features like vision parsing.
+
+    \item \textbf{(Optional) Enable Vision Parser} \\
+    Below the server execution toggle, you can enable the \texttt{Vision Parser}. This feature allows the application to extract content from \textbf{scanned documents or images} embedded in PDFs. \\
+    \textit{Note:} This option requires more computing power and works best when server execution is turned on.
+
+    \item \textbf{Upload Your PDF Files} \\
+    Use the upload box to select one or more PDF files from your computer. Once selected, click the \texttt{Upload} button to send them to the system. A confirmation message will appear when the process is complete.
+
+    \item \textbf{Manage Your Documents} \\
+    Uploaded documents are listed below the upload section. Each file can be deleted individually using the \texttt{Delete} button next to it.
+
+    \item \textbf{Reset the Document Database (Optional)} \\
+    Click the \texttt{Reset Database} button to remove all uploaded documents and start fresh.
+\end{enumerate}
+
+\subsection*{Important Notes}
+\begin{itemize}
+    \item Only \textbf{PDF files} are supported.
+    \item The AI can only respond based on the documents you provide; no external data is used.
+    \item \textbf{Enabling Server Execution} is highly recommended for improved speed and reliability.
+    \item Use the \texttt{Vision Parser} for scanned or image-based documents.
+\end{itemize}
+
+
+
+\section{Configuration Page}
+
+The \textbf{Configuration} page allows you to customize how the application behaves when processing and analyzing your documents. This includes setting which models are used for different tasks and specifying the server connection for remote processing.
+
+\subsection*{Purpose of This Page}
+
+This page is intended for adjusting key settings that control how documents are indexed and how responses are generated. While default values are already provided, this page gives you flexibility if you want to update the models or connect to a different server.
+
+\subsection*{Step-by-Step Guide}
+
+\begin{enumerate}
+    \item \textbf{Access the Configuration Page} \\
+    From the sidebar, click on the \texttt{Configuration} section to open the settings editor.
+
+    \item \textbf{Edit the Ollama Host (Server URL)} \\
+    The first field allows you to change the URL of the server (called the \texttt{Ollama Host}) that performs document indexing and answering tasks.
+    \\
+A message will appear to confirm whether the URL format is valid.
+   
+
+    \item \textbf{Configure Models} \\
+    You can modify the models used by the system. There are different models for different modes:
+    \begin{itemize}
+        \item \textbf{Local Reasoning Model}: Used for \textbf{Discussion} if you enable \textbf{Reasoning model}.
+        \item \textbf{Local Standard Model}: Used for \textbf{Discussion} if you disable \textbf{Reasoning model}.
+        \item \textbf{Server Standard Model}: Used for \textbf{Discussion} if you disable \textbf{Reasoning model} using a server. 
+        \item \textbf{Server Reasoning Model}: Used for \textbf{Discussion} if you enable \textbf{Reasoning model} using a server. 
+        \item \textbf{Vision Model}: Used to parse PDFs that are converted into images (requires server execution).
+    \end{itemize}
+
+    \item \textbf{Save Your Settings} \\
+    After adjusting the fields as needed, click the \texttt{Save Configuration} button. The new settings will be applied immediately, and a success message will appear.
+\end{enumerate}
+
+\section{Models Page}
+
+The \textbf{Model} page allows you to download and manage models from Ollama. These models are required for the application to perform tasks such as document embedding and question answering.
+
+\subsection*{Purpose of This Page}
+
+Before the application can run operations, the required models must be downloaded (also known as "pulled") from the \href{https://ollama.com/library}{Ollama model hub}. This page provides a simple interface to do that, whether you're running the application locally or using a remote server.
+
+\subsection*{Step-by-Step Guide}
+
+\begin{enumerate}
+    \item \textbf{Enable Server Execution (Optional)} \\
+    In the sidebar, you will find a toggle labeled \texttt{Server Execution}. If enabled, the model will be downloaded to the remote server. Otherwise, it will be pulled to your local machine. \\
+
+    \item \textbf{Enter the Model Name} \\
+    In the main interface, you’ll see a text box labeled \texttt{Enter the model you want to pull}. Here, you must type the exact name of the model you want to use. \\
+    \textit{Note: Model names must match exactly as listed on the Ollama website. For example, \texttt{llama3}, \texttt{gemma:2b}, etc.}
+
+    \item \textbf{Pull the Model} \\
+    After entering the model name, click the \texttt{Pull} button. The system will:
+    \begin{itemize}
+        \item Check if the model already exists.
+        \item If not, download it and show a progress bar.
+        \item Notify you when the process is complete.
+    \end{itemize}
+
+    \item \textbf{View Available Models} \\
+    At the bottom of the page, you can see a list of all models that are currently available on the selected host (either local or server if enabled).
+\end{enumerate}
+\newpage
+\section{Discussion Page}
+
+
+
+The \textbf{Discussion} page provides a chat interface where you can interact with the agent based on your uploaded documents. This is the main interface for asking questions and getting detailed answers, including the agent's reasoning process if enabled.
+
+
+\subsection*{Step-by-Step Guide}
+
+\begin{enumerate}
+    \item \textbf{Navigate to the Discussion Page} \\
+    Use the sidebar to select the \texttt{Discussion} section.
+
+    \item \textbf{(Optional) Enable Server Execution} \\
+    In the sidebar, you will find a toggle labeled \texttt{Server Execution}.
+    \begin{itemize}
+        \item When enabled, responses are generated using a remote server, which is generally faster and more powerful.
+        \item When disabled, everything runs locally on your computer.
+    \end{itemize}
+
+    \item \textbf{(Optional) Enable Reasoning Model} \\
+    You can toggle between a standard model and a reasoning model.
+    \begin{itemize}
+        \item The reasoning model includes a visible "thinking" process before producing the final answer.
+        \item The standard model gives a direct answer without explanation.
+    \end{itemize}
+
+    \item \textbf{Enter Your Query} \\
+    At the bottom of the chat, type your query into the input field and press \texttt{Enter}.
+    \begin{itemize}
+        \item Your query will immediately appear in the chat window.
+        \item The agent will begin typing its response in real time.
+    \end{itemize}
+
+    \item \textbf{View the Answer and Thinking (If Enabled)} \\
+    If you enabled the reasoning model, you will see an expandable section labeled \texttt{Show Thinking} containing the model’s intermediate steps or explanation before answering.
+\end{enumerate}
+
+\subsection*{Other Features}
+
+\begin{itemize}
+    \item \textbf{Conversation Threads}: The system keeps track of your conversation history within a session.
+    \item \textbf{Model Selection Feedback}: The sidebar shows which model is currently being used.
+    \item \textbf{Server Connection Status}: The sidebar also displays the active server used to process queries.
+\end{itemize}
+
+
+\section{Report Page}
+
+The \textbf{Report} page allows users to generate structured reports based on the documents they have uploaded.
+
+\subsection*{Purpose of This Page}
+
+This interface enables the generation of a detailed report by interacting with the agent. The report is created from the uploaded documents and can be customized according to the user’s needs through several sidebar options.
+
+\subsection*{Step-by-Step Guide}
+
+
+\begin{enumerate}
+    \item \textbf{Navigate to the Report Page} \\
+    Use the sidebar to access the \texttt{Report} section.
+
+    \item \textbf{Configure Report Settings}
+    
+    \begin{itemize}
+        \item \textbf{Model} \\
+        If you want to change the model that writes the report you should go to \\\texttt{./src/core/configuration.py} and then find this : 
+        \begin{lstlisting}
+report_model: str = field(
+        default = "gemma3:4b",   #change this value,
+    )
+\end{lstlisting}
+We highly recommend you not to use thinking model for this task. 
+        
+
+
+      
+        \item \textbf{Number of Report Sections} \\
+        Choose how many sections you want in your report. This allows the report to be structured into multiple logical parts.
+
+        \item \textbf{Documents per Section} \\
+        Define how many relevant documents (chunks) should be retrieved and analyzed for each part of the report. Increasing this number may lead to more detailed content but less performance (default is 4), while a lower number can make each section more concise.
+        
+        \item \textbf{Server Execution (Optional)} \\
+        Toggle the \texttt{Server Execution} option if you want the report to be generated using a remote server for better performance.
+        
+
+    \item \textbf{Enter Your Report Topic} \\
+    In the main area, you will find a text box where you can describe what your report should be about. Be as specific as possible to get better results.
+
+
+    \item \textbf{Download the Report} \\
+    Once the report is generated, you can download the PDF file on your personal computer. 
+     \end{itemize}
+\end{enumerate}
+
+
+
+\chapter{Next steps - Future development}
+
+\section{.exe file}
+
+To further simplify the deployment process, we plan to provide a standalone executable file (\texttt{.exe}) that allows users to run the application without requiring a Python environment or any manual setup.
+
+\subsection*{Current Limitation}
+
+At this stage, we do not have the necessary permissions to generate or execute such a file on SCK CEN-managed computers. Specifically, creating executables using tools like PyInstaller requires administrative rights or ICT approval, which we currently lack. An official request must be made to ICT to proceed with this compilation on internal machines.
+
+\subsection*{Proposed Solution}
+
+The idea is to use the \textbf{PyInstaller} library to convert the Python-based Streamlit application into a self-contained executable. This would eliminate the need for users to manually install Python, create a virtual environment, or install packages.
+
+\subsection*{Benefits of a Standalone Executable}
+
+\begin{itemize}
+    \item No Python installation required
+    \item No command-line interaction for the user
+    \item Compatible with environments where dependency installation is restricted
+    \item Simplified deployment for end users or clients
+\end{itemize}
+
+\subsection*{Automation of Environment Setup}
+
+A shell script has already been prepared that automates the setup:
+\begin{itemize}
+    \item Creates and activates a virtual environment
+    \item Installs all packages from \texttt{requirements.txt}
+    \item Launches the Streamlit app
+\end{itemize}
+
+\subsection*{Code to Compile}
+
+
+\vspace{0.5em}
+\begin{lstlisting}[caption={setup.py file in the main root to compile}]
+import os
+import subprocess
+
+# Paths 
+project_dir = r"C:\Users\mdlbarre\Documents\homer-main" #update this
+venv_dir = os.path.join(project_dir, "venv")
+requirements_path = os.path.join(project_dir, "requirements.txt")
+main_script = os.path.join(project_dir, "main.py")
+
+# Create the venv
+subprocess.call(f'python -m venv "{venv_dir}"', shell=True)
+
+# Activate the venv and run commands
+activate_cmd = os.path.join(venv_dir, "Scripts", "activate.bat")
+
+# Combine all into a single command string
+commands = f'''
+call "{activate_cmd}"
+pip install -r "{requirements_path}"
+python "{main_script}"
+'''
+
+# Run the above in CMD
+subprocess.call(commands, shell=True)
+\end{lstlisting}
+
+Then you have to run the following command line in the terminal : 
+
+\begin{lstlisting}
+pyinstaller setup.py 
+\end{lstlisting}
+
+The .exe file will be in the \texttt{dist} folder.
+
+
+
+\section{Client–Server Setup with L6 and SSH Tunneling}
+
+A potential enhancement under consideration is to extend the architecture so that the Streamlit application runs locally on the user's L6 machine while offloading model inference to a remote server through an SSH tunnel. This setup would allow users to benefit from the performance of the server-side models without deploying or running heavy computations locally.
+
+\subsection*{Proposed Design}
+
+\begin{itemize}
+    \item \textbf{L6 as a Client:} The application interface would execute on L6, acting as a lightweight frontend.
+    \item \textbf{Remote Server with Ollama:} The Ollama service would run on a remote compute server (e.g., a cluster), which hosts large language models.
+    \item \textbf{SSH Tunnel:} A secure tunnel would forward API calls from the local machine to the server, making the remote service accessible as if it were local.
+\end{itemize}
+
+\subsection*{Advantages}
+
+\begin{itemize}
+    \item Allows users to run the application without requiring local installation of large models or GPUs.
+    \item Offers improved scalability and model performance by using dedicated hardware.
+    \item You can switch off your personal computer while it's running in the background. 
+\end{itemize}
+
+\section{Agentic RAG}
+
+Models like DeepSeek R1 and Qwen3 demonstrate sophisticated tool-use capabilities that enable more autonomous operation compared to traditional pipeline-based approaches like the Retrieval Graph currently implemented in our system. These agentic models can dynamically determine when and how to retrieve information based on query context and their reasoning process.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{static/schemas/agenticRAG.png}
+    \caption{Agentic RAG graph}
+    \label{arag}
+\end{figure}
+
+\subsection*{Tool integration}
+This tool abstraction allows the agentic model to determine when retrieval is necessary, formulate appropriate search queries autonomously, and integrate retrieved information into its reasoning chain. 
+\begin{lstlisting}
+@tool
+def search_for_context(query:str, source: Optional[str], config: RunnableConfig):
+    configuration = Configuration.from_runnable_config(config)
+ 
+    embeddings = load_embedding_model(model=configuration.embedding_model)
+    with make_retriever(embedding_model=embeddings) as retriever:
+        results = retriever.invoke(query)
+    if not results:
+        return "No relevant documents found."
+    return format_docs(results)
+\end{lstlisting}
+
+
+\section{Future Integration within the SCK CEN Infrastructure}
+
+Homer is currently a functional prototype developed to demonstrate AI-assisted document analysis using large language models (LLMs). The next logical step is to integrate this tool within the internal infrastructure of SCK CEN.
+
+\subsection*{Integration Objectives}
+
+Integrating Homer into the SCK CEN network will enable:
+
+\begin{itemize}
+    \item Secure and compliant document processing within the protected internal environment.
+    \item Streamlined access to internal resources such as document repositories, identity management systems, and network storage.
+\end{itemize}
+
+\subsection*{Current Limitations}
+
+At this stage, Homer has been developed and tested outside the SCK CEN production environment. Integration requires:
+
+\begin{itemize}
+    \item Approval and support from ICT services.
+    \item Validation of security protocols, especially for components involving LLMs and SSH tunnels.
+    \item Adaptation of the current prototype to comply with internal software deployment standards and access control policies.
+\end{itemize}
+
+
+\subsection*{Continuous Evolution of A.I.} 
+Artificial Intelligence is evolving at a rapid pace, with new models, tools, and capabilities emerging frequently. To ensure that SCK CEN remains at the forefront of this technological shift and can fully leverage AI advancements in a secure and efficient manner, it is essential to establish a dedicated AI team. This team would be responsible for monitoring AI trends, updating internal tools such as HOMER, evaluating new model capabilities, and ensuring safe and ethical deployment aligned with the organization's objectives.
 
 
 
