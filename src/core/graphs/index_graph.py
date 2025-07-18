@@ -117,13 +117,14 @@ def parse_pdfs(
                     )
                 
                 # Split the Document content into smaller chunks
-                document = text_splitter.split_documents(loader.load())
+                chunks = text_splitter.split_documents(loader.load())
                 #ensure metadata
-                document[0].metadata={"source": pdf_file}
+                for c in chunks:
+                    c.metadata={"source": pdf_file}
                 # Add them to the list of Documents
-                documents.extend(document)
+                documents.extend(chunks)
                 
-                logger.debug(f"Successfully processed {pdf_file}, created {len(document)} chunks")
+                logger.debug(f"Successfully processed {pdf_file}, created {len(chunks)} chunks")
                 
             except Exception as e:
                 logger.error(f"Failed to process file {pdf_file}: {str(e)}")

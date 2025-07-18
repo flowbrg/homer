@@ -18,7 +18,7 @@ DEFAULT_MODELS = {
     "server_reasoning": "qwen3:30b-a3b",
     "server_standard": "gemma3:4b-it-qat", 
     "local_reasoning": "qwen3:0.6b",
-    "local_standard": "gemma3n:e2b"
+    "local_standard": "gemma3:1b"
 }
 
 # Ensure session variables are instantiated

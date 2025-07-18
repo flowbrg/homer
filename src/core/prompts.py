@@ -81,8 +81,8 @@ GUIDELINES:
 - If context is insufficient, state what's missing rather than inventing content
 - Write in flowing paragraphs without subheadings
 - Integrate multiple sources to build coherent arguments
-- When referring to a specific section, figure or chapter, please specify the source document
-    located in <document source=source_here> (e.g. "as depicted in section 4.6 [source_here] there are...")
+- When referring to a specific section, figure or chapter, do as follows:
+    "as depicted in section 4.6 [name of the source from <document source=...>],...")
 
 CONTEXT:
 {context}
@@ -99,9 +99,8 @@ EDITING GOALS:
 - Combine choppy sentences into flowing analytical prose
 - Ensure logical progression of ideas
 - Do not explain your edits or provide commentary, just return the edited section
-- When referring to a specific section, figure or chapter, ensure the source document
-    (which is located in <document source=source_here>) is referenced as, for instance,
-    "as depicted in section 4.6 [source_here],...".
+- When referring to a specific section, figure or chapter, do as follows:
+    "as depicted in section 4.6 [name of the source from <document source=...>],...")
 
 SOURCE MATERIAL
 {context}

@@ -519,11 +519,14 @@ def review_section(
         model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host)
         logger.debug("Section review model loaded successfully")
         
+        context_docs = format_docs(state.retrieved_docs)
+        logger.debug(f"Context formatted as: {context_docs[:200]}...")
+
         # Format review prompt with context
         prompt = prompts.REVIEW_SYSTEM_PROMPT.format(
             main_query = main_query,
             current_section = current_section,
-            context = format_docs(state.retrieved_docs),
+            context = context_docs,
             draft_section = state.raw_section_content,
         )
         messages  =  [
