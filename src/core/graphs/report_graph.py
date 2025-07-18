@@ -523,6 +523,7 @@ def review_section(
         prompt = prompts.REVIEW_SYSTEM_PROMPT.format(
             main_query = main_query,
             current_section = current_section,
+            context = format_docs(state.retrieved_docs),
             draft_section = state.raw_section_content,
         )
         messages  =  [

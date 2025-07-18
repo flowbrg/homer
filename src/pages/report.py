@@ -85,6 +85,7 @@ def _create_report(query:str):
                 file_name=filename,
                 mime="application/pdf"
             )
+            # TODO: maybe remove the file from the user_data folder if it is downloaded?
     else:
         st.error(f"No report content was generated: output:{output}")
 
@@ -95,20 +96,26 @@ def _create_report(query:str):
 # Connection button
 connectionButton = st.sidebar.toggle(
     label = "Server execution",
-    value = is_connected(st.session_state)
+    value = is_connected(st.session_state),
+    key="reportConnectionButton"
 )
 
 if connectionButton:
     conn = is_ollama_client_available(st.session_state.ollama_host)
     if conn:
         st.session_state.baseConfig.ollama_host=st.session_state.ollama_host
+        st.session_state.baseConfig.report_model = st.session_state.models["server_standard"]  
     else:
         st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
         st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+        st.session_state.baseConfig.report_model = st.session_state.models["local_standard"]  
 else:
     st.session_state.baseConfig.ollama_host=OLLAMA_LOCALHOST
+    st.session_state.baseConfig.report_model = st.session_state.models["local_standard"]  
 
 st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+
+st.sidebar.info(f"Using model: {st.session_state.baseConfig.report_model}")
 
 st.sidebar.divider()
 

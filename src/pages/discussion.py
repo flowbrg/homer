@@ -94,7 +94,8 @@ def _stream_with_thinking_separation(query: str):
 # Server connection toggle
 connectionButton = st.sidebar.toggle(
     label="Server execution",
-    value=is_connected(st.session_state)
+    value=is_connected(st.session_state),
+    key="discussionConnectionButton",
 )
 
 # Configure server host based on connection preference
@@ -113,8 +114,9 @@ st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
     
 # Model selection toggle
 reasoningModelButton = st.sidebar.toggle(
-        label="Reasoning model",
-    )
+    label="Reasoning model",
+    key="discussionReasoningButton",
+)
 
 # Configure model based on server type and thinking preference
 if reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:

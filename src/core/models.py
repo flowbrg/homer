@@ -28,5 +28,5 @@ def load_chat_model(
     modelLogger.info(f"Loading chat model: {model}")
     return ChatOllama(model = model,
                       temperature=0,
-                      num_ctx= 16384,
+                      num_ctx= 8192, #16384,
                       base_url = host)

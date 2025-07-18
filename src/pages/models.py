@@ -27,7 +27,8 @@ if "ollama_host" not in st.session_state:
 # Server connection toggle
 connectionButton = st.sidebar.toggle(
     label="Server execution",
-    value=is_connected(st.session_state)
+    value=is_connected(st.session_state),
+    key="modelsConnectionButton",
 )
 
 # Configure server host based on connection preference

@@ -21,7 +21,7 @@ if "baseConfig" not in st.session_state:
     st.session_state.baseConfig = load_config()
 if "ollama_host" not in st.session_state:
     from constant import OLLAMA_CLIENT
-    st.session_state.ollama_host = OLLAMA_CLIENT
+    st.session_state.ollama_host = OLLAMA_CLIENT # Loaded in session_state to allow users to modify it from the config.py page
 if "models" not in st.session_state:
     st.session_state.models = DEFAULT_MODELS.copy()
 

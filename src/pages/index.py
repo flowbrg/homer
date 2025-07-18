@@ -90,11 +90,13 @@ def _process_files(uploaded_files):
 
 ############################## Sidebar ##############################
 
+
 conn = is_ollama_client_available(st.session_state.ollama_host)
 
 connectionButton = st.sidebar.toggle(
     label = "Server execution",
-    value = is_connected(st.session_state)
+    value = is_connected(st.session_state),
+    key="indexConnectionButton",
 )
 
 if connectionButton:
@@ -110,7 +112,8 @@ st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
 
 visionParserButton = st.sidebar.toggle(
     label = "Vision Parser",
-    value = st.session_state.baseConfig.ocr,
+    value = st.session_state.baseConfig.ocr,,
+    key="indexVisionButton",
     help="Enable or disable the vision analysis for PDF documents (only available on the server)",
     disabled=not (connectionButton and conn), # Disable if not connected or Ollama client is not available
 )

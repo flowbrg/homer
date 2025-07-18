@@ -71,7 +71,7 @@ class RetrievalAgent(BaseAgent):
         }
         for message_chunk, metadata in self._graph.stream(
             input=input,
-            stream_mode="messages",
+            stream_mode="messages", # Stream the "messages" value of the graph state
             config=config,
         ):
             if message_chunk.content and metadata["langgraph_node"] == "respond":

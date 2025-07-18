@@ -26,7 +26,9 @@ class Configuration:
         default = 5,
     )
 
-    writing_style: Literal["general", "technical"] = field(default = "technical")
+    writing_style: Literal["general", "technical"] = field(
+        default = "technical"
+    )
 
     # Ollama configuration
     ollama_host: str = field(
