@@ -17,6 +17,8 @@ from utils.utils import VECTORSTORE_DIR, get_chroma_client
 
 _COLLECTION = "HOMER"
 _COLLECTION_METADATA = {"hnsw:space": "cosine"}
+
+
 @contextmanager
 def make_retriever(
     embedding_model: Embeddings,
@@ -29,7 +31,7 @@ def make_retriever(
     search_kwargs:
         - k: Amount of documents to return (Default: 4)
         - score_threshold: Minimum relevance threshold (for similarity_score_threshold)
-        - fetch_k: Amount of documents to pass to MMR algorithm (Default: 5)
+        - fetch_k: Amount of documents to pass to MMR algorithm (Default: 4)
         - lambda_mult: Diversity of results returned by MMR, 1 for minimum diversity and 0 for maximum. (Default: 0)
         - filter: Filter by document metadata
     """
@@ -37,7 +39,9 @@ def make_retriever(
 
     # Extract kwargs with default
     #search_type = kwargs.get("search_type","similarity_score_threshold")
-    #search_kwargs = {"k":kwargs.get("k",5), "score_threshold": kwargs.get("score_threshold",0)}
+    search_kwargs = {"k":kwargs.get("k",4), 
+                     #"score_threshold": kwargs.get("score_threshold",0.1)
+                    }
 
     vector_store = Chroma(
         collection_name = _COLLECTION,
@@ -48,7 +52,7 @@ def make_retriever(
 
     yield vector_store.as_retriever(
         #search_type=search_type,
-        #search_kwargs=search_kwargs
+        search_kwargs=search_kwargs
     )
 
 

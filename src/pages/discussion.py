@@ -88,6 +88,51 @@ def _stream_with_thinking_separation(query: str):
         response_placeholder.markdown(error_message)
 
 
+############################## Sidebar ##############################
+
+
+# Server connection toggle
+connectionButton = st.sidebar.toggle(
+    label="Server execution",
+    value=is_connected(st.session_state)
+)
+
+# Configure server host based on connection preference
+if connectionButton:
+    conn = is_ollama_client_available(st.session_state.ollama_host)
+    if conn:
+        st.session_state.baseConfig.ollama_host = st.session_state.ollama_host
+    else:
+        st.sidebar.warning(f"Could not connect to {st.session_state.ollama_host}")
+        st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
+else:
+    st.session_state.baseConfig.ollama_host = OLLAMA_LOCALHOST
+
+# Display the current server connection status
+st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
+    
+# Model selection toggle
+reasoningModelButton = st.sidebar.toggle(
+        label="Reasoning model",
+    )
+
+# Configure model based on server type and thinking preference
+if reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
+    st.session_state.baseConfig.response_model = st.session_state.models["local_reasoning"]
+
+elif not reasoningModelButton and st.session_state.baseConfig.ollama_host == OLLAMA_LOCALHOST:
+    st.session_state.baseConfig.response_model = st.session_state.models["local_standard"]
+
+elif reasoningModelButton and st.session_state.baseConfig.ollama_host == st.session_state.ollama_host:
+    st.session_state.baseConfig.response_model = st.session_state.models["server_reasoning"]
+
+else:
+    st.session_state.baseConfig.response_model = st.session_state.models["server_standard"]
+
+# Display the currently selected model in the sidebar
+st.sidebar.write(f"using model {st.session_state.baseConfig.response_model}")
+
+
 ############################## Page ##############################
 
 

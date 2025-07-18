@@ -319,8 +319,8 @@ def respond(
         
         # Display sources for debugging
         if state.retrieved_docs:
-            logger.info("Displaying source information")
-            print("[info] Sources retrieved for current thread")
+            logger.debug("Displaying source information")
+            print("=====Sources retrieved for current thread=====")
             print(format_sources(documents=state.retrieved_docs))
         else:
             logger.debug("No retrieved documents to display")

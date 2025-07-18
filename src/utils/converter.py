@@ -4,7 +4,9 @@ Convert dictionaries of Markdown content to PDF using ReportLab.
 Used in the report page of the streamlit app to turn the report
 agent output into a downloadable PDF.
 """
-
+from utils.logging import get_logger
+# Initialize logger
+logger = get_logger(__name__)
 
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -164,11 +166,12 @@ class MarkdownToPDF:
         text = []
         text.append(Paragraph(header, self.styles['title']))
         text.append(Spacer(1, 18))
+        logger.info(f"Added header: {header}")
         
         for i, item in enumerate(data):
             title = item.get('title', f'Section {i+1}')
             content = item.get('content', '')
-            
+            logger.info(f"Added section: {item.get('title', f'Section {i+1}')}")
             if not title and not content:
                 continue
             
@@ -208,7 +211,8 @@ def dict_to_pdf(data: List[Dict[str, str]], output_filename: str = "report.pdf",
         str: Path to the created PDF file
     """
     converter = MarkdownToPDF()
-    return converter.generate_pdf(data, output_filename, output_dir,header)
+    logger.info("Starting the conversion")
+    return converter.generate_pdf(data=data, header=header, filename=output_filename, output_dir=output_dir)
 
 
 ######################################## Example usage ########################################

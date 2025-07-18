@@ -146,6 +146,18 @@ numberOfPartsSlider = st.sidebar.slider(
 # Update the configuration
 st.session_state.baseConfig.number_of_parts = numberOfPartsSlider
 
+st.sidebar.divider()
+
+# Number of parts slider
+retriverKSlider = st.sidebar.slider(
+    label="Number of documents retrieved",
+    min_value=1,
+    max_value=20,
+    value=4,
+)
+
+# Update the configuration
+#st.session_state.baseConfig.retriever_k = retriverKSlider
 
 ############################## Page ##############################
 
