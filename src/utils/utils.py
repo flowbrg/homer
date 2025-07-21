@@ -17,6 +17,7 @@ def get_connection() -> sqlite3.Connection:
 
 from chromadb import PersistentClient
 
+
 def get_chroma_client() -> PersistentClient:
     return PersistentClient(path=VECTORSTORE_DIR)
 
