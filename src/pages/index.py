@@ -112,7 +112,7 @@ st.sidebar.write(f"Connected to: {st.session_state.baseConfig.ollama_host}")
 
 visionParserButton = st.sidebar.toggle(
     label = "Vision Parser",
-    value = st.session_state.baseConfig.ocr,,
+    value = st.session_state.baseConfig.ocr,
     key="indexVisionButton",
     help="Enable or disable the vision analysis for PDF documents (only available on the server)",
     disabled=not (connectionButton and conn), # Disable if not connected or Ollama client is not available
