@@ -13,6 +13,6 @@ os.environ['ANONYMIZED_TELEMETRY'] = 'False' # Disable Chromadb telemetry
 
 # Run the Streamlit app
 try:
-    subprocess.run(["streamlit", "run", "src/streamlit_app.py"], check=True)
+  subprocess.run(["streamlit", "run", "src/streamlit_app.py"], check=True)
 except subprocess.CalledProcessError as e:
-    print(f"Streamlit exited with error: {e}")
+  print(f"Streamlit exited with error: {e}")

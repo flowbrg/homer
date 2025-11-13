@@ -3,7 +3,7 @@ RESPONSE_SYSTEM_PROMPT = """
 -You are given access to a large corpus of technical documents and reports which relevant information to the user are in the documents below.
 -Answer questions clearly using fact-based and statistical information where possible.
 -When referring to a specific section, figure or chapter, please specify the source document
-    located in <document source=source_here> (e.g. "as depicted in section 4.6 [source_here] there are...")
+  located in <document source=source_here> (e.g. "as depicted in section 4.6 [source_here] there are...")
 
 
 Use only the following information to answer the user's query:
@@ -64,7 +64,7 @@ GUIDELINES:
 - Connect ideas from multiple sources into a unified narrative
 - Acknowledge any informational gaps explicitly
 - When referring to a specific section, figure or chapter, please specify the source document
-    located in <document source=source_here> (e.g. "as depicted in section 4.6 [source_here] there are...")
+  located in <document source=source_here> (e.g. "as depicted in section 4.6 [source_here] there are...")
 
 CONTEXT:
 {context}
@@ -82,7 +82,7 @@ GUIDELINES:
 - Write in flowing paragraphs without subheadings
 - Integrate multiple sources to build coherent arguments
 - When referring to a specific section, figure or chapter, do as follows:
-    "as depicted in section 4.6 [name of the source from <document source=...>],...")
+  "as depicted in section 4.6 [name of the source from <document source=...>],...")
 
 CONTEXT:
 {context}
@@ -100,7 +100,7 @@ EDITING GOALS:
 - Ensure logical progression of ideas
 - Do not explain your edits or provide commentary, just return the edited section
 - When referring to a specific section, figure or chapter, do as follows:
-    "as depicted in section 4.6 [name of the source from <document source=...>],...")
+  "as depicted in section 4.6 [name of the source from <document source=...>],...")
 
 SOURCE MATERIAL
 {context}

@@ -19,10 +19,10 @@
 
 % Page geometry
 \geometry{
-    left=2.5cm,
-    right=2.5cm,
-    top=3cm,
-    bottom=3cm
+  left=2.5cm,
+  right=2.5cm,
+  top=3cm,
+  bottom=3cm
 }
 
 \setlength{\parindent}{0pt}
@@ -37,43 +37,43 @@
 
 % Code listing style
 \lstdefinestyle{pythonstyle}{
-    language=Python,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{blue}\bfseries,
-    commentstyle=\color{gray},
-    stringstyle=\color{red},
-    numberstyle=\tiny\color{gray},
-    numbers=left,
-    stepnumber=1,
-    numbersep=8pt,
-    showstringspaces=false,
-    breaklines=true,
-    frame=single,
-    backgroundcolor=\color{gray!10},
-    captionpos=b
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  numberstyle=\tiny\color{gray},
+  numbers=left,
+  stepnumber=1,
+  numbersep=8pt,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!10},
+  captionpos=b
 }
 
 \lstset{style=pythonstyle}
 
 % Hyperref setup
 \hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,
-    urlcolor=cyan,
-    pdftitle={Homer Technical Report},
-    pdfauthor={Florent Bergé, Mathieu de la Barre},
-    pdfsubject={RAG Application for Nuclear Reactor Documentation},
-    pdfkeywords={RAG, AI, Nuclear, MYRRHA, LangGraph, ChromaDB}
+  colorlinks=true,
+  linkcolor=blue,
+  filecolor=magenta,
+  urlcolor=cyan,
+  pdftitle={Homer Technical Report},
+  pdfauthor={Florent Bergé, Mathieu de la Barre},
+  pdfsubject={RAG Application for Nuclear Reactor Documentation},
+  pdfkeywords={RAG, AI, Nuclear, MYRRHA, LangGraph, ChromaDB}
 }
 
 % Title page information
 \title{\textbf{Homer - Technical Report}}
 \author{
-    Florent Bergé \\
-    \and
-    Mathieu de la Barre \\
-    \textit{IMT Atlantique}
+  Florent Bergé \\
+  \and
+  Mathieu de la Barre \\
+  \textit{IMT Atlantique}
 }
 \date{March 1st - July 18th, 2025}
 
@@ -81,36 +81,36 @@
 
 % Title page
 \begin{titlepage}
-    \centering
-    \vspace*{2cm}
-    
-    {\huge\bfseries Homer - Technical Report\par}
-    \vspace{1cm}
-    {\Large\itshape A Retrieval-Augmented Generation System for Nuclear Engineers Documentation\par}
-    \vspace{2cm}
-    
-    {\Large
-    Florent Bergé \\
-    Mathieu de la Barre \\
-    \textit{IMT Atlantique}
-    \par}
-    \vspace{1cm}
-    
-    {\large Supervised by: Mr. Vincenzo De Florio\par}
-    \vspace{2cm}
-    
-    {\large
-    \textbf{SCK CEN} \\
-    Belgian Nuclear Research Centre \\
-    April 1st - July 18th, 2025
-    \par}
-    
-    \vfill
-    
-    {\large
-    Classification: Restricted
-    \par}
-    
+  \centering
+  \vspace*{2cm}
+  
+  {\huge\bfseries Homer - Technical Report\par}
+  \vspace{1cm}
+  {\Large\itshape A Retrieval-Augmented Generation System for Nuclear Engineers Documentation\par}
+  \vspace{2cm}
+  
+  {\Large
+  Florent Bergé \\
+  Mathieu de la Barre \\
+  \textit{IMT Atlantique}
+  \par}
+  \vspace{1cm}
+  
+  {\large Supervised by: Mr. Vincenzo De Florio\par}
+  \vspace{2cm}
+  
+  {\large
+  \textbf{SCK CEN} \\
+  Belgian Nuclear Research Centre \\
+  April 1st - July 18th, 2025
+  \par}
+  
+  \vfill
+  
+  {\large
+  Classification: Restricted
+  \par}
+  
 \end{titlepage}
 
 % Table of contents
@@ -141,17 +141,17 @@ The name Homer pays homage to the ancient Greek poet traditionally regarded as t
 The Retrieval-Augmented Generation (RAG) pattern is an industry-standard approach to building applications that use language models to process specific or proprietary data that the model doesn't already know. The architecture is straightforward and best suited for large and fast-changing data sets (compared to fine-tuning).
 
 \begin{figure}[H]
-        \centering
-        \includegraphics[width=1\linewidth]{static/schemas/query.png}
-        \caption{RAG application flow}
-        \label{fig:ragflow}
-    \end{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{static/schemas/query.png}
+    \caption{RAG application flow}
+    \label{fig:ragflow}
+  \end{figure}
 
 \begin{enumerate}
-    \item The user issues a query
-    \item The application performs a search on the vectorstore based on the user input
-    \item The top k results matching the query are extracted. Both the results and the query are then packaged together in a prompt and sent to the Large Language Model (LLM)
-    \item The LLM outputs a structured answer based on both the input and the retrieved context
+  \item The user issues a query
+  \item The application performs a search on the vectorstore based on the user input
+  \item The top k results matching the query are extracted. Both the results and the query are then packaged together in a prompt and sent to the Large Language Model (LLM)
+  \item The LLM outputs a structured answer based on both the input and the retrieved context
 \end{enumerate}
 
 \section{Core Components}
@@ -175,17 +175,17 @@ The chat model is the large language model responsible for generating responses 
 An indexing pipeline allows transforming files into useable data for the RAG application. The data pipeline processes each document individually by completing the following steps:
 
 \begin{figure}[H]
-        \centering
-        \includegraphics[width=1\linewidth]{static/schemas/documentLoader.png}
-        \caption{Indexing pipeline}
-        \label{fig:indexpipeline}
+    \centering
+    \includegraphics[width=1\linewidth]{static/schemas/documentLoader.png}
+    \caption{Indexing pipeline}
+    \label{fig:indexpipeline}
 \end{figure}
 
 \begin{enumerate}
-    \item \textbf{Loading}: Data is extracted from the documents
-    \item \textbf{Chunking}: The document is divided into smaller parts—recommended between 256 and 512 chunks—according to a chunking technique
-    \item \textbf{Chunk enrichment}: Adds metadata fields that the pipeline creates based on the content in the chunks, such as the source document, the titles and other relevant information
-    \item \textbf{Indexing}: All the chunks are turned into embeddings and stored into a vector database according to an indexing algorithm\cite{berge2025hybrid}
+  \item \textbf{Loading}: Data is extracted from the documents
+  \item \textbf{Chunking}: The document is divided into smaller parts—recommended between 256 and 512 chunks—according to a chunking technique
+  \item \textbf{Chunk enrichment}: Adds metadata fields that the pipeline creates based on the content in the chunks, such as the source document, the titles and other relevant information
+  \item \textbf{Indexing}: All the chunks are turned into embeddings and stored into a vector database according to an indexing algorithm\cite{berge2025hybrid}
 \end{enumerate}
 
 \subsection{Chunking Techniques}
@@ -203,17 +203,17 @@ LangChain is a popular open-source framework designed to simplify the developmen
 \textbf{Key LangChain Components:}
 
 \begin{itemize}
-    \item \textbf{The Retriever}: A core abstraction that defines a standard interface for fetching relevant documents based on a query. It acts as the bridge between the user's question and the vectorstore, encapsulating the search logic and returning a list of relevant documents
-    \begin{itemize}
-        \item \textit{VectorStoreRetriever}: Performs similarity search on vector databases
-        \item \textit{MultiQueryRetriever}: Generates multiple variations of the user query to improve retrieval coverage
-    \end{itemize}
-    
-    \item \textbf{The Document Class}: LangChain's standardized representation of a piece of text content along with its associated metadata. Each Document object contains:
-    \begin{itemize}
-        \item \textit{page\_content}: The actual text content of the document chunk
-        \item \textit{metadata}: A dictionary containing additional information such as source file, page number, creation date, document type, and custom fields
-    \end{itemize}
+  \item \textbf{The Retriever}: A core abstraction that defines a standard interface for fetching relevant documents based on a query. It acts as the bridge between the user's question and the vectorstore, encapsulating the search logic and returning a list of relevant documents
+  \begin{itemize}
+    \item \textit{VectorStoreRetriever}: Performs similarity search on vector databases
+    \item \textit{MultiQueryRetriever}: Generates multiple variations of the user query to improve retrieval coverage
+  \end{itemize}
+  
+  \item \textbf{The Document Class}: LangChain's standardized representation of a piece of text content along with its associated metadata. Each Document object contains:
+  \begin{itemize}
+    \item \textit{page\_content}: The actual text content of the document chunk
+    \item \textit{metadata}: A dictionary containing additional information such as source file, page number, creation date, document type, and custom fields
+  \end{itemize}
 \end{itemize}
 
 \subsection{LangGraph}
@@ -222,11 +222,11 @@ LangGraph is a framework built on top of LangChain that enables the creation of 
 \textbf{Core LangGraph Components:}
 
 \begin{itemize}
-    \item \textbf{The Graph}: The core abstraction that defines the structure and flow of your application. It represents a directed graph where nodes perform specific tasks and edges define the transitions between these tasks;
-    \item \textbf{Nodes}: Individual processing units within a LangGraph. Each node encapsulates a specific function, receiving the current state as input and returning updated state information;
-    \item \textbf{State Management}: Allows information to persist and evolve throughout the execution of a graph. The state serves as a shared data structure that nodes can read from and write to;
-    \item \textbf{The Checkpointer}: Responsible for persisting the state of a graph execution at specific points, enabling durability and recovery capabilities. In our implementation, we use an in-memory SQLite database;
-    \begin{lstlisting}[caption={Checkpointer usage}]
+  \item \textbf{The Graph}: The core abstraction that defines the structure and flow of your application. It represents a directed graph where nodes perform specific tasks and edges define the transitions between these tasks;
+  \item \textbf{Nodes}: Individual processing units within a LangGraph. Each node encapsulates a specific function, receiving the current state as input and returning updated state information;
+  \item \textbf{State Management}: Allows information to persist and evolve throughout the execution of a graph. The state serves as a shared data structure that nodes can read from and write to;
+  \item \textbf{The Checkpointer}: Responsible for persisting the state of a graph execution at specific points, enabling durability and recovery capabilities. In our implementation, we use an in-memory SQLite database;
+  \begin{lstlisting}[caption={Checkpointer usage}]
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 builder = StateGraph(...
@@ -235,16 +235,16 @@ conn = sqlite3.connect(':memory:', check_same_thread=False)
 memory = SqliteSaver(conn)
 
 graph = builder.compile(checkpointer=memory)
-    \end{lstlisting}
-    \item \textbf{The Runnable Config}: A configuration object that controls how a graph executes, providing fine-grained control over the execution environment and allowing configuration to be passed inside the nodes. In order to provide a custom configuration to the graph, it needs to be passed in the "configurable" argument of the RunnableConfig and turned into a dictionary. To use a checkpoint, you also have to add a \textit{thread\_id} to the configurable dictionary;
-    \begin{lstlisting}[caption={Runnable config usage}]
+  \end{lstlisting}
+  \item \textbf{The Runnable Config}: A configuration object that controls how a graph executes, providing fine-grained control over the execution environment and allowing configuration to be passed inside the nodes. In order to provide a custom configuration to the graph, it needs to be passed in the "configurable" argument of the RunnableConfig and turned into a dictionary. To use a checkpoint, you also have to add a \textit{thread\_id} to the configurable dictionary;
+  \begin{lstlisting}[caption={Runnable config usage}]
 configuration = {"parameter1":value1, ...}|{"thread_id":1}
 
 graph.invoke(
-    input=user_input,
-    config={"configurable":configuration}
+  input=user_input,
+  config={"configurable":configuration}
 )
-    \end{lstlisting}
+  \end{lstlisting}
 \end{itemize}
 
 \chapter{Architecture}
@@ -252,9 +252,9 @@ graph.invoke(
 Homer is a RAG application that allows users to provide their own documents to augment the agent's knowledge. It is composed of a Streamlit web interface, LangGraph agents, and an Ollama client.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{static/schemas/scope.png}
-    \label{fig:scope}
+  \centering
+  \includegraphics[width=0.5\linewidth]{static/schemas/scope.png}
+  \label{fig:scope}
 \end{figure}
 
 The core Application (interface, agents and vectorstore) runs on the local machine and sends requests to an Ollama client which handles model inferences. The latter can either be running on the local machine as well or on a distant server.
@@ -264,10 +264,10 @@ This architecture was chosen because it allows confidential data to stay on the 
 \section{Code architecture}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\linewidth]{static/schemas/projectOverview.drawio.png}
-    \caption{Code organization}
-    \label{fig:overview}
+  \centering
+  \includegraphics[width=0.7\linewidth]{static/schemas/projectOverview.drawio.png}
+  \caption{Code organization}
+  \label{fig:overview}
 \end{figure}
 
 The application starts by running:
@@ -283,10 +283,10 @@ streamlit run streamlit_app.py
 \end{lstlisting}
 
 \begin{itemize}
-    \item \textbf{Pages} refers to the streamlit interface pages, which are managed by the file \texttt{streamlit\_app}
-    \item \textbf{core} refers to the core components (configuration and agents related files)
-    \item \textbf{utils} are all the utility functions that can be called in any file, such as the log management, functions to load a sqlite3 connection etc
-    \item \textbf{parser} refers to the custom pdf parser described in Chapter 3
+  \item \textbf{Pages} refers to the streamlit interface pages, which are managed by the file \texttt{streamlit\_app}
+  \item \textbf{core} refers to the core components (configuration and agents related files)
+  \item \textbf{utils} are all the utility functions that can be called in any file, such as the log management, functions to load a sqlite3 connection etc
+  \item \textbf{parser} refers to the custom pdf parser described in Chapter 3
 \end{itemize}
 
 \section{Streamlit Client}
@@ -294,12 +294,12 @@ streamlit run streamlit_app.py
 The Streamlit client is composed of 6 pages:
 
 \begin{itemize}
-    \item \textbf{Home}: Welcome page with navigation
-    \item \textbf{Discussion}: The page where users can chat with the RetrievalAgent
-    \item \textbf{Report}: The page where users can send a query to the ReportAgent
-    \item \textbf{Documents}: The page to add documents to the knowledge base
-    \item \textbf{Configuration}: The page where users can temporarily modify parameters
-    \item \textbf{Models}: Allows users to enter an Ollama model to pull
+  \item \textbf{Home}: Welcome page with navigation
+  \item \textbf{Discussion}: The page where users can chat with the RetrievalAgent
+  \item \textbf{Report}: The page where users can send a query to the ReportAgent
+  \item \textbf{Documents}: The page to add documents to the knowledge base
+  \item \textbf{Configuration}: The page where users can temporarily modify parameters
+  \item \textbf{Models}: Allows users to enter an Ollama model to pull
 \end{itemize}
 
 \subsection*{Session state}
@@ -307,32 +307,32 @@ The Streamlit client is composed of 6 pages:
 Streamlit uses a 'session\_state' to store session variables such as:
 
 \begin{itemize}
-    \item \textbf{baseConfig} (Configuration): Loads the default Configuration
-    \item \textbf{ollama\_host} (str): The IP address of the distant Ollama client
-    \item \textbf{models} (dictionary): The discussion models, reasoning or standard, local or server (server ones are larger and more accurate than local ones)
+  \item \textbf{baseConfig} (Configuration): Loads the default Configuration
+  \item \textbf{ollama\_host} (str): The IP address of the distant Ollama client
+  \item \textbf{models} (dictionary): The discussion models, reasoning or standard, local or server (server ones are larger and more accurate than local ones)
 \end{itemize}
 
 \subsection{Discussion Page}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{static/figures/discussionPage.png}
-    \label{fig:discussionPage}
+  \centering
+  \includegraphics[width=1\linewidth]{static/figures/discussionPage.png}
+  \label{fig:discussionPage}
 \end{figure}
 
 This is the main page for asking questions to the RetrievalAgent. The discussion displays in the main page, above the input field at the bottom. It features 2 buttons in the sidebar:
 
 \begin{itemize}
-    \item \textbf{Server Execution}: Allows running models on the distant client at the 'ollama\_host' address, if available
-    \item \textbf{Reasoning Model}: Allows switching between traditional and reasoning models. Due to their 'thinking' step, they take more time to output an answer. When Reasoning model is on, the thinking part will be accessible through an expander on top of the answer
+  \item \textbf{Server Execution}: Allows running models on the distant client at the 'ollama\_host' address, if available
+  \item \textbf{Reasoning Model}: Allows switching between traditional and reasoning models. Due to their 'thinking' step, they take more time to output an answer. When Reasoning model is on, the thinking part will be accessible through an expander on top of the answer
 \end{itemize}
 
 The specific session\_state values for this page are:
 \begin{itemize}
-    \item \textbf{retrievalAgent} (RetrievalAgent): The compiled retrieval agent
-    \item \textbf{ollama\_host}
-    \item \textbf{baseConfig}
-    \item \textbf{models}
+  \item \textbf{retrievalAgent} (RetrievalAgent): The compiled retrieval agent
+  \item \textbf{ollama\_host}
+  \item \textbf{baseConfig}
+  \item \textbf{models}
 \end{itemize}
 
 Loading the retrieval agent in the session\_state allows compiling the graph only once.
@@ -340,56 +340,56 @@ Loading the retrieval agent in the session\_state allows compiling the graph onl
 \subsection{Report Page}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{static/figures/reportPage.png}
-    \label{fig:reportPage}
+  \centering
+  \includegraphics[width=1\linewidth]{static/figures/reportPage.png}
+  \label{fig:reportPage}
 \end{figure}
 
 This page allows the user to request a report to the ReportAgent. The sidebar features 2 options:
 
 \begin{itemize}
-    \item \textbf{Server Execution}
-    \item \textbf{Writing}: Allows switching between 'general' and 'technical' writing style
+  \item \textbf{Server Execution}
+  \item \textbf{Writing}: Allows switching between 'general' and 'technical' writing style
 \end{itemize}
 
 Once a report is completed, a button to download it.
 
 The specific session\_state values for this page are:
 \begin{itemize}
-    \item \textbf{reportAgent} (ReportAgent): The compiled report agent
-    \item \textbf{report\_history} (list): A list of previous reports from the session
-    \item \textbf{ollama\_host}
-    \item \textbf{baseConfig}
+  \item \textbf{reportAgent} (ReportAgent): The compiled report agent
+  \item \textbf{report\_history} (list): A list of previous reports from the session
+  \item \textbf{ollama\_host}
+  \item \textbf{baseConfig}
 \end{itemize}
 
 \subsection{Document Page}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{static/figures/documentPage.png}
-    \label{fig:documentPage}
+  \centering
+  \includegraphics[width=\linewidth]{static/figures/documentPage.png}
+  \label{fig:documentPage}
 \end{figure}
 
 This page allows the user to send documents to the documents pipeline (IndexAgent). The sidebar features 2 options:
 
 \begin{itemize}
-    \item \textbf{Server Execution}
-    \item \textbf{Vision parser}: Allows switching between PyMuPDF parser and a custom Vision parser (using a LLVM)
+  \item \textbf{Server Execution}
+  \item \textbf{Vision parser}: Allows switching between PyMuPDF parser and a custom Vision parser (using a LLVM)
 \end{itemize}
 
 The specific session\_state values for this page are:
 \begin{itemize}
-    \item \textbf{indexAgent} (IndexAgent): The compiled indexing pipeline
-    \item \textbf{ollama\_host}
-    \item \textbf{baseConfig}
+  \item \textbf{indexAgent} (IndexAgent): The compiled indexing pipeline
+  \item \textbf{ollama\_host}
+  \item \textbf{baseConfig}
 \end{itemize}
 
 \subsection{Model Page}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{static/figures/modelPage.png}
-    \label{fig:modelPage}
+  \centering
+  \includegraphics[width=\linewidth]{static/figures/modelPage.png}
+  \label{fig:modelPage}
 \end{figure}
 
 This page allows the user to pull a model to either the local or server ollama client.
@@ -397,9 +397,9 @@ This page allows the user to pull a model to either the local or server ollama c
 \section{Configuration Management}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{static/schemas/classDiagramConfiguration.drawio.png}
-    \label{fig:configuration}
+  \centering
+  \includegraphics[width=0.5\linewidth]{static/schemas/classDiagramConfiguration.drawio.png}
+  \label{fig:configuration}
 \end{figure}
 
 \subsection{Configuration Architecture}
@@ -411,16 +411,16 @@ The configuration system utilizes Python's \texttt{dataclass} decorator with the
 \begin{lstlisting}[caption={Configuration dataclass structure}]
 @dataclass(kw_only=True)
 class Configuration:
-    # Report configuration
-    number_of_parts: int = field(default=5)
-    
-    # Ollama configuration  
-    ollama_host: str = field(default=OLLAMA_LOCALHOST)
-    
-    # Model specifications
-    embedding_model: str = field(default="nomic-embed-text")
-    response_model: str = field(default="gemma3:1b")
-    # ... additional model configurations
+  # Report configuration
+  number_of_parts: int = field(default=5)
+  
+  # Ollama configuration  
+  ollama_host: str = field(default=OLLAMA_LOCALHOST)
+  
+  # Model specifications
+  embedding_model: str = field(default="nomic-embed-text")
+  response_model: str = field(default="gemma3:1b")
+  # ... additional model configurations
 \end{lstlisting}
 
 \subsection{Dynamic Host Resolution}
@@ -429,9 +429,9 @@ The system implements intelligent host resolution through the \texttt{\_is\_olla
 
 This dual-mode operation enables:
 \begin{itemize}
-    \item \textbf{Local development} with reduced model capabilities but full functionality
-    \item \textbf{Production deployment} with access to larger, more capable models on dedicated hardware
-    \item \textbf{Automatic failover} ensuring system availability regardless of server status
+  \item \textbf{Local development} with reduced model capabilities but full functionality
+  \item \textbf{Production deployment} with access to larger, more capable models on dedicated hardware
+  \item \textbf{Automatic failover} ensuring system availability regardless of server status
 \end{itemize}
 
 \subsection{Configuration Integration with LangGraph}
@@ -474,18 +474,18 @@ The reasoning models incorporate a \texttt{<think>...</think>} mechanism, enabli
 Agents are organised as shown:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{static/schemas/classDiagramAgents.drawio.png}
-    \caption{Agents class diagram}
-    \label{fig:agents}
+  \centering
+  \includegraphics[width=\linewidth]{static/schemas/classDiagramAgents.drawio.png}
+  \caption{Agents class diagram}
+  \label{fig:agents}
 \end{figure}
 
 The \texttt{RetrievalAgent} and \texttt{ReportAgent} both use custom structured output at some point in their execution. They come in the form of pydantic's BaseModels:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{static/schemas/classDiagramStructuredOutputs.drawio.png}
-    \label{fig:StructuredOutputs}
+  \centering
+  \includegraphics[width=0.5\linewidth]{static/schemas/classDiagramStructuredOutputs.drawio.png}
+  \label{fig:StructuredOutputs}
 \end{figure}
 
 \subsection{Graph State Architecture}
@@ -493,10 +493,10 @@ The \texttt{RetrievalAgent} and \texttt{ReportAgent} both use custom structured 
 Homer implements a sophisticated state management system using LangGraph's state abstractions. Each agent maintains its specific state structure while sharing common interfaces:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{static/schemas/classDiagramStates.drawio.png}
-    \caption{Agents states}
-    \label{fig:states}
+  \centering
+  \includegraphics[width=\linewidth]{static/schemas/classDiagramStates.drawio.png}
+  \caption{Agents states}
+  \label{fig:states}
 \end{figure}
 
 \subsection{State Reducers}
@@ -505,18 +505,18 @@ The system implements custom state reducers for complex state transitions:
 
 \begin{lstlisting}[caption={Document state reducer}]
 def reduce_docs(existing: Optional[Sequence[Document]], 
-                new: Union[Sequence[Document], str, Literal["delete"]]):
-    if new == "delete":
-        return []
-    # Handle various input types and transformations
+        new: Union[Sequence[Document], str, Literal["delete"]]):
+  if new == "delete":
+    return []
+  # Handle various input types and transformations
 \end{lstlisting}
 
 \subsection{Memory and Persistence}
 
 \begin{itemize}
-    \item \textbf{Conversation Memory}: RetrievalAgent uses SQLite-based checkpointing for conversation persistence
-    \item \textbf{Document Storage}: ChromaDB provides persistent vector storage with metadata
-    \item \textbf{Session State}: Streamlit manages user session state for UI consistency
+  \item \textbf{Conversation Memory}: RetrievalAgent uses SQLite-based checkpointing for conversation persistence
+  \item \textbf{Document Storage}: ChromaDB provides persistent vector storage with metadata
+  \item \textbf{Session State}: Streamlit manages user session state for UI consistency
 \end{itemize}
 
 In a previous version, making the discussions persistent has been considered, but the streamlit interface made switching discussions difficult. You can find some files related to this in \texttt{src/schemas} and \texttt{src/core/database.py}.\\
@@ -527,10 +527,10 @@ To enable the persistent database, the value \texttt{":memory:"} from \texttt{sr
 The RetrievalAgent implements a stateful conversational retrieval system using LangGraph's state management capabilities. The agent maintains conversation context through an SQLite checkpointer, enabling multi-turn conversations with persistent memory.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.4\linewidth]{static/schemas/retrievalGraph.drawio.png}
-    \caption{Retrieval graph structure}
-    \label{fig:retrievalGraph}
+  \centering
+  \includegraphics[width=0.4\linewidth]{static/schemas/retrievalGraph.drawio.png}
+  \caption{Retrieval graph structure}
+  \label{fig:retrievalGraph}
 \end{figure}
 
 \textbf{Nodes:}\\
@@ -541,43 +541,43 @@ Generate an optimized search query based on conversation context.  This function
 
 \begin{lstlisting}[caption={Rephrase query node}]
 def rephrase_query(
-    state: RetrievalState, *, config: RunnableConfig
+  state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, Union[str, List]]:
 
-    configuration = Configuration.from_runnable_config(config)
-    
-    # Load and configure model
-    model = load_chat_model(
-        model=configuration.query_model, 
-        host=configuration.ollama_host
-    ).with_structured_output(SearchQuery)
-    
-    # Prepare message context
-    previous_messages = (
-        format_messages(state.messages[-3:-1]) 
-        if len(state.messages) >= 3 
-        else "There were no previous messages."
-    )
-    
-    # Create prompt
-    system_prompt = prompts.REPHRASE_QUERY_SYSTEM_PROMPT.format(
-        previous_messages= previous_messages,
-    )
-    user_prompt = state.messages[-1].content
-    
-    messages = [
-        ("human", combine_prompts(system_prompt,user_prompt)),
-    ]
-    
-    # Generate rephrased query
-    generated = cast(SearchQuery, model.invoke(messages, config))
-    
-    retrievalAgentLogger.info(f"Generated query: '{generated.query}'")
-    
-    return {
-        "query": generated.query,
-        "retrieved_docs": "delete" if state.retrieved_docs else [],
-    }
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Load and configure model
+  model = load_chat_model(
+    model=configuration.query_model, 
+    host=configuration.ollama_host
+  ).with_structured_output(SearchQuery)
+  
+  # Prepare message context
+  previous_messages = (
+    format_messages(state.messages[-3:-1]) 
+    if len(state.messages) >= 3 
+    else "There were no previous messages."
+  )
+  
+  # Create prompt
+  system_prompt = prompts.REPHRASE_QUERY_SYSTEM_PROMPT.format(
+    previous_messages= previous_messages,
+  )
+  user_prompt = state.messages[-1].content
+  
+  messages = [
+    ("human", combine_prompts(system_prompt,user_prompt)),
+  ]
+  
+  # Generate rephrased query
+  generated = cast(SearchQuery, model.invoke(messages, config))
+  
+  retrievalAgentLogger.info(f"Generated query: '{generated.query}'")
+  
+  return {
+    "query": generated.query,
+    "retrieved_docs": "delete" if state.retrieved_docs else [],
+  }
 \end{lstlisting}
 
 \paragraph{Retrieve}
@@ -586,29 +586,29 @@ Retrieve relevant documents based on the generated query. This function takes a 
 
 \begin{lstlisting}[caption={Retrieve node}]
 def retrieve(
-    state: RetrievalState, *, config: RunnableConfig
+  state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, List[Document]]:
 
-    configuration = Configuration.from_runnable_config(config)
-    
-    # Load embedding model
-    embeddings = load_embedding_model(
-        model=configuration.embedding_model, 
-        host=configuration.ollama_host
-    )
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Load embedding model
+  embeddings = load_embedding_model(
+    model=configuration.embedding_model, 
+    host=configuration.ollama_host
+  )
 
-    # Retrieve documents
-    with retrieval.make_retriever(embedding_model=embeddings) as retriever:
-        response = retriever.invoke(state.query, config)
-        
-        if response:
-            retrievalAgentLogger.info(f"Successfully retrieved {len(response)} documents")
-            for doc in response:
-                retrievalAgentLogger.debug(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
-        else:
-            retrievalAgentLogger.warning("No documents retrieved for the query")
-        
-        return {"retrieved_docs": response}
+  # Retrieve documents
+  with retrieval.make_retriever(embedding_model=embeddings) as retriever:
+    response = retriever.invoke(state.query, config)
+    
+    if response:
+      retrievalAgentLogger.info(f"Successfully retrieved {len(response)} documents")
+      for doc in response:
+        retrievalAgentLogger.debug(f"Document: {doc.page_content} from {doc.metadata.get('source', 'unknown')}\n")
+    else:
+      retrievalAgentLogger.warning("No documents retrieved for the query")
+    
+    return {"retrieved_docs": response}
 \end{lstlisting}
 
 \paragraph{Respond}
@@ -617,100 +617,100 @@ def retrieve(
 
 \begin{lstlisting}[caption={Respond node}]
 def respond(
-    state: RetrievalState, *, config: RunnableConfig
+  state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, Union[List[BaseMessage], List, str]]:
 
-    configuration = Configuration.from_runnable_config(config)
-    
-    # Load model
-    model = load_chat_model(
-        model=configuration.response_model, 
-        host=configuration.ollama_host
-    )
-    
-    # Prepare context
-    previous_messages = ya_format_messages(state.messages[-3:-1] if len(state.messages)>2 else [])
-    context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
-    
-    # Create prompt
-    system_prompt = prompts.RESPONSE_SYSTEM_PROMPT.format(
-        context = context_docs,
-        summary = state.summary if state.summary else "",
-    )
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Load model
+  model = load_chat_model(
+    model=configuration.response_model, 
+    host=configuration.ollama_host
+  )
+  
+  # Prepare context
+  previous_messages = ya_format_messages(state.messages[-3:-1] if len(state.messages)>2 else [])
+  context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
+  
+  # Create prompt
+  system_prompt = prompts.RESPONSE_SYSTEM_PROMPT.format(
+    context = context_docs,
+    summary = state.summary if state.summary else "",
+  )
 
-    messages = [
-        ("system", system_prompt)
-    ] + previous_messages + [
-        ("human", state.messages[-1].content)
-    ]
+  messages = [
+    ("system", system_prompt)
+  ] + previous_messages + [
+    ("human", state.messages[-1].content)
+  ]
 
-    # Generate response
-    response = model.invoke(input=messages, config=config)
+  # Generate response
+  response = model.invoke(input=messages, config=config)
 
-    return {
-        "messages": [response],
-        "retrieved_docs": [],
-        "query": "",
-    }
+  return {
+    "messages": [response],
+    "retrieved_docs": [],
+    "query": "",
+  }
 \end{lstlisting}
 
 \paragraph{Summarize conversation}
 
 Create or extend a conversation summary to manage long chat histories. This function generates a concise summary of recent conversation messages, either creating a new summary or extending an existing one. This helps maintain context while keeping prompt sizes manageable for long conversations.
-    
+  
 \begin{lstlisting}[caption={Summarize conversation node}]
 def summarize_conversation(
-    state: RetrievalState, *, config: RunnableConfig
+  state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, str]:
 
-    configuration = Configuration.from_runnable_config(config)
-    
-    # Get existing summary
-    existing_summary = state.summary if state.summary else ""
-    messages_to_summarize = ya_format_messages(state.messages[-6:])  # Last 6 messages
-    
-    # Determine prompt based on existing summary
-    if existing_summary:
-        summary_system_prompt = f"""This is summary of the conversation to date:
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Get existing summary
+  existing_summary = state.summary if state.summary else ""
+  messages_to_summarize = ya_format_messages(state.messages[-6:])  # Last 6 messages
+  
+  # Determine prompt based on existing summary
+  if existing_summary:
+    summary_system_prompt = f"""This is summary of the conversation to date:
 <summary>
 {existing_summary}
 </summary>
 
 Extend the summary by taking into account the new messages:"""
 
-    else:
-        summary_system_prompt = "Create a summary of the conversation:"
+  else:
+    summary_system_prompt = "Create a summary of the conversation:"
 
-    # Load model
-    model = load_chat_model(
-        model=configuration.query_model, 
-        host=configuration.ollama_host
-    )
-    
-    # Create prompt
-    messages = [
-        ('system', summary_system_prompt)
-    ] + messages_to_summarize
+  # Load model
+  model = load_chat_model(
+    model=configuration.query_model, 
+    host=configuration.ollama_host
+  )
+  
+  # Create prompt
+  messages = [
+    ('system', summary_system_prompt)
+  ] + messages_to_summarize
 
-    
-    response = model.invoke(messages, config)
+  
+  response = model.invoke(messages, config)
 
-    return {"summary": response.content}
+  return {"summary": response.content}
 \end{lstlisting}
 
 Determine whether conversation summarization should occur. This function implements the logic for deciding when to summarize the conversation based on message count. It triggers summarization every 6 messages to keep conversation context manageable while preserving important information.
-    
+  
 \begin{lstlisting}[caption={Summarize conditional edge}]
 def should_summarize(
-    state: RetrievalState, *, config: RunnableConfig
+  state: RetrievalState, *, config: RunnableConfig
 ) -> str:
-    message_count = len(state.messages)
-    should_trigger = message_count % 6 == 0
+  message_count = len(state.messages)
+  should_trigger = message_count % 6 == 0
 
-    if should_trigger:
-        return "summarize_conversation"
-    else:
-        return END
+  if should_trigger:
+    return "summarize_conversation"
+  else:
+    return END
 \end{lstlisting}
 
 \subsection{ReportAgent - Structured Document Generation}
@@ -718,10 +718,10 @@ def should_summarize(
 The ReportAgent generates comprehensive technical reports through a multi-stage pipeline that creates structured, well-organized documents from the knowledge base.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.2\linewidth]{static/schemas/reportGraph.drawio.png}
-    \caption{Report graph structure}
-    \label{fig:reportGraph}
+  \centering
+  \includegraphics[width=0.2\linewidth]{static/schemas/reportGraph.drawio.png}
+  \caption{Report graph structure}
+  \label{fig:reportGraph}
 \end{figure}
 
 \textbf{Nodes:}\\
@@ -732,21 +732,21 @@ Retrieve documents based on the input state to create the outline. This function
 
 \begin{lstlisting}[caption={Initial retrieval node}]
 def initial_retrieval(
-    state: ReportState, *, config: RunnableConfig) -> dict[str, list[Document]]:
+  state: ReportState, *, config: RunnableConfig) -> dict[str, list[Document]]:
 
-    configuration = Configuration.from_runnable_config(config)
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Extract main query from the last message
+  main_query = get_message_text(state.messages[-1])
+
+   # Setup retriever with embedding model
+  with retrieval.make_retriever(
+    embedding_model=load_embedding_model(model=configuration.embedding_model, host=configuration.ollama_host),   
+  ) as retriever:
+    # Perform document retrieval
+    response = retriever.invoke(main_query, config)
     
-    # Extract main query from the last message
-    main_query = get_message_text(state.messages[-1])
-
-     # Setup retriever with embedding model
-    with retrieval.make_retriever(
-        embedding_model=load_embedding_model(model=configuration.embedding_model, host=configuration.ollama_host),   
-    ) as retriever:
-        # Perform document retrieval
-        response = retriever.invoke(main_query, config)
-        
-    return {"retrieved_docs": response}
+  return {"retrieved_docs": response}
 \end{lstlisting}
 
 \paragraph{Generate outline}
@@ -755,68 +755,68 @@ Generate an outline based on the user query and retrieved context. This function
 
 \begin{lstlisting}[caption={Initial retrieval node}]
 def generate_outline(
-    state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
+  state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
 
-    configuration = Configuration.from_runnable_config(config)
-    
-    # Extract query and context information
-    main_query = get_message_text(state.messages[-1])
-    context_text = "\n\n".join([doc.page_content for doc in state.retrieved_docs])
-    
-    # Load model with structured output
-    model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host).with_structured_output(Outline)
-    
-    # Create prompt with context and requirements
-    system_prompt = prompts.OUTLINE_SYSTEM_PROMPT.format(
-        context = format_docs(state.retrieved_docs),
-        number_of_parts = configuration.number_of_parts
-    )
-    user_prompt = state.messages[-1].content
-    messages = [
-        ("human", combine_prompts(system=system_prompt, user=user_prompt))
-    ]
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Extract query and context information
+  main_query = get_message_text(state.messages[-1])
+  context_text = "\n\n".join([doc.page_content for doc in state.retrieved_docs])
+  
+  # Load model with structured output
+  model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host).with_structured_output(Outline)
+  
+  # Create prompt with context and requirements
+  system_prompt = prompts.OUTLINE_SYSTEM_PROMPT.format(
+    context = format_docs(state.retrieved_docs),
+    number_of_parts = configuration.number_of_parts
+  )
+  user_prompt = state.messages[-1].content
+  messages = [
+    ("human", combine_prompts(system=system_prompt, user=user_prompt))
+  ]
 
-    # Generate outline using structured output
-    generated = cast(Outline, model.invoke(messages, config))
+  # Generate outline using structured output
+  generated = cast(Outline, model.invoke(messages, config))
 
-     # Initialize report structure and determine writing style label
-    style_label = "Technical Report" if configuration.writing_style == "technical" else "General Report"
-    report_header = f"{style_label.upper()}\nTITLE: {main_query}\n\n"
-    
-    return {
-        "outlines": generated.entries,
-        "current_section_index": 0,
-        "report_header": report_header,
-    }    
+   # Initialize report structure and determine writing style label
+  style_label = "Technical Report" if configuration.writing_style == "technical" else "General Report"
+  report_header = f"{style_label.upper()}\nTITLE: {main_query}\n\n"
+  
+  return {
+    "outlines": generated.entries,
+    "current_section_index": 0,
+    "report_header": report_header,
+  }  
 \end{lstlisting}
 
 \paragraph{Retrieve for section node}
 
-    Retrieve documents for the current section being processed. This function performs targeted document retrieval for the specific section currently being processed. It uses the section title as the query to find the most relevant documents for that particular part of the report.
+  Retrieve documents for the current section being processed. This function performs targeted document retrieval for the specific section currently being processed. It uses the section title as the query to find the most relevant documents for that particular part of the report.
 
 \begin{lstlisting}[caption={Retrieve for section node}]
 def retrieve_for_section(
-    state: ReportState, *, config: RunnableConfig) -> dict[str, list[Document]]:
+  state: ReportState, *, config: RunnableConfig) -> dict[str, list[Document]]:
 
-    # Validate section state
-    if not state.outlines:
-        return {"retrieved_docs": []}
+  # Validate section state
+  if not state.outlines:
+    return {"retrieved_docs": []}
+  
+  if state.current_section_index >= len(state.outlines):
+    return {"retrieved_docs": []}
     
-    if state.current_section_index >= len(state.outlines):
-        return {"retrieved_docs": []}
-        
-    configuration = Configuration.from_runnable_config(config)
-    
-    current_section = state.outlines[state.current_section_index]
+  configuration = Configuration.from_runnable_config(config)
+  
+  current_section = state.outlines[state.current_section_index]
 
-    # Setup retriever and perform document retrieval
-    with retrieval.make_retriever(
-        embedding_model=load_embedding_model(model=configuration.embedding_model, host=configuration.ollama_host),   
-    ) as retriever:
-        # Retrieve documents using section title as query
-        response = retriever.invoke(current_section, config)
-        
-    return {"retrieved_docs": response}
+  # Setup retriever and perform document retrieval
+  with retrieval.make_retriever(
+    embedding_model=load_embedding_model(model=configuration.embedding_model, host=configuration.ollama_host),   
+  ) as retriever:
+    # Retrieve documents using section title as query
+    response = retriever.invoke(current_section, config)
+    
+  return {"retrieved_docs": response}
 \end{lstlisting}
 
 \paragraph{Synthesize section node}
@@ -825,41 +825,41 @@ Synthesize raw section content from retrieved documents. This function generates
 
 \begin{lstlisting}[caption={Synthesize section node}]
 def synthesize_section(
-    state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
+  state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
 
-    # Validate section state
-    if not state.outlines:
-        return {"raw_section_content": ""}
+  # Validate section state
+  if not state.outlines:
+    return {"raw_section_content": ""}
 
-    if state.current_section_index >= len(state.outlines):
-        return {"raw_section_content": ""}
-        
-    configuration = Configuration.from_runnable_config(config)
+  if state.current_section_index >= len(state.outlines):
+    return {"raw_section_content": ""}
     
-    current_section = state.outlines[state.current_section_index]
-    main_query = state.messages[-1].content
+  configuration = Configuration.from_runnable_config(config)
+  
+  current_section = state.outlines[state.current_section_index]
+  main_query = state.messages[-1].content
 
-    # Load content generation model
-    model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host)
+  # Load content generation model
+  model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host)
 
-    # Select appropriate prompt based on writing style
-    prompt = prompts.TECHNICAL_SECTION_SYSTEM_PROMPT if configuration.writing_style == "technical" else prompts.GENERAL_SECTION_SYSTEM_PROMPT
-    
-    # Format prompt with context and section information
-    formatted_prompt = prompt.format(
-        context = format_docs(state.retrieved_docs),
-        current_section = current_section,
-        main_query = main_query
-    )
-    messages  = [
-        ("human", formatted_prompt)
-    ]
+  # Select appropriate prompt based on writing style
+  prompt = prompts.TECHNICAL_SECTION_SYSTEM_PROMPT if configuration.writing_style == "technical" else prompts.GENERAL_SECTION_SYSTEM_PROMPT
+  
+  # Format prompt with context and section information
+  formatted_prompt = prompt.format(
+    context = format_docs(state.retrieved_docs),
+    current_section = current_section,
+    main_query = main_query
+  )
+  messages  = [
+    ("human", formatted_prompt)
+  ]
 
-    # Generate section content
-    response = model.invoke(messages, config)
-    synthesized_content = get_message_text(response).strip()
+  # Generate section content
+  response = model.invoke(messages, config)
+  synthesized_content = get_message_text(response).strip()
 
-    return {"raw_section_content": synthesized_content}
+  return {"raw_section_content": synthesized_content}
 \end{lstlisting}
 
 \paragraph{Review section node}
@@ -868,65 +868,65 @@ This function takes the raw content generated in synthesize\_section and applies
 
 \begin{lstlisting}[caption={Review section node}]
 def review_section(
-    state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
+  state: ReportState, *, config: RunnableConfig) -> dict[str, Any]:
 
-    # Validate section state
-    if not state.outlines:
-        return {}
+  # Validate section state
+  if not state.outlines:
+    return {}
 
-    if state.current_section_index >= len(state.outlines):
-        return {}
-        
-    configuration = Configuration.from_runnable_config(config)
+  if state.current_section_index >= len(state.outlines):
+    return {}
     
-    current_section = state.outlines[state.current_section_index]
-    main_query = state.messages[-1].content
+  configuration = Configuration.from_runnable_config(config)
+  
+  current_section = state.outlines[state.current_section_index]
+  main_query = state.messages[-1].content
 
-    # Load review model
-    model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host)
-    
-    # Format review prompt with context
-    prompt = prompts.REVIEW_SYSTEM_PROMPT.format(
-        main_query = main_query,
-        current_section = current_section,
-        draft_section = state.raw_section_content,
-    )
-    messages  =  [
-        ("human", prompt)
-    ]
+  # Load review model
+  model = load_chat_model(model=configuration.report_model, host=configuration.ollama_host)
+  
+  # Format review prompt with context
+  prompt = prompts.REVIEW_SYSTEM_PROMPT.format(
+    main_query = main_query,
+    current_section = current_section,
+    draft_section = state.raw_section_content,
+  )
+  messages  =  [
+    ("human", prompt)
+  ]
 
-    # Generate polished content
-    response = model.invoke(messages, config)
-    polished_content = get_message_text(response).strip()
-    
-    # Create final section structure
-    final_section = {"title": current_section, "content": polished_content}
-    next_index = state.current_section_index + 1
-    
-    return {
-        "report": [final_section],
-        "current_section_index": next_index
-    }
+  # Generate polished content
+  response = model.invoke(messages, config)
+  polished_content = get_message_text(response).strip()
+  
+  # Create final section structure
+  final_section = {"title": current_section, "content": polished_content}
+  next_index = state.current_section_index + 1
+  
+  return {
+    "report": [final_section],
+    "current_section_index": next_index
+  }
 \end{lstlisting}
 
 The following function implements the control logic for the iterative section processing workflow. It checks if there are more sections to process based on the current section index and the total number of outlined sections.
-    
+  
 \begin{lstlisting}[caption={Should continue conditional edge}]
 def should_continue(state: ReportState, *, config: RunnableConfig):]:
 
-    if not state.outlines:
-        return END
-    
-    if current_index >= len(state.outlines):
-        return END
-    else:
-        return "retrieve_for_section"
+  if not state.outlines:
+    return END
+  
+  if current_index >= len(state.outlines):
+    return END
+  else:
+    return "retrieve_for_section"
 \end{lstlisting}
 
 \textbf{Writing Style Support:}
 \begin{itemize}
-    \item \textbf{Technical Style}: Detailed technical analysis with precise values and specifications
-    \item \textbf{General Style}: Accessible explanations suitable for broader audiences
+  \item \textbf{Technical Style}: Detailed technical analysis with precise values and specifications
+  \item \textbf{General Style}: Accessible explanations suitable for broader audiences
 \end{itemize}
 
 \subsection{IndexAgent - Document Ingestion Pipeline}
@@ -934,10 +934,10 @@ def should_continue(state: ReportState, *, config: RunnableConfig):]:
 The IndexAgent manages the document ingestion pipeline, transforming PDF documents into searchable vector representations stored in the ChromaDB vectorstore.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\linewidth]{static/schemas/indexGraph.drawio.png}
-    \caption{Index graph structure}
-    \label{fig:indexGraph}
+  \centering
+  \includegraphics[width=0.3\linewidth]{static/schemas/indexGraph.drawio.png}
+  \caption{Index graph structure}
+  \label{fig:indexGraph}
 \end{figure}
 
 \textbf{Nodes:}\\
@@ -948,63 +948,63 @@ This function scans a directory for PDF files, loads them using PyMuPDFLoader, s
 
 \begin{lstlisting}[caption={Parse pdf node}]
 def parse_pdfs(
-    state: InputIndexState, *, config: Optional[RunnableConfig] = None
+  state: InputIndexState, *, config: Optional[RunnableConfig] = None
 ) -> dict[str, str]:
 
-    configuration = Configuration.from_runnable_config(config)
-    
-    path = Path(state.path)
-    if not path.is_dir():
-        raise FileNotFoundError(f"Directory not found: {state.path}")
+  configuration = Configuration.from_runnable_config(config)
+  
+  path = Path(state.path)
+  if not path.is_dir():
+    raise FileNotFoundError(f"Directory not found: {state.path}")
 
-    documents = []
-    
-    # Get new PDF files (excluding already processed ones)
-    pdf_files = remove_duplicates(
-        base=retrieval.get_existing_documents(),
-        new=[str(p) for p in list(path.glob("*.pdf"))]
-    )
-    
-    if not pdf_files:
-        return {"docs": documents}
-    
-    #embeddings = load_embedding_model(model=Configuration.embedding_model, host=Configuration.ollama_host)
-
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=4000,
-        chunk_overlap=200,
-        length_function=len,
-        is_separator_regex=False
-    )
-
-    # Process each PDF file
-    for pdf_file in tqdm(pdf_files, desc="Loading files..."):                
-        # Load the file into a Document object
-        if configuration.ocr:
-            logger.debug("using server parser")
-            loader = VisionLoader(
-                file_path=str(pdf_file),
-                mode = 'single',
-                ollama_base_url= configuration.ollama_host,
-                ollama_model=configuration.vision_model,
-            )
-        else:
-            logger.debug("distant client not found, falling back to local parser")
-            loader = PyMuPDFLoader(
-                file_path=str(pdf_file),
-                extract_tables='markdown',
-                mode= "single"
-            )
-        
-        # Split the Document content into smaller chunks
-        document = text_splitter.split_documents(loader.load())
-        #ensure metadata
-        document[0].metadata={"source": pdf_file}
-        # Add them to the list of Documents
-        documents.extend(document)
-
-
+  documents = []
+  
+  # Get new PDF files (excluding already processed ones)
+  pdf_files = remove_duplicates(
+    base=retrieval.get_existing_documents(),
+    new=[str(p) for p in list(path.glob("*.pdf"))]
+  )
+  
+  if not pdf_files:
     return {"docs": documents}
+  
+  #embeddings = load_embedding_model(model=Configuration.embedding_model, host=Configuration.ollama_host)
+
+  text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=4000,
+    chunk_overlap=200,
+    length_function=len,
+    is_separator_regex=False
+  )
+
+  # Process each PDF file
+  for pdf_file in tqdm(pdf_files, desc="Loading files..."):        
+    # Load the file into a Document object
+    if configuration.ocr:
+      logger.debug("using server parser")
+      loader = VisionLoader(
+        file_path=str(pdf_file),
+        mode = 'single',
+        ollama_base_url= configuration.ollama_host,
+        ollama_model=configuration.vision_model,
+      )
+    else:
+      logger.debug("distant client not found, falling back to local parser")
+      loader = PyMuPDFLoader(
+        file_path=str(pdf_file),
+        extract_tables='markdown',
+        mode= "single"
+      )
+    
+    # Split the Document content into smaller chunks
+    document = text_splitter.split_documents(loader.load())
+    #ensure metadata
+    document[0].metadata={"source": pdf_file}
+    # Add them to the list of Documents
+    documents.extend(document)
+
+
+  return {"docs": documents}
 \end{lstlisting}
 
 The following function is a conditional edge that skips the \texttt{index\_docs} node in case there are no documents to index.
@@ -1012,11 +1012,11 @@ The following function is a conditional edge that skips the \texttt{index\_docs}
 \begin{lstlisting}[caption={Should index conditional edge}]
 should_index(state: IndexState, *, config: RunnableConfig) -> str:
 
-    if not state.docs:
-        logger.info("No documents to index, ending workflow")
-        return END
+  if not state.docs:
+    logger.info("No documents to index, ending workflow")
+    return END
 
-    return "index_docs"
+  return "index_docs"
 \end{lstlisting}
 
 \paragraph{Index documents node}
@@ -1025,23 +1025,23 @@ This function takes documents from the state, processes them in batches, and add
 
 \begin{lstlisting}[caption={Index doc node}]
 def index_docs(
-    state: IndexState, *, config: Optional[RunnableConfig] = None
+  state: IndexState, *, config: Optional[RunnableConfig] = None
 ) -> dict[str, str]:
 
-    configuration = Configuration.from_runnable_config(config)
+  configuration = Configuration.from_runnable_config(config)
+  
+  # Prepare document batches
+  documents_batch = make_batch(obj=state.docs, size= 20)
+
+  # Index documents using the retriever
+  with retrieval.make_retriever(
+    embedding_model=load_embedding_model(model=configuration.embedding_model)
+  ) as retriever:
     
-    # Prepare document batches
-    documents_batch = make_batch(obj=state.docs, size= 20)
+    for i, batch in enumerate(tqdm(documents_batch, desc="Adding document batch..."), 1):
+      retriever.add_documents(batch)
 
-    # Index documents using the retriever
-    with retrieval.make_retriever(
-        embedding_model=load_embedding_model(model=configuration.embedding_model)
-    ) as retriever:
-        
-        for i, batch in enumerate(tqdm(documents_batch, desc="Adding document batch..."), 1):
-            retriever.add_documents(batch)
-
-    return {"docs": "delete"} # To clear the value of the current thread
+  return {"docs": "delete"} # To clear the value of the current thread
 \end{lstlisting}
 
 \textbf{Chunking Strategy}\\
@@ -1049,16 +1049,16 @@ def index_docs(
 The system supports two chunking approaches:
 
 \begin{itemize}
-    \item \textbf{Recursive Character Splitting}: Fixed-size chunks with overlap (4000 characters, 200 overlap)
-    \item \textbf{Semantic Chunking}: Meaning-based division using embedding models (commented out for performance)
+  \item \textbf{Recursive Character Splitting}: Fixed-size chunks with overlap (4000 characters, 200 overlap)
+  \item \textbf{Semantic Chunking}: Meaning-based division using embedding models (commented out for performance)
 \end{itemize}
 
 \begin{lstlisting}[caption={Text splitting configuration}]
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=4000,
-    chunk_overlap=200,
-    length_function=len,
-    is_separator_regex=False
+  chunk_size=4000,
+  chunk_overlap=200,
+  length_function=len,
+  is_separator_regex=False
 )
 \end{lstlisting}
 
@@ -1068,7 +1068,7 @@ Documents are processed in batches of 20 to limit memory usage and provide progr
 \begin{lstlisting}[caption={Batch processing implementation}]
 documents_batch = make_batch(obj=state.docs, size=20)
 for batch in tqdm(documents_batch, desc="Adding document batch..."):
-    retriever.add_documents(batch)
+  retriever.add_documents(batch)
 \end{lstlisting}
 
 \section{Retrieval System}
@@ -1080,16 +1080,16 @@ Homer utilizes ChromaDB as its primary vector store, providing persistent storag
 \begin{lstlisting}[caption={Vector store retriever implementation}]
 @contextmanager
 def make_retriever(embedding_model: Embeddings, **kwargs):
-    vector_store = Chroma(
-        collection_name=_COLLECTION,
-        collection_metadata={"hnsw:space": "cosine"},
-        embedding_function=embedding_model,
-        persist_directory=VECTORSTORE_DIR,
-    )
-    yield vector_store.as_retriever(
-        search_type="similarity_score_threshold", 
-        search_kwargs={"k": 5, "score_threshold": 0.4}
-    )
+  vector_store = Chroma(
+    collection_name=_COLLECTION,
+    collection_metadata={"hnsw:space": "cosine"},
+    embedding_function=embedding_model,
+    persist_directory=VECTORSTORE_DIR,
+  )
+  yield vector_store.as_retriever(
+    search_type="similarity_score_threshold", 
+    search_kwargs={"k": 5, "score_threshold": 0.4}
+  )
 \end{lstlisting}
 
 \subsection{Search Configuration}
@@ -1097,16 +1097,16 @@ def make_retriever(embedding_model: Embeddings, **kwargs):
 The retrieval system supports multiple search strategies:
 
 \begin{itemize}
-    \item \textbf{Similarity Search}: Standard cosine similarity with configurable top-k results
-    \item \textbf{Similarity Score Threshold}: Filters results below a minimum relevance threshold
-    \item \textbf{Maximum Marginal Relevance (MMR)}: Balances relevance and diversity in results
+  \item \textbf{Similarity Search}: Standard cosine similarity with configurable top-k results
+  \item \textbf{Similarity Score Threshold}: Filters results below a minimum relevance threshold
+  \item \textbf{Maximum Marginal Relevance (MMR)}: Balances relevance and diversity in results
 \end{itemize}
 
 \textbf{Default Parameters:}
 \begin{itemize}
-    \item \textbf{Top-k}: 5 documents per query
-    \item \textbf{Score Threshold}: 0.4 minimum similarity
-    \item \textbf{Collection}: "HOMER" with cosine similarity space
+  \item \textbf{Top-k}: 5 documents per query
+  \item \textbf{Score Threshold}: 0.4 minimum similarity
+  \item \textbf{Collection}: "HOMER" with cosine similarity space
 \end{itemize}
 
 \subsection{Document Lifecycle Management}
@@ -1115,10 +1115,10 @@ The system provides comprehensive document lifecycle management through utility 
 
 \begin{lstlisting}[caption={Document management functions}]
 def get_existing_documents() -> list[str]:
-    """Returns list of all indexed document sources"""
-    
+  """Returns list of all indexed document sources"""
+  
 def delete_documents(docs: str | list[str]):
-    """Removes documents by source filename"""
+  """Removes documents by source filename"""
 \end{lstlisting}
 
 This enables users to manage their document collection, remove outdated content, and track indexing status through the web interface.\\
@@ -1140,7 +1140,7 @@ This block loops through the metadata and collects all values from the \texttt{"
 sources = set()
 for metadata in results["metadatas"]:
 if metadata and "source" in metadata.keys():
-    sources.add(metadata["source"])
+  sources.add(metadata["source"])
 \end{lstlisting}
 
 \paragraph{Delete documents.}
@@ -1173,42 +1173,42 @@ from langchain_core.embeddings import Embeddings
 
 @contextmanager
 def make_retriever(embedding_model: Embeddings, **kwargs):
-    vector_store = Milvus(
-        embedding_function=embedding_model,
-        builtin_function=BM25BuiltInFunction(),  # Enable BM25 for sparse vectors
-        vector_field=["dense", "sparse"],  # Dense embeddings + sparse BM25
-        collection_name=_COLLECTION,
-        connection_args={
-            "uri": VECTORSTORE_DIR,  # Local file-based storage like ChromaDB
-        },
-        index_params=[
-            {"metric_type": "COSINE", "index_type": "HNSW"},   # Dense index
-            {"metric_type": "BM25", "index_type": "AUTOINDEX"} # Sparse index
-        ]
-        consistency_level="Strong",
-        drop_old=False,  # Don't drop existing collection
-    )
-    
-    # Configure retriever with hybrid search and score threshold
-    yield vector_store.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs={
-            "k": 5,
-            "score_threshold": 0.4,
-            # For hybrid search, you can also specify:
-            "ranker_type": "weighted",  # Use weighted ranking
-            "ranker_params": {"weights": [0.7, 0.3]},  # Dense: 0.7, Sparse: 0.3
-        }
-    )
+  vector_store = Milvus(
+    embedding_function=embedding_model,
+    builtin_function=BM25BuiltInFunction(),  # Enable BM25 for sparse vectors
+    vector_field=["dense", "sparse"],  # Dense embeddings + sparse BM25
+    collection_name=_COLLECTION,
+    connection_args={
+      "uri": VECTORSTORE_DIR,  # Local file-based storage like ChromaDB
+    },
+    index_params=[
+      {"metric_type": "COSINE", "index_type": "HNSW"},   # Dense index
+      {"metric_type": "BM25", "index_type": "AUTOINDEX"} # Sparse index
+    ]
+    consistency_level="Strong",
+    drop_old=False,  # Don't drop existing collection
+  )
+  
+  # Configure retriever with hybrid search and score threshold
+  yield vector_store.as_retriever(
+    search_type="similarity_score_threshold",
+    search_kwargs={
+      "k": 5,
+      "score_threshold": 0.4,
+      # For hybrid search, you can also specify:
+      "ranker_type": "weighted",  # Use weighted ranking
+      "ranker_params": {"weights": [0.7, 0.3]},  # Dense: 0.7, Sparse: 0.3
+    }
+  )
 \end{lstlisting}
 \end{minipage}
 
 \paragraph{Advantages of Milvus.}
 \begin{itemize}
-    \item \textbf{Quick Setup:} Fully embedded—no Docker, no remote server
-    \item \textbf{Hybrid Search:} Combines semantic and keyword-based retrieval
-    \item \textbf{Scalable:} Designed to scale up to billions of vectors
-    \item \textbf{Modular Integration:} Compatible with Homer's existing architecture
+  \item \textbf{Quick Setup:} Fully embedded—no Docker, no remote server
+  \item \textbf{Hybrid Search:} Combines semantic and keyword-based retrieval
+  \item \textbf{Scalable:} Designed to scale up to billions of vectors
+  \item \textbf{Modular Integration:} Compatible with Homer's existing architecture
 \end{itemize}
 
 This experimental integration highlights the extensibility of Homer's architecture. In the future, a parallel \texttt{server\_retrieve} node could be a possibility, to search for additional context in another knowledge base.
@@ -1221,14 +1221,14 @@ Each component implements robust error handling with degradation:
 
 \begin{lstlisting}[caption={Error handling pattern}]
 try:
-    # Main processing logic
-    response = model.invoke(messages, config)
-    logger.info("Operation completed successfully")
-    return {"result": response}
+  # Main processing logic
+  response = model.invoke(messages, config)
+  logger.info("Operation completed successfully")
+  return {"result": response}
 except Exception as e:
-    logger.error(f"Error in operation: {str(e)}")
-    # Fallback mechanism
-    return {"result": fallback_response}
+  logger.error(f"Error in operation: {str(e)}")
+  # Fallback mechanism
+  return {"result": fallback_response}
 \end{lstlisting}
 
 \subsection{Logging Architecture}
@@ -1244,19 +1244,19 @@ logger = get_logger(__name__)
 
 \textbf{Log Levels and Usage:}
 \begin{itemize}
-    \item \textbf{INFO}: System status, configuration changes, major operations
-    \item \textbf{DEBUG}: Detailed operation traces, parameter values, intermediate states
-    \item \textbf{WARNING}: Non-fatal issues, fallback activations
-    \item \textbf{ERROR}: Failed operations, exceptions with context
+  \item \textbf{INFO}: System status, configuration changes, major operations
+  \item \textbf{DEBUG}: Detailed operation traces, parameter values, intermediate states
+  \item \textbf{WARNING}: Non-fatal issues, fallback activations
+  \item \textbf{ERROR}: Failed operations, exceptions with context
 \end{itemize}
 
 \subsection{Caching Strategy}
 
 
 \begin{itemize}
-    \item \textbf{Model Loading}: Models are cached within session state to avoid recompilation
-    \item \textbf{Vector Store}: ChromaDB provides built-in caching for embedding lookups
-    \item \textbf{Configuration}: Static configuration loading with dynamic host resolution
+  \item \textbf{Model Loading}: Models are cached within session state to avoid recompilation
+  \item \textbf{Vector Store}: ChromaDB provides built-in caching for embedding lookups
+  \item \textbf{Configuration}: Static configuration loading with dynamic host resolution
 \end{itemize}
 
 This architecture ensures optimal performance while maintaining system reliability and user experience quality.
@@ -1271,10 +1271,10 @@ This architecture ensures optimal performance while maintaining system reliabili
 Homer implements a dual-path document parsing system supporting both traditional text extraction and advanced vision-based processing. The parser architecture is designed around the \texttt{VisionLoader} class, which extends LangChain's \texttt{BaseLoader} interface.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.55\linewidth]{static/schemas/classDiagramVisionLoader.drawio.png}
-    \caption{Class diagram of the vision loader}
-    \label{fig:VisionLoader}
+  \centering
+  \includegraphics[width=0.55\linewidth]{static/schemas/classDiagramVisionLoader.drawio.png}
+  \caption{Class diagram of the vision loader}
+  \label{fig:VisionLoader}
 \end{figure}
 
 The vision parser is a loader based on Langchain's BaseLoader. It leverages a custom vision parser pipeline described later.\\
@@ -1282,15 +1282,15 @@ The vision parser is a loader based on Langchain's BaseLoader. It leverages a cu
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[caption={VisionLoader class structure}]
 class VisionLoader(BaseLoader):
-    def __init__(self, file_path: str, ollama_model: str, 
-                 ollama_base_url: str, mode: Literal['single','page'] = 'page'):
-        # Configuration and pipeline initialization
-        self.pipeline = parser.PDFToMarkdownPipeline(
-            ollama_model=ollama_model,
-            ollama_base_url=ollama_base_url,
-            enable_validation=False,
-            dpi=400
-        )
+  def __init__(self, file_path: str, ollama_model: str, 
+         ollama_base_url: str, mode: Literal['single','page'] = 'page'):
+    # Configuration and pipeline initialization
+    self.pipeline = parser.PDFToMarkdownPipeline(
+      ollama_model=ollama_model,
+      ollama_base_url=ollama_base_url,
+      enable_validation=False,
+      dpi=400
+    )
 \end{lstlisting}
 \end{minipage}
 
@@ -1299,17 +1299,17 @@ class VisionLoader(BaseLoader):
 The multi-modal parser uses an Ollama LLVM to extract content from PDF documents, particularly effective for documents containing complex layouts, tables, mathematical formulas, and embedded images. In the current release, we use \texttt{Qwen2.5vl}. The implementation uses the following pipeline:
 
 \begin{enumerate}
-    \item \textbf{Page Rasterization}: PDF pages are converted to high-resolution PNG images (default 400 DPI)
-    \item \textbf{Vision Model Inference}: Each page image is processed by the configured vision model
-    \item \textbf{Content Extraction}: The model outputs markdown-formatted text preserving structure
-    \item \textbf{Content Validation}: The model output is compared to the \texttt{fitz} text extraction to ensure that there are no significant data loss. (Not used in the current release)
+  \item \textbf{Page Rasterization}: PDF pages are converted to high-resolution PNG images (default 400 DPI)
+  \item \textbf{Vision Model Inference}: Each page image is processed by the configured vision model
+  \item \textbf{Content Extraction}: The model outputs markdown-formatted text preserving structure
+  \item \textbf{Content Validation}: The model output is compared to the \texttt{fitz} text extraction to ensure that there are no significant data loss. (Not used in the current release)
 \end{enumerate}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{static/schemas/classDiagramOllamaVisionParser.drawio.png}
-    \caption{Class diagram of the vision parser}
-    \label{fig:VisionParser}
+  \centering
+  \includegraphics[width=\linewidth]{static/schemas/classDiagramOllamaVisionParser.drawio.png}
+  \caption{Class diagram of the vision parser}
+  \label{fig:VisionParser}
 \end{figure}
 
 The vision parser pipeline has been built using \texttt{Claude Sonnet 4} extensively.
@@ -1320,10 +1320,10 @@ The parser includes a comprehensive validation system (\texttt{src/parser/valida
 
 \textbf{Validation Metrics:}
 \begin{itemize}
-    \item \textbf{Word Overlap Ratio}: Percentage of words correctly extracted
-    \item \textbf{Character Overlap Ratio}: Character-level accuracy using longest common subsequence
-    \item \textbf{Sentence Overlap Ratio}: Structural preservation of sentence boundaries
-    \item \textbf{Semantic Similarity}: Overall content similarity using normalized edit distance
+  \item \textbf{Word Overlap Ratio}: Percentage of words correctly extracted
+  \item \textbf{Character Overlap Ratio}: Character-level accuracy using longest common subsequence
+  \item \textbf{Sentence Overlap Ratio}: Structural preservation of sentence boundaries
+  \item \textbf{Semantic Similarity}: Overall content similarity using normalized edit distance
 \end{itemize}
 
 The validation system calculates a weighted overall score:
@@ -1337,13 +1337,13 @@ When vision parsing is disabled in the runnable config, the system falls back to
 
 \begin{lstlisting}[caption={Parser fallback mechanism}]
 if configuration.ocr:
-    loader = VisionLoader(file_path=str(pdf_file), ...)
+  loader = VisionLoader(file_path=str(pdf_file), ...)
 else:
-    loader = PyMuPDFLoader(
-        file_path=str(pdf_file),
-        extract_tables='markdown',
-        mode="single"
-    )
+  loader = PyMuPDFLoader(
+    file_path=str(pdf_file),
+    extract_tables='markdown',
+    mode="single"
+  )
 \end{lstlisting}
 
 This ensures consistent functionality across different deployment scenarios while optimizing resource utilization.
@@ -1400,12 +1400,12 @@ In addition to local execution, Homer also supports running Ollama models on a r
 
 \paragraph{Step 1: Configure the SSH Tunnel (using PuTTY)}
 \begin{itemize}
-    \item Open PuTTY and enter the IP address or hostname of the remote server.
-    \item In the sidebar, navigate to \texttt{Connection > SSH > Tunnels}.
-    \item In the \textbf{Source port}, enter \texttt{6780}.
-    \item In the \textbf{Destination}, enter \texttt{localhost:6780}.
-    \item Click \texttt{Add}.
-    \item Go back to \texttt{Session}, save the session configuration, and click \texttt{Open} to start the tunnel.
+  \item Open PuTTY and enter the IP address or hostname of the remote server.
+  \item In the sidebar, navigate to \texttt{Connection > SSH > Tunnels}.
+  \item In the \textbf{Source port}, enter \texttt{6780}.
+  \item In the \textbf{Destination}, enter \texttt{localhost:6780}.
+  \item Click \texttt{Add}.
+  \item Go back to \texttt{Session}, save the session configuration, and click \texttt{Open} to start the tunnel.
 \end{itemize}
 
 
@@ -1414,18 +1414,18 @@ In addition to local execution, Homer also supports running Ollama models on a r
 To host an Ollama model on a remote server, follow these steps:
 
 \begin{enumerate}
-    \item \textbf{Install Ollama} on the remote machine by following the official installation instructions: \url{https://ollama.com/download}.
-    
-    \item \textbf{Start the Ollama service} on the remote server using the tunnel port 6780 :
-    \begin{lstlisting}
+  \item \textbf{Install Ollama} on the remote machine by following the official installation instructions: \url{https://ollama.com/download}.
+  
+  \item \textbf{Start the Ollama service} on the remote server using the tunnel port 6780 :
+  \begin{lstlisting}
 OLLAMA_HOST=0.0.0.0:6780 ollama serve
-    \end{lstlisting}
-    
-    \item \textbf{Pull the desired model} (e.g., \texttt{llama3}) :
-    \begin{lstlisting}
+  \end{lstlisting}
+  
+  \item \textbf{Pull the desired model} (e.g., \texttt{llama3}) :
+  \begin{lstlisting}
 OLLAMA_HOST=0.0.0.0:6780 pull llama3
-    \end{lstlisting}
-    
+  \end{lstlisting}
+  
 \end{enumerate}
 
 
@@ -1460,33 +1460,33 @@ The \textbf{Documents} page is where you upload the PDF files you want the appli
 \subsection*{Step-by-Step Guide}
 
 \begin{enumerate}
-    \item \textbf{Navigate to the Documents Page} \\
-    Use the sidebar on the left to access the \texttt{Documents} section.
+  \item \textbf{Navigate to the Documents Page} \\
+  Use the sidebar on the left to access the \texttt{Documents} section.
 
-    \item \textbf{Enable Server Execution (Recommended)} \\
-    In the sidebar, activate the toggle labeled \texttt{Server Execution}. This enables the application to process and index documents using a \textbf{remote server}, rather than your local machine. \\
-    \textit{Why this matters:} Remote indexing is significantly \textbf{faster and more efficient}, especially when working with large documents or using advanced features like vision parsing.
+  \item \textbf{Enable Server Execution (Recommended)} \\
+  In the sidebar, activate the toggle labeled \texttt{Server Execution}. This enables the application to process and index documents using a \textbf{remote server}, rather than your local machine. \\
+  \textit{Why this matters:} Remote indexing is significantly \textbf{faster and more efficient}, especially when working with large documents or using advanced features like vision parsing.
 
-    \item \textbf{(Optional) Enable Vision Parser} \\
-    Below the server execution toggle, you can enable the \texttt{Vision Parser}. This feature allows the application to extract content from \textbf{scanned documents or images} embedded in PDFs. \\
-    \textit{Note:} This option requires more computing power and works best when server execution is turned on.
+  \item \textbf{(Optional) Enable Vision Parser} \\
+  Below the server execution toggle, you can enable the \texttt{Vision Parser}. This feature allows the application to extract content from \textbf{scanned documents or images} embedded in PDFs. \\
+  \textit{Note:} This option requires more computing power and works best when server execution is turned on.
 
-    \item \textbf{Upload Your PDF Files} \\
-    Use the upload box to select one or more PDF files from your computer. Once selected, click the \texttt{Upload} button to send them to the system. A confirmation message will appear when the process is complete.
+  \item \textbf{Upload Your PDF Files} \\
+  Use the upload box to select one or more PDF files from your computer. Once selected, click the \texttt{Upload} button to send them to the system. A confirmation message will appear when the process is complete.
 
-    \item \textbf{Manage Your Documents} \\
-    Uploaded documents are listed below the upload section. Each file can be deleted individually using the \texttt{Delete} button next to it.
+  \item \textbf{Manage Your Documents} \\
+  Uploaded documents are listed below the upload section. Each file can be deleted individually using the \texttt{Delete} button next to it.
 
-    \item \textbf{Reset the Document Database (Optional)} \\
-    Click the \texttt{Reset Database} button to remove all uploaded documents and start fresh.
+  \item \textbf{Reset the Document Database (Optional)} \\
+  Click the \texttt{Reset Database} button to remove all uploaded documents and start fresh.
 \end{enumerate}
 
 \subsection*{Important Notes}
 \begin{itemize}
-    \item Only \textbf{PDF files} are supported.
-    \item The AI can only respond based on the documents you provide; no external data is used.
-    \item \textbf{Enabling Server Execution} is highly recommended for improved speed and reliability.
-    \item Use the \texttt{Vision Parser} for scanned or image-based documents.
+  \item Only \textbf{PDF files} are supported.
+  \item The AI can only respond based on the documents you provide; no external data is used.
+  \item \textbf{Enabling Server Execution} is highly recommended for improved speed and reliability.
+  \item Use the \texttt{Vision Parser} for scanned or image-based documents.
 \end{itemize}
 
 
@@ -1502,27 +1502,27 @@ This page is intended for adjusting key settings that control how documents are 
 \subsection*{Step-by-Step Guide}
 
 \begin{enumerate}
-    \item \textbf{Access the Configuration Page} \\
-    From the sidebar, click on the \texttt{Configuration} section to open the settings editor.
+  \item \textbf{Access the Configuration Page} \\
+  From the sidebar, click on the \texttt{Configuration} section to open the settings editor.
 
-    \item \textbf{Edit the Ollama Host (Server URL)} \\
-    The first field allows you to change the URL of the server (called the \texttt{Ollama Host}) that performs document indexing and answering tasks.
-    \\
+  \item \textbf{Edit the Ollama Host (Server URL)} \\
+  The first field allows you to change the URL of the server (called the \texttt{Ollama Host}) that performs document indexing and answering tasks.
+  \\
 A message will appear to confirm whether the URL format is valid.
    
 
-    \item \textbf{Configure Models} \\
-    You can modify the models used by the system. There are different models for different modes:
-    \begin{itemize}
-        \item \textbf{Local Reasoning Model}: Used for \textbf{Discussion} if you enable \textbf{Reasoning model}.
-        \item \textbf{Local Standard Model}: Used for \textbf{Discussion} if you disable \textbf{Reasoning model}.
-        \item \textbf{Server Standard Model}: Used for \textbf{Discussion} if you disable \textbf{Reasoning model} using a server. 
-        \item \textbf{Server Reasoning Model}: Used for \textbf{Discussion} if you enable \textbf{Reasoning model} using a server. 
-        \item \textbf{Vision Model}: Used to parse PDFs that are converted into images (requires server execution).
-    \end{itemize}
+  \item \textbf{Configure Models} \\
+  You can modify the models used by the system. There are different models for different modes:
+  \begin{itemize}
+    \item \textbf{Local Reasoning Model}: Used for \textbf{Discussion} if you enable \textbf{Reasoning model}.
+    \item \textbf{Local Standard Model}: Used for \textbf{Discussion} if you disable \textbf{Reasoning model}.
+    \item \textbf{Server Standard Model}: Used for \textbf{Discussion} if you disable \textbf{Reasoning model} using a server. 
+    \item \textbf{Server Reasoning Model}: Used for \textbf{Discussion} if you enable \textbf{Reasoning model} using a server. 
+    \item \textbf{Vision Model}: Used to parse PDFs that are converted into images (requires server execution).
+  \end{itemize}
 
-    \item \textbf{Save Your Settings} \\
-    After adjusting the fields as needed, click the \texttt{Save Configuration} button. The new settings will be applied immediately, and a success message will appear.
+  \item \textbf{Save Your Settings} \\
+  After adjusting the fields as needed, click the \texttt{Save Configuration} button. The new settings will be applied immediately, and a success message will appear.
 \end{enumerate}
 
 \section{Models Page}
@@ -1536,23 +1536,23 @@ Before the application can run operations, the required models must be downloade
 \subsection*{Step-by-Step Guide}
 
 \begin{enumerate}
-    \item \textbf{Enable Server Execution (Optional)} \\
-    In the sidebar, you will find a toggle labeled \texttt{Server Execution}. If enabled, the model will be downloaded to the remote server. Otherwise, it will be pulled to your local machine. \\
+  \item \textbf{Enable Server Execution (Optional)} \\
+  In the sidebar, you will find a toggle labeled \texttt{Server Execution}. If enabled, the model will be downloaded to the remote server. Otherwise, it will be pulled to your local machine. \\
 
-    \item \textbf{Enter the Model Name} \\
-    In the main interface, you’ll see a text box labeled \texttt{Enter the model you want to pull}. Here, you must type the exact name of the model you want to use. \\
-    \textit{Note: Model names must match exactly as listed on the Ollama website. For example, \texttt{llama3}, \texttt{gemma:2b}, etc.}
+  \item \textbf{Enter the Model Name} \\
+  In the main interface, you’ll see a text box labeled \texttt{Enter the model you want to pull}. Here, you must type the exact name of the model you want to use. \\
+  \textit{Note: Model names must match exactly as listed on the Ollama website. For example, \texttt{llama3}, \texttt{gemma:2b}, etc.}
 
-    \item \textbf{Pull the Model} \\
-    After entering the model name, click the \texttt{Pull} button. The system will:
-    \begin{itemize}
-        \item Check if the model already exists.
-        \item If not, download it and show a progress bar.
-        \item Notify you when the process is complete.
-    \end{itemize}
+  \item \textbf{Pull the Model} \\
+  After entering the model name, click the \texttt{Pull} button. The system will:
+  \begin{itemize}
+    \item Check if the model already exists.
+    \item If not, download it and show a progress bar.
+    \item Notify you when the process is complete.
+  \end{itemize}
 
-    \item \textbf{View Available Models} \\
-    At the bottom of the page, you can see a list of all models that are currently available on the selected host (either local or server if enabled).
+  \item \textbf{View Available Models} \\
+  At the bottom of the page, you can see a list of all models that are currently available on the selected host (either local or server if enabled).
 \end{enumerate}
 \newpage
 \section{Discussion Page}
@@ -1565,40 +1565,40 @@ The \textbf{Discussion} page provides a chat interface where you can interact wi
 \subsection*{Step-by-Step Guide}
 
 \begin{enumerate}
-    \item \textbf{Navigate to the Discussion Page} \\
-    Use the sidebar to select the \texttt{Discussion} section.
+  \item \textbf{Navigate to the Discussion Page} \\
+  Use the sidebar to select the \texttt{Discussion} section.
 
-    \item \textbf{(Optional) Enable Server Execution} \\
-    In the sidebar, you will find a toggle labeled \texttt{Server Execution}.
-    \begin{itemize}
-        \item When enabled, responses are generated using a remote server, which is generally faster and more powerful.
-        \item When disabled, everything runs locally on your computer.
-    \end{itemize}
+  \item \textbf{(Optional) Enable Server Execution} \\
+  In the sidebar, you will find a toggle labeled \texttt{Server Execution}.
+  \begin{itemize}
+    \item When enabled, responses are generated using a remote server, which is generally faster and more powerful.
+    \item When disabled, everything runs locally on your computer.
+  \end{itemize}
 
-    \item \textbf{(Optional) Enable Reasoning Model} \\
-    You can toggle between a standard model and a reasoning model.
-    \begin{itemize}
-        \item The reasoning model includes a visible "thinking" process before producing the final answer.
-        \item The standard model gives a direct answer without explanation.
-    \end{itemize}
+  \item \textbf{(Optional) Enable Reasoning Model} \\
+  You can toggle between a standard model and a reasoning model.
+  \begin{itemize}
+    \item The reasoning model includes a visible "thinking" process before producing the final answer.
+    \item The standard model gives a direct answer without explanation.
+  \end{itemize}
 
-    \item \textbf{Enter Your Query} \\
-    At the bottom of the chat, type your query into the input field and press \texttt{Enter}.
-    \begin{itemize}
-        \item Your query will immediately appear in the chat window.
-        \item The agent will begin typing its response in real time.
-    \end{itemize}
+  \item \textbf{Enter Your Query} \\
+  At the bottom of the chat, type your query into the input field and press \texttt{Enter}.
+  \begin{itemize}
+    \item Your query will immediately appear in the chat window.
+    \item The agent will begin typing its response in real time.
+  \end{itemize}
 
-    \item \textbf{View the Answer and Thinking (If Enabled)} \\
-    If you enabled the reasoning model, you will see an expandable section labeled \texttt{Show Thinking} containing the model’s intermediate steps or explanation before answering.
+  \item \textbf{View the Answer and Thinking (If Enabled)} \\
+  If you enabled the reasoning model, you will see an expandable section labeled \texttt{Show Thinking} containing the model’s intermediate steps or explanation before answering.
 \end{enumerate}
 
 \subsection*{Other Features}
 
 \begin{itemize}
-    \item \textbf{Conversation Threads}: The system keeps track of your conversation history within a session.
-    \item \textbf{Model Selection Feedback}: The sidebar shows which model is currently being used.
-    \item \textbf{Server Connection Status}: The sidebar also displays the active server used to process queries.
+  \item \textbf{Conversation Threads}: The system keeps track of your conversation history within a session.
+  \item \textbf{Model Selection Feedback}: The sidebar shows which model is currently being used.
+  \item \textbf{Server Connection Status}: The sidebar also displays the active server used to process queries.
 \end{itemize}
 
 
@@ -1614,41 +1614,41 @@ This interface enables the generation of a detailed report by interacting with t
 
 
 \begin{enumerate}
-    \item \textbf{Navigate to the Report Page} \\
-    Use the sidebar to access the \texttt{Report} section.
+  \item \textbf{Navigate to the Report Page} \\
+  Use the sidebar to access the \texttt{Report} section.
 
-    \item \textbf{Configure Report Settings}
-    
-    \begin{itemize}
-        \item \textbf{Model} \\
-        If you want to change the model that writes the report you should go to \\\texttt{./src/core/configuration.py} and then find this : 
-        \begin{lstlisting}
+  \item \textbf{Configure Report Settings}
+  
+  \begin{itemize}
+    \item \textbf{Model} \\
+    If you want to change the model that writes the report you should go to \\\texttt{./src/core/configuration.py} and then find this : 
+    \begin{lstlisting}
 report_model: str = field(
-        default = "gemma3:4b",   #change this value,
-    )
+    default = "gemma3:4b",   #change this value,
+  )
 \end{lstlisting}
 We highly recommend you not to use thinking model for this task. 
-        
+    
 
 
-      
-        \item \textbf{Number of Report Sections} \\
-        Choose how many sections you want in your report. This allows the report to be structured into multiple logical parts.
+    
+    \item \textbf{Number of Report Sections} \\
+    Choose how many sections you want in your report. This allows the report to be structured into multiple logical parts.
 
-        \item \textbf{Documents per Section} \\
-        Define how many relevant documents (chunks) should be retrieved and analyzed for each part of the report. Increasing this number may lead to more detailed content but less performance (default is 4), while a lower number can make each section more concise.
-        
-        \item \textbf{Server Execution (Optional)} \\
-        Toggle the \texttt{Server Execution} option if you want the report to be generated using a remote server for better performance.
-        
+    \item \textbf{Documents per Section} \\
+    Define how many relevant documents (chunks) should be retrieved and analyzed for each part of the report. Increasing this number may lead to more detailed content but less performance (default is 4), while a lower number can make each section more concise.
+    
+    \item \textbf{Server Execution (Optional)} \\
+    Toggle the \texttt{Server Execution} option if you want the report to be generated using a remote server for better performance.
+    
 
-    \item \textbf{Enter Your Report Topic} \\
-    In the main area, you will find a text box where you can describe what your report should be about. Be as specific as possible to get better results.
+  \item \textbf{Enter Your Report Topic} \\
+  In the main area, you will find a text box where you can describe what your report should be about. Be as specific as possible to get better results.
 
 
-    \item \textbf{Download the Report} \\
-    Once the report is generated, you can download the PDF file on your personal computer. 
-     \end{itemize}
+  \item \textbf{Download the Report} \\
+  Once the report is generated, you can download the PDF file on your personal computer. 
+   \end{itemize}
 \end{enumerate}
 
 
@@ -1670,19 +1670,19 @@ The idea is to use the \textbf{PyInstaller} library to convert the Python-based 
 \subsection*{Benefits of a Standalone Executable}
 
 \begin{itemize}
-    \item No Python installation required
-    \item No command-line interaction for the user
-    \item Compatible with environments where dependency installation is restricted
-    \item Simplified deployment for end users or clients
+  \item No Python installation required
+  \item No command-line interaction for the user
+  \item Compatible with environments where dependency installation is restricted
+  \item Simplified deployment for end users or clients
 \end{itemize}
 
 \subsection*{Automation of Environment Setup}
 
 A shell script has already been prepared that automates the setup:
 \begin{itemize}
-    \item Creates and activates a virtual environment
-    \item Installs all packages from \texttt{requirements.txt}
-    \item Launches the Streamlit app
+  \item Creates and activates a virtual environment
+  \item Installs all packages from \texttt{requirements.txt}
+  \item Launches the Streamlit app
 \end{itemize}
 
 \subsection*{Code to Compile}
@@ -1733,17 +1733,17 @@ A potential enhancement under consideration is to extend the architecture so tha
 \subsection*{Proposed Design}
 
 \begin{itemize}
-    \item \textbf{L6 as a Client:} The application interface would execute on L6, acting as a lightweight frontend.
-    \item \textbf{Remote Server with Ollama:} The Ollama service would run on a remote compute server (e.g., a cluster), which hosts large language models.
-    \item \textbf{SSH Tunnel:} A secure tunnel would forward API calls from the local machine to the server, making the remote service accessible as if it were local.
+  \item \textbf{L6 as a Client:} The application interface would execute on L6, acting as a lightweight frontend.
+  \item \textbf{Remote Server with Ollama:} The Ollama service would run on a remote compute server (e.g., a cluster), which hosts large language models.
+  \item \textbf{SSH Tunnel:} A secure tunnel would forward API calls from the local machine to the server, making the remote service accessible as if it were local.
 \end{itemize}
 
 \subsection*{Advantages}
 
 \begin{itemize}
-    \item Allows users to run the application without requiring local installation of large models or GPUs.
-    \item Offers improved scalability and model performance by using dedicated hardware.
-    \item You can switch off your personal computer while it's running in the background. 
+  \item Allows users to run the application without requiring local installation of large models or GPUs.
+  \item Offers improved scalability and model performance by using dedicated hardware.
+  \item You can switch off your personal computer while it's running in the background. 
 \end{itemize}
 
 \section{Agentic RAG}
@@ -1751,10 +1751,10 @@ A potential enhancement under consideration is to extend the architecture so tha
 Models like DeepSeek R1 and Qwen3 demonstrate sophisticated tool-use capabilities that enable more autonomous operation compared to traditional pipeline-based approaches like the Retrieval Graph currently implemented in our system. These agentic models can dynamically determine when and how to retrieve information based on query context and their reasoning process.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\linewidth]{static/schemas/agenticRAG.png}
-    \caption{Agentic RAG graph}
-    \label{arag}
+  \centering
+  \includegraphics[width=0.3\linewidth]{static/schemas/agenticRAG.png}
+  \caption{Agentic RAG graph}
+  \label{arag}
 \end{figure}
 
 \subsection*{Tool integration}
@@ -1762,14 +1762,14 @@ This tool abstraction allows the agentic model to determine when retrieval is ne
 \begin{lstlisting}
 @tool
 def search_for_context(query:str, source: Optional[str], config: RunnableConfig):
-    configuration = Configuration.from_runnable_config(config)
+  configuration = Configuration.from_runnable_config(config)
  
-    embeddings = load_embedding_model(model=configuration.embedding_model)
-    with make_retriever(embedding_model=embeddings) as retriever:
-        results = retriever.invoke(query)
-    if not results:
-        return "No relevant documents found."
-    return format_docs(results)
+  embeddings = load_embedding_model(model=configuration.embedding_model)
+  with make_retriever(embedding_model=embeddings) as retriever:
+    results = retriever.invoke(query)
+  if not results:
+    return "No relevant documents found."
+  return format_docs(results)
 \end{lstlisting}
 
 
@@ -1782,8 +1782,8 @@ Homer is currently a functional prototype developed to demonstrate AI-assisted d
 Integrating Homer into the SCK CEN network will enable:
 
 \begin{itemize}
-    \item Secure and compliant document processing within the protected internal environment.
-    \item Streamlined access to internal resources such as document repositories, identity management systems, and network storage.
+  \item Secure and compliant document processing within the protected internal environment.
+  \item Streamlined access to internal resources such as document repositories, identity management systems, and network storage.
 \end{itemize}
 
 \subsection*{Current Limitations}
@@ -1791,9 +1791,9 @@ Integrating Homer into the SCK CEN network will enable:
 At this stage, Homer has been developed and tested outside the SCK CEN production environment. Integration requires:
 
 \begin{itemize}
-    \item Approval and support from ICT services.
-    \item Validation of security protocols, especially for components involving LLMs and SSH tunnels.
-    \item Adaptation of the current prototype to comply with internal software deployment standards and access control policies.
+  \item Approval and support from ICT services.
+  \item Validation of security protocols, especially for components involving LLMs and SSH tunnels.
+  \item Adaptation of the current prototype to comply with internal software deployment standards and access control policies.
 \end{itemize}
 
 
