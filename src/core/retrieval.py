@@ -1,9 +1,7 @@
-"""Manage the configuration of various retrievers.
+"""Manage the configuration of the retriever.
 
-This module provides functionality to create and manage retrievers for different
-vector store backends, specifically Elasticsearch, Pinecone, and MongoDB.
-
-The retrievers support filtering results by user_id to ensure data isolation between users.
+This module provides functionality to create and manage thr retriever for 
+ChromaDB.
 """
 
 from contextlib import contextmanager

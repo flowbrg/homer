@@ -26,11 +26,12 @@ from core import retrieval
 from core.states import InputState, RetrievalState
 from core.configuration import Configuration
 from core.models import load_chat_model, load_embedding_model
-from utils.utils import format_docs, format_messages, format_sources, get_connection, combine_prompts, ya_format_messages
+from utils.utils import (format_docs, format_messages, format_sources,
+                         get_connection, combine_prompts, ya_format_messages)
 from core import prompts
 
 
-######################################## Structured output class ########################################
+########################### Structured output class ##########################
 
 
 class SearchQuery(BaseModel):
@@ -41,12 +42,13 @@ class SearchQuery(BaseModel):
   search query string when generating queries from conversation context.
   
   Attributes:
-    query (str): The generated search query string optimized for document retrieval.
+    query (str): The generated search query string optimized for document
+                 retrieval.
   """
   query: str
 
 
-######################################## Rephrase query node ########################################
+############################# Rephrase query node #############################
 
 
 def rephrase_query(
@@ -55,10 +57,10 @@ def rephrase_query(
   """
   Generate an optimized search query based on conversation context.
 
-  This function analyzes the current conversation state and generates a search query
-  optimized for document retrieval. It uses a language model with structured output
-  to create queries that effectively capture the user's information needs while
-  considering conversation history.
+  This function analyzes the current conversation state and generates a search
+  query optimized for document retrieval. It uses a language model with
+  structured output to create queries that effectively capture the user's
+  information needs while considering conversation history.
 
   Args:
     state (RetrievalState): Current conversation state containing:
@@ -137,7 +139,9 @@ def rephrase_query(
     logger.error(f"Error in generate_query: {str(e)}")
     # Return a fallback query based on the last user message
     try:
-      fallback_query = state.messages[-1].content if state.messages else "general search"
+      fallback_query = "general search"
+      if state.messages:
+        state.messages[-1].content
       logger.warning(f"Using fallback query: '{fallback_query}'")
       return {
         "query": fallback_query,
@@ -148,7 +152,7 @@ def rephrase_query(
       raise e
 
 
-######################################## Retrieve node ########################################
+################################# Retrieve node ###############################
 
 
 def retrieve(
@@ -157,9 +161,10 @@ def retrieve(
   """
   Retrieve relevant documents based on the generated query.
 
-  This function takes a search query from the state and retrieves the most relevant
-  documents from the indexed document collection using vector similarity search.
-  It uses the configured embedding model to encode the query and find matching documents.
+  This function takes a search query from the state and retrieves the most
+  relevant documents from the indexed document collection using vector
+  similarity search. It uses the configured embedding model to encode the query
+  and find matching documents.
 
   Args:
     state (RetrievalState): Current state containing:
@@ -217,7 +222,8 @@ def retrieve(
       if response:
         logger.info(f"Successfully retrieved {len(response)} documents")
         for doc in response:
-          logger.debug(f"Document: {doc.page_content[:500]}... from {doc.metadata.get('source', 'unknown')}\n")
+          logger.debug(
+            f"Document: {doc.page_content[:500]}... from {doc.metadata.get('source', 'unknown')}\n")
       else:
         logger.warning("No documents retrieved for the query")
       
@@ -229,18 +235,20 @@ def retrieve(
     return {"retrieved_docs": []}
 
 
-######################################## Respond node ########################################
+################################# Respond node ################################
 
 
 def respond(
   state: RetrievalState, *, config: RunnableConfig
 ) -> Dict[str, Union[List[BaseMessage], List, str]]:
   """
-  Generate a conversational response based on retrieved documents and chat history.
+  Generate a conversational response based on retrieved documents and chat
+  history.
 
-  This function creates a contextual response using the retrieved documents as context,
-  considering the conversation history and any existing conversation summary. It handles
-  message history efficiently by using summaries for older conversations.
+  This function creates a contextual response using the retrieved documents as
+  context, considering the conversation history and any existing conversation
+  summary. It handles message history efficiently by using summaries for older
+  conversations.
 
   Args:
     state (RetrievalState): Current state containing:
@@ -297,7 +305,9 @@ def respond(
     )
     
     # Prepare context
-    context_docs = format_docs(state.retrieved_docs) if state.retrieved_docs else ""
+    context_docs = ""
+    if state.retrieved_docs:
+      context_docs = format_docs(state.retrieved_docs)
     
     # Create prompt
     system_prompt = prompts.RESPONSE_SYSTEM_PROMPT.format(
@@ -336,7 +346,7 @@ def respond(
     # Create a fallback response
     try:
       from langchain_core.messages import AIMessage
-      fallback_response = AIMessage(content="I apologize, but I encountered an error while generating a response. Please try rephrasing your question.")
+      fallback_response = AIMessage(content="""I apologize, but I encountered an error while generating a response. Please try rephrasing your question.""")
       logger.warning("Using fallback response due to error")
       return {
         "messages": [fallback_response],
@@ -344,11 +354,12 @@ def respond(
         "query": "",
       }
     except Exception as fallback_error:
-      logger.error(f"Fallback response generation failed: {str(fallback_error)}")
+      logger.error(
+        f"Fallback response generation failed: {str(fallback_error)}")
       raise e
 
 
-######################################## Summarize node ########################################
+################################ Summarize node ###############################
 
 
 def summarize_conversation(
@@ -359,7 +370,8 @@ def summarize_conversation(
 
   This function generates a concise summary of recent conversation messages,
   either creating a new summary or extending an existing one. This helps
-  maintain context while keeping prompt sizes manageable for long conversations.
+  maintain context while keeping prompt sizes manageable for long
+  conversations.
 
   Args:
     state (RetrievalState): Current state containing:
@@ -387,7 +399,8 @@ def summarize_conversation(
 
   Note:
     - Processes the last 6 messages to create/update the summary
-    - Uses different prompts for creating new summaries vs. extending existing ones
+    - Uses different prompts for creating new summaries vs. extending existing
+      ones
     - Helps maintain conversation context while reducing prompt length
   """
   logger.info("Starting conversation summarization")
@@ -397,7 +410,8 @@ def summarize_conversation(
     configuration = Configuration.from_runnable_config(config)
     if not configuration:
       logger.error("Configuration not found in config")
-      raise ValueError("Configuration is required for conversation summarization")
+      raise ValueError(
+        "Configuration is required for conversation summarization")
     
     # Get existing summary
     existing_summary = state.summary if state.summary else ""
@@ -446,7 +460,7 @@ Extend the summary by taking into account the new messages:"""
     return {"summary": fallback_summary}
 
 
-######################################## Should summarize conditional edge ########################################
+###################### Should summarize conditional edge ######################
 
 
 def should_summarize(
@@ -455,9 +469,10 @@ def should_summarize(
   """
   Determine whether conversation summarization should occur.
 
-  This function implements the logic for deciding when to summarize the conversation
-  based on message count. It triggers summarization every 6 messages to keep
-  conversation context manageable while preserving important information.
+  This function implements the logic for deciding when to summarize the
+  conversation based on message count. It triggers summarization every 6
+  messages to keep conversation context manageable while preserving important
+  information.
 
   Args:
     state (RetrievalState): Current state containing conversation messages
@@ -492,7 +507,7 @@ def should_summarize(
     return END
 
 
-######################################## Graph compiler ########################################
+################################ Graph compiler ###############################
 
 
 def get_retrieval_graph() -> CompiledStateGraph:

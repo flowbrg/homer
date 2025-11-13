@@ -12,7 +12,7 @@ from core.configuration import Configuration
 from langgraph.graph.state import CompiledStateGraph
 
 
-######################################## BaseAgent ########################################
+################################## BaseAgent ##################################
 
 
 class BaseAgent:
@@ -23,7 +23,7 @@ class BaseAgent:
     self._graph = graph
 
 
-######################################## Rerieval Agent ########################################
+################################ Rerieval Agent ###############################
 
 
 from core.graphs.retrieval_graph import get_retrieval_graph
@@ -59,7 +59,9 @@ class RetrievalAgent(BaseAgent):
 
     Args:
       query (str): The query to process.
-      configuration (Configuration(dataclass)): The configuration holding the models, host url and other parameters
+      configuration (Configuration(dataclass)): The configuration holding the
+                                                models, host url and other
+                                                parameters.
       thread_id (int): The ID of the thread for context.
 
     Yields:
