@@ -60,8 +60,7 @@ class RetrievalAgent(BaseAgent):
     Args:
       query (str): The query to process.
       configuration (Configuration(dataclass)): The configuration holding the
-                                                models, host url and other
-                                                parameters.
+        models, host url and other parameters.
       thread_id (int): The ID of the thread for context.
 
     Yields:
@@ -80,7 +79,7 @@ class RetrievalAgent(BaseAgent):
         yield message_chunk.content
 
 
-######################################## Index Agent ########################################
+################################# Index Agent #################################
 
 
 from core.graphs.index_graph import get_index_graph
@@ -97,7 +96,7 @@ class IndexAgent(BaseAgent):
     self._graph.invoke(input={"path": path}, config = {"configurable": configuration.asdict()})
 
 
-######################################## Report Agent ########################################
+################################ Report Agent #################################
 
 
 from core.graphs.report_graph import get_report_graph
@@ -120,9 +119,14 @@ class ReportAgent(BaseAgent):
 
     Args:
       query (str): The query to process.
-      writing_style (Optional[Literal["technical", "general"]]): The writing style of the report, either general or technical with a lot of details and precise values.
-      number_of_parts (Optional[int]): The approximate number of parts wanted (LLMs are not deterministic so nothing can guarantee this exact number of parts, but it will most likely be a close value)
-      configuration (Configuration(dataclass)): The configuration holding the models, host url and other parameters
+      writing_style (Optional[Literal["technical", "general"]]): The writing
+        style of the report, either general or technical with a lot of details
+        and precise values.
+      number_of_parts (Optional[int]): The approximate number of parts wanted
+        (LLMs are not deterministic so nothing can guarantee this exact number
+        of parts, but it will most likely be a close value)
+      configuration (Configuration(dataclass)): The configuration holding the
+        models, host url and other parameters
 
     Returns:
       Dict[str, Any]: The output state of the agent.
