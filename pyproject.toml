@@ -1,0 +1,20 @@
+[project]
+name = "homer"
+version = "0.1.0"
+description = "Academic project of a RAG Application"
+requires-python = ">=3.12"
+
+dependencies = [
+    "langchain",
+    "langgraph",
+    "langchain-community",
+    "langchain-ollama",
+    "langchain-chroma",
+    "langchain-experimental",
+    "langgraph-checkpoint-sqlite",
+    "streamlit",
+    "chromadb",
+    "pymupdf",
+    "reportlab",
+    "simsimd",
+]
