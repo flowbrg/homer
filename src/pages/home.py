@@ -24,7 +24,7 @@ with col2:
     <br>
     <div style="display: flex; align-items: center; gap: 15px;">
         <span>Start by uploading your documents</span>
-        <a href="./Documents" target="_self">
+        <a href="./index" target="_self">
             <button style="padding:0.3em 0.8em; font-size:16px; background-color:#512967; color:white; border:none; border-radius:5px; cursor:pointer;">
                 HERE
             </button>
