@@ -1,3 +1,5 @@
+# dotenv was not working, need to find a better solution than this
+
 OLLAMA_CLIENT = "http://127.0.0.1:6780/" # Change this value for distant server
 OLLAMA_LOCALHOST = "http://127.0.0.1:11434/" # DO NOT CHANGE
 UPLOAD_DIR = "./user_data/temp"
