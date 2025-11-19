@@ -19,21 +19,21 @@ with col1:
     st.image(logo, width=150)
 
 with col2:
-    st.markdown("""
-    ### Welcome to HOMER  
-    <br>
-    <div style="display: flex; align-items: center; gap: 15px;">
-        <span>Start by uploading your documents</span>
-        <a href="./index" target="_self">
-            <button style="padding:0.3em 0.8em; font-size:16px; background-color:#512967; color:white; border:none; border-radius:5px; cursor:pointer;">
-                HERE
-            </button>
-        </a>
-    </div>
-    
-    <br>
-    Then, you can either ask a simple question or generate a full structured report based on the content of your files.
-    """, unsafe_allow_html=True)
+  st.markdown("""
+  ### Welcome to HOMER  
+  <br>
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <span>Start by uploading your documents</span>
+    <a href="./index" target="_self">
+      <button style="padding:0.3em 0.8em; font-size:16px; background-color:#512967; color:white; border:none; border-radius:5px; cursor:pointer;">
+        HERE
+      </button>
+    </a>
+  </div>
+  
+  <br>
+  Then, you can either ask a simple question or generate a full structured report based on the content of your files.
+  """, unsafe_allow_html=True)
 
 
 ############################## Footer ##############################
