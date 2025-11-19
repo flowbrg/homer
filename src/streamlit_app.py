@@ -14,7 +14,7 @@ DEFAULT_MODELS = {
   "server_standard": "gemma3:4b-it-qat", 
   "local_reasoning": "qwen3:0.6b",
   "local_standard": "gemma3:1b"
-}
+} # This is awful, need persistent configuration better deletion
 
 if "baseConfig" not in st.session_state:
   from core.configuration import load_config
