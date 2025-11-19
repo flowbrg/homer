@@ -1,4 +1,6 @@
 # src/core/config.py
+# TODO: refactor configuration to use json file for persistence
+
 
 from __future__ import annotations
 

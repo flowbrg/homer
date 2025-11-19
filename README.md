@@ -2,6 +2,7 @@
 
 Homer is a small academic project of a RAG application using Ollama and Langgraph as well as streamlit for the UI.
 
+This project is designed to be executed on relatively low-performance laptops; therefore, computationally intensive tasks are delegated to a server (specifically, an Ollama instance operating on a non-default IP address).
 ## Environment
 
 In PowerShell:
@@ -32,11 +33,12 @@ cd ./homer
 uv venv
 source .\.venv\bin\activate # or .\.venv\Scripts\Activate.ps1
 uv sync
+uv run .\src\main.py
 ```
 
 ## TODO
 
 - Refactor the configuration (persistent configuration using json)
 - Improve the RAG-as-a-tool agent
-- Explore microsoft file parser and google's langextract
+- Explore microsoft [markitdown](https://github.com/microsoft/markitdown) and google's [langextract](https://github.com/google/langextract)
 - Migrate from streamlit probably
