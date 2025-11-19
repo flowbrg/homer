@@ -25,16 +25,16 @@ pip install -r ./requirements.txt
 
 You can use [uv](https://github.com/astral-sh/uv)
 ```
-u
-## Dependencies
-
-- [Ollama](https://ollama.com) 
 cd ./homer
 uv venv
 source .\.venv\bin\activate # or .\.venv\Scripts\Activate.ps1
 uv sync
 uv run .\src\main.py
 ```
+
+## Dependencies
+
+- [Ollama](https://ollama.com) 
 
 ## TODO
 
