@@ -1,8 +1,8 @@
 ###############################################################################
-#NOT USED: This module is not used in the current version.          #
-#It manages a persistent database to store multiple discussions.        #
+#NOT USED: This module is not used in the current version.                    #
+#It manages a persistent database to store multiple discussions.              #
 #In the current version, discussions are stored in memory and not persisted.  #
-#This module is kept for reference and may be useful in future versions     #
+#This module is kept for reference and may be useful in future versions       #
 ###############################################################################
 
 
