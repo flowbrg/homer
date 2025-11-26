@@ -1,7 +1,7 @@
 # dotenv was not working, need to find a better solution than this
 
 OLLAMA_CLIENT = "http://127.0.0.1:6780/" # Change this value for distant server
-OLLAMA_LOCALHOST = "http://127.0.0.1:11434/" # DO NOT CHANGE
+OLLAMA_LOCALHOST = "http://127.0.0.1:11434/" # local ollama instance
 UPLOAD_DIR = "./user_data/temp"
 OUTPUT_DIR = "./user_data/outputs"
 VECTORSTORE_DIR = "./user_data/vectorstore/"
@@ -15,7 +15,7 @@ VISION_MODELS = ("qwen2.5vl",
          "llama3.2-vision",
          "moondream",
          "mistral-small3.1",
-        )
+)
 REASONING_MODELS = ("qwen3",
           "deepseek-r1"
-           )
+)

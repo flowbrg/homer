@@ -4,8 +4,10 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field, fields
 from typing import Optional, Type, TypeVar, Literal
+from pathlib import Path
 
 from constant import OLLAMA_CLIENT, OLLAMA_LOCALHOST
 
@@ -13,7 +15,13 @@ from langchain_core.runnables import RunnableConfig, ensure_config
 
 from utils.logging import get_logger
 
+
+
 logger = get_logger(__name__)
+
+
+CONFIG_PATH =  Path("./user_data/configuration.json")
+
 
 @dataclass(kw_only=True)
 class Configuration:
@@ -63,6 +71,8 @@ class Configuration:
     default = "qwen2.5vl:3b-q4_K_M"
   )
 
+
+
   def asdict(self) -> dict[str, any]:
     """Convert the instance to a dictionary.
 
@@ -111,3 +121,21 @@ def load_config(cls: Optional[Type[T]] = Configuration) -> T:
     logger.info(f"{OLLAMA_CLIENT} available")
     config.ollama_host = OLLAMA_CLIENT
   return config
+
+def _init_configuration() -> Configuration:
+    """Create a default configuration when no file exists."""
+    cfg = Configuration(item=[])
+    save_configuration(cfg)
+    return cfg
+
+def load_configuration() -> Configuration:
+    if not CONFIG_PATH.exists():
+        return _init_configuration()
+    with CONFIG_PATH.open("r") as f:
+        data = json.load(f)
+    return Configuration(**data)
+
+
+def save_configuration(cfg: Configuration) -> None:
+    with CONFIG_PATH.open("w") as f:
+        json.dump(asdict(cfg), f, indent=2

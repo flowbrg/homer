@@ -39,7 +39,9 @@ uv run .\src\main.py
 
 ## TODO
 
-- Refactor the configuration (persistent configuration using json)
-- Improve the RAG-as-a-tool agent
-- Explore microsoft [markitdown](https://github.com/microsoft/markitdown) and google's [langextract](https://github.com/google/langextract)
-- Migrate from streamlit probably
+- Refactor the configuration (persistent configuration using json);
+- Improve the RAG-as-a-tool agent;
+- Rework the report agent;
+- Explore microsoft [markitdown](https://github.com/microsoft/markitdown) and google's [langextract](https://github.com/google/langextract) and replace the current vibe coded parser module;
+- Migrate from streamlit probably;
+

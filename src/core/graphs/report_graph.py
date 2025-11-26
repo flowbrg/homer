@@ -17,6 +17,20 @@ The report generation follows a structured workflow:
 The graph supports both technical and general writing styles, with appropriate
 prompts and formatting for each style.
 """
+###############################################################################
+# This graph needs to be reworked. It is currently functional but not very    #
+# efficient nor elegant.                                                      #
+# I plan to change it for an expert - journalist model pair, where the expert #
+# would be in charge of retrieving and selecting relevant information, while  #
+# the journalist would be in charge of asking questions to develop the topic  #
+# and write the report.                                                       #
+# We should also expand the context window to support longer answers within a #
+# single query and produce the complete report as one JSON-formatted string   #
+# rather than a structured output (as the current dictionary).                #
+###############################################################################
+
+
+
 
 from utils.logging import get_logger
 # Initialize retrievalAgentLogger
