@@ -1,6 +1,7 @@
 ###############################################################################
-#DEPRECATED: This module is deprecated and will be removed in future versions.#
-#It is kept for the clear and update_database methods, which will be re used. #
+# DEPRECATED: This module is deprecated and will be removed in future         #
+# versions.                                                                   #
+# It is kept for the clear and update_database methods, which will be re used.#
 ###############################################################################
 
 

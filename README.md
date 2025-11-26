@@ -3,6 +3,7 @@
 Homer is a small academic project of a RAG application using Ollama and Langgraph as well as streamlit for the UI.
 
 This project is designed to be executed on relatively low-performance laptops; therefore, computationally intensive tasks are delegated to a server (specifically, an Ollama instance operating on a non-default IP address).
+
 ## Environment
 
 In PowerShell:
