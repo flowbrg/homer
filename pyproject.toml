@@ -2,7 +2,7 @@
 name = "homer"
 version = "0.1.0"
 description = "Academic project of a RAG Application"
-requires-python = ">=3.12"
+requires-python = "3.12"
 
 dependencies = [
   "langchain",
