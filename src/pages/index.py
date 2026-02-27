@@ -11,6 +11,9 @@ from core.retrieval import get_existing_documents
 from pages.utils import is_ollama_client_available, is_connected
 
 
+# TODO: fix the page displaying update successful when the graph ran into an error (happened with a failed connection to ollama)
+# Error was displayed but also the message "update successful", should not be the case
+
 ############################## Initialize session state ##############################
 
 

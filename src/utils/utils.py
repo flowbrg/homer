@@ -109,28 +109,6 @@ def format_messages(messages: Optional[list[AnyMessage]])-> str:
 {formatted}
 <messages>"""
 
-
-from langchain_core.messages import AIMessage
-from langchain_core.messages.human import HumanMessage
-
-
-def ya_format_messages(messages=list[AnyMessage]):
-  "yet another format messages function"
-  
-  if not messages:
-    return []
-  
-  formated_list = []
-  for m in messages:
-    if isinstance(m, HumanMessage):
-      formated_list.append(("human", m.content))
-    elif isinstance(m, AIMessage):
-      formated_list.append(("ai", m.content))
-    else:
-      formated_list.append(("system", m.content)) 
-  return formated_list
-
-
 ############################### format sources ################################
 
 

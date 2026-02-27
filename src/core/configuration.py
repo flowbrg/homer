@@ -122,20 +122,20 @@ def load_config(cls: Optional[Type[T]] = Configuration) -> T:
     config.ollama_host = OLLAMA_CLIENT
   return config
 
-def _init_configuration() -> Configuration:
-    """Create a default configuration when no file exists."""
-    cfg = Configuration(item=[])
-    save_configuration(cfg)
-    return cfg
+# def _init_configuration() -> Configuration:
+#     """Create a default configuration when no file exists."""
+#     cfg = Configuration(item=[])
+#     save_configuration(cfg)
+#     return cfg
 
-def load_configuration() -> Configuration:
-    if not CONFIG_PATH.exists():
-        return _init_configuration()
-    with CONFIG_PATH.open("r") as f:
-        data = json.load(f)
-    return Configuration(**data)
+# def load_configuration() -> Configuration:
+#     if not CONFIG_PATH.exists():
+#         return _init_configuration()
+#     with CONFIG_PATH.open("r") as f:
+#         data = json.load(f)
+#     return Configuration(**data)
 
 
-def save_configuration(cfg: Configuration) -> None:
-    with CONFIG_PATH.open("w") as f:
-        json.dump(asdict(cfg), f, indent=2
+# def save_configuration(cfg: Configuration) -> None:
+#     with CONFIG_PATH.open("w") as f:
+#         json.dump(asdict(cfg), f, indent=2)
