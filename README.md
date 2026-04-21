@@ -43,5 +43,5 @@ uv run .\src\main.py
 - Improve the RAG-as-a-tool agent;
 - Rework the report agent;
 - Explore microsoft [markitdown](https://github.com/microsoft/markitdown) and google [langextract](https://github.com/google/langextract) and replace the current vibe coded parser module;
-- Stop using streamlit;
+- Stop using streamlit; Use Openwebui instead
 
